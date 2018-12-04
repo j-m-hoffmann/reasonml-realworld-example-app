@@ -23,15 +23,6 @@ let followUserRequest = username => JsonRequests.followUser(username, Effects.ge
 
 let unFollowUserRequest = username => JsonRequests.unFollowUser(username, Effects.getTokenFromStorage()) |> ignore;
 
-let decodeComment = json: Comment.t =>
-  Json.Decode.{
-    id: json |> field("id", int),
-    createdAt: json |> field("createdAt", string),
-    updatedAt: json |> field("updatedAt", string),
-    body: json |> field("body", string),
-    author: json |> field("author", Author.fromJson),
-  };
-
 let followUser = (isFollowing, event) =>
   isFollowing ?
     UnFollowUser(ReactEvent.Mouse.target(event)##value) : FollowUser(ReactEvent.Mouse.target(event)##value);
