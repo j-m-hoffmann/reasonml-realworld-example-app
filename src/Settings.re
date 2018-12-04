@@ -29,7 +29,8 @@ module Encode = {
       ])
     );
 
-  let user = (settings: state) => Json.Encode.(object_([("user", userSettings(settings))]));
+  let user = (settings: state) =>
+    Json.Encode.(object_([("user", userSettings(settings))]));
 
   let token = currentUser => Json.Encode.[("token", string(currentUser))];
 };
@@ -45,14 +46,20 @@ let updateSettings = (router, event, {ReasonReact.state}) => {
        })
     |> ignore;
   };
-  JsonRequests.updateUser(responseCatch, Encode.user(state), Effects.getTokenFromStorage()) |> ignore;
+  JsonRequests.updateUser(
+    responseCatch,
+    Encode.user(state),
+    Effects.getTokenFromStorage(),
+  )
+  |> ignore;
 };
 
 let updateImage = event => UpdateImage(ReactEvent.Form.target(event)##value);
 let updateName = event => UpdateName(ReactEvent.Form.target(event)##value);
 let updateBio = event => UpdateBio(ReactEvent.Form.target(event)##value);
 let updateEmail = event => UpdateEmail(ReactEvent.Form.target(event)##value);
-let updatePassword = event => UpdatePassword(ReactEvent.Form.target(event)##value);
+let updatePassword = event =>
+  UpdatePassword(ReactEvent.Form.target(event)##value);
 
 let getField =
   fun
@@ -105,15 +112,19 @@ let make = (~router, _children) => {
         DirectorRe.setRoute(router, "/login");
       };
 
-      let usersToken = JsonRequests.getUserGraph(result) |> JsonRequests.parseUser;
-      JsonRequests.getCurrentUser(reduceCurrentUser, Some(usersToken.token)) |> ignore;
+      let usersToken =
+        JsonRequests.getUserGraph(result) |> JsonRequests.parseUser;
+      JsonRequests.getCurrentUser(reduceCurrentUser, Some(usersToken.token))
+      |> ignore;
 
       result |> Js.Promise.resolve;
     };
 
-    let reduceUser = (_status, jsonPayload) => jsonPayload |> Js.Promise.then_(displayResult);
+    let reduceUser = (_status, jsonPayload) =>
+      jsonPayload |> Js.Promise.then_(displayResult);
 
-    JsonRequests.getCurrentUser(reduceUser, Effects.getTokenFromStorage()) |> ignore;
+    JsonRequests.getCurrentUser(reduceUser, Effects.getTokenFromStorage())
+    |> ignore;
     ReasonReact.NoUpdate;
   },
   render: self =>
@@ -121,25 +132,25 @@ let make = (~router, _children) => {
       <div className="container page">
         <div className="row">
           <div className="col-md-6 offset-md-3 col-xs-12">
-            <h1 className="text-xs-center"> {show("Your Settings")} </h1>
+            <h1 className="text-xs-center"> (show("Your Settings")) </h1>
             <form>
               <fieldset>
                 <fieldset className="form-group">
                   <input
                     className="form-control"
-                    _type="text"
+                    type_="text"
                     placeholder="URL of profile picture"
-                    value={self.state.image}
-                    onChange={self.reduce(updateImage)}
+                    value=self.state.image
+                    onChange=(self.reduce(updateImage))
                   />
                 </fieldset>
                 <fieldset className="form-group">
                   <input
                     className="form-control form-control-lg"
-                    _type="text"
+                    type_="text"
                     placeholder="Your Name"
-                    value={self.state.name}
-                    onChange={self.reduce(updateName)}
+                    value=self.state.name
+                    onChange=(self.reduce(updateName))
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -147,31 +158,32 @@ let make = (~router, _children) => {
                     className="form-control form-control-lg"
                     rows=8
                     placeholder="Short bio about you"
-                    value={self.state.bio}
-                    onChange={self.reduce(updateBio)}
+                    value=self.state.bio
+                    onChange=(self.reduce(updateBio))
                   />
                 </fieldset>
                 <fieldset className="form-group">
                   <input
                     className="form-control form-control-lg"
-                    _type="text"
+                    type_="text"
                     placeholder="Email"
-                    value={self.state.email}
-                    onChange={self.reduce(updateEmail)}
+                    value=self.state.email
+                    onChange=(self.reduce(updateEmail))
                   />
                 </fieldset>
                 <fieldset className="form-group">
                   <input
                     className="form-control form-control-lg"
-                    _type="password"
+                    type_="password"
                     placeholder="Password"
-                    value={self.state.password}
-                    onChange={self.reduce(updatePassword)}
+                    value=self.state.password
+                    onChange=(self.reduce(updatePassword))
                   />
                 </fieldset>
                 <button
-                  className="btn btn-lg btn-primary pull-xs-right" onClick={self.handle(updateSettings(router))}>
-                  {show("Update Settings")}
+                  className="btn btn-lg btn-primary pull-xs-right"
+                  onClick=(self.handle(updateSettings(router)))>
+                  (show("Update Settings"))
                 </button>
               </fieldset>
             </form>
