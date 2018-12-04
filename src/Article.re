@@ -1,18 +1,10 @@
 open Models;
 
-type comment = {
-  id: int,
-  createdAt: string,
-  updatedAt: string,
-  body: string,
-  author,
-};
-
-type commentList = {comments: list(comment)};
+type commentList = {comments: list(Comment.t)};
 
 type state = {
   slug: string,
-  commentList: list(comment),
+  commentList: list(Comment.t),
   articleBody: string,
   isFollowing: bool,
 };
@@ -22,26 +14,7 @@ type action =
   | DeleteComment(int)
   | FollowUser(string)
   | UnFollowUser(string)
-  | FetchComments(list(comment));
-
-let component = ReasonReact.reducerComponent("Article");
-let renderComment = (reduce, index, comment) =>
-  <div className="card" key={string_of_int(index)}>
-    <div className="card-block"> <p className="card-text"> {ReasonReact.string(comment.body)} </p> </div>
-    <div className="card-footer">
-      <a href="" className="comment-author">
-        <img src={Belt.Option.getWithDefault(comment.author.image, "")} className="comment-author-img" />
-      </a>
-      {ReasonReact.string(" ")}
-      <a href="" className="comment-author"> {ReasonReact.string(comment.author.username)} </a>
-      <span className="date-posted">
-        {ReasonReact.string(Js.Date.fromString(comment.createdAt) |> Js.Date.toDateString)}
-      </span>
-      <span className="mod-options">
-        <i className="ion-trash-a" onClick={reduce(_event => DeleteComment(comment.id))} />
-      </span>
-    </div>
-  </div>;
+  | FetchComments(list(Comment.t));
 
 let deleteCommentRequest = (id, slug) =>
   JsonRequests.deleteCommentForArticle(slug, id, Effects.getTokenFromStorage()) |> ignore;
@@ -58,7 +31,7 @@ let decodeAuthor = json =>
     following: json |> field("following", bool),
   };
 
-let decodeComment = json =>
+let decodeComment = json: Comment.t =>
   Json.Decode.{
     id: json |> field("id", int),
     createdAt: json |> field("createdAt", string),
@@ -74,6 +47,8 @@ let followUser = (isFollowing, event) =>
 /* Add markdown parser to display properly */
 let dangerousHtml: string => Js.t('a) = html => {"__html": html};
 
+let component = ReasonReact.reducerComponent("Article");
+
 let make = (~router, ~article, _children) => {
   ...component,
   initialState: () => {
@@ -86,7 +61,7 @@ let make = (~router, ~article, _children) => {
     switch (action) {
     | AddComment => ReasonReact.NoUpdate
     | DeleteComment(commentId) =>
-      let commentsWithout = List.filter(comment => comment.id != commentId, state.commentList);
+      let commentsWithout = Belt.List.keep(state.commentList, comment => comment.id != commentId);
       ReasonReact.UpdateWithSideEffects(
         {...state, commentList: commentsWithout},
         (_self => deleteCommentRequest(commentId, state.slug)),
@@ -103,14 +78,13 @@ let make = (~router, ~article, _children) => {
       |> Js.Promise.then_(result => {
            let parsedComments = Js.Json.parseExn(result);
            let commentList = Json.Decode.{comments: parsedComments |> field("comments", list(decodeComment))};
-           self.reduce(_ => FetchComments(commentList.comments), ());
+           self.send(FetchComments(commentList.comments));
            result |> Js.Promise.resolve;
          });
 
     JsonRequests.commentsForArticle(self.state.slug, reduceComments) |> ignore;
-    ReasonReact.NoUpdate;
   },
-  render: self =>
+  render: ({state, send}) =>
     <div className="article-page">
       <div className="banner">
         <div className="container">
@@ -126,10 +100,10 @@ let make = (~router, ~article, _children) => {
             <button
               className="btn btn-sm btn-outline-secondary"
               value={article.author.username}
-              onClick={self.reduce(followUser(self.state.isFollowing))}>
+              onClick={e => send(followUser(state.isFollowing, e))}>
               <i className="ion-plus-round" />
               {ReasonReact.string(" ")}
-              {ReasonReact.string((self.state.isFollowing ? "unfollow " : "follow ") ++ article.author.username)}
+              {ReasonReact.string((state.isFollowing ? "unfollow " : "follow ") ++ article.author.username)}
               <span className="counter"> {ReasonReact.string("(10)")} </span>
             </button>
             {ReasonReact.string("  ")}
@@ -159,10 +133,10 @@ let make = (~router, ~article, _children) => {
             <button
               className="btn btn-sm btn-outline-secondary"
               value={article.author.username}
-              onClick={self.reduce(followUser(self.state.isFollowing))}>
+              onClick={e => send(followUser(state.isFollowing, e))}>
               <i className="ion-plus-round" />
               {ReasonReact.string(" ")}
-              {ReasonReact.string((self.state.isFollowing ? "unfollow " : "follow ") ++ article.author.username)}
+              {ReasonReact.string((state.isFollowing ? "unfollow " : "follow ") ++ article.author.username)}
               <span className="counter"> {ReasonReact.string("(0)")} </span>
             </button>
             {ReasonReact.string(" ")}
@@ -186,9 +160,11 @@ let make = (~router, ~article, _children) => {
               </div>
             </form>
             {
-              List.mapi(renderComment(self.reduce), self.state.commentList)
-              |> Array.of_list
-              |> ReasonReact.arrayToElement
+              Belt.List.toArray(state.commentList)
+              ->Belt.Array.mapWithIndex(_, (index, comment) =>
+                  <Comment comment index deleteComment={_ => send(DeleteComment(comment.id))} />
+                )
+              ->ReasonReact.array
             }
           </div>
         </div>
