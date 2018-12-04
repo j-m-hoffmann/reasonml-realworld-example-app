@@ -6,3 +6,4 @@ npm-debug.log
 /node_modules/
 /.idea/
 /src/*.bs.js
+/__tests__/*.bs.js
