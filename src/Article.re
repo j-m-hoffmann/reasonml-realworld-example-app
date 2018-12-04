@@ -23,21 +23,13 @@ let followUserRequest = username => JsonRequests.followUser(username, Effects.ge
 
 let unFollowUserRequest = username => JsonRequests.unFollowUser(username, Effects.getTokenFromStorage()) |> ignore;
 
-let decodeAuthor = json =>
-  Json.Decode.{
-    username: json |> field("username", string),
-    bio: json |> optional(field("bio", string)),
-    image: json |> optional(field("image", string)),
-    following: json |> field("following", bool),
-  };
-
 let decodeComment = json: Comment.t =>
   Json.Decode.{
     id: json |> field("id", int),
     createdAt: json |> field("createdAt", string),
     updatedAt: json |> field("updatedAt", string),
     body: json |> field("body", string),
-    author: json |> field("author", decodeAuthor),
+    author: json |> field("author", Author.fromJson),
   };
 
 let followUser = (isFollowing, event) =>
@@ -77,7 +69,7 @@ let make = (~router, ~article, _children) => {
       jsonPayload
       |> Js.Promise.then_(result => {
            let parsedComments = Js.Json.parseExn(result);
-           let commentList = Json.Decode.{comments: parsedComments |> field("comments", list(decodeComment))};
+           let commentList = Json.Decode.{comments: parsedComments |> field("comments", list(Comment.fromJson))};
            self.send(FetchComments(commentList.comments));
            result |> Js.Promise.resolve;
          });

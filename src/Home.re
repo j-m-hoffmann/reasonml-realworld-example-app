@@ -43,15 +43,6 @@ let initialState = () => {
 
 let showTaggedArticles = event => ShowTagList(ReactEvent.Mouse.target(event)##innerText);
 
-/* article page uses this decoder as well */
-let decodeAuthor = json =>
-  Json.Decode.{
-    username: json |> field("username", string),
-    bio: json |> optional(field("bio", string)),
-    image: json |> optional(field("image", string)),
-    following: json |> field("following", bool),
-  };
-
 let decodeArticles = json =>
   Json.Decode.{
     slug: json |> field("slug", string),
@@ -63,7 +54,7 @@ let decodeArticles = json =>
     updatedAt: json |> field("updatedAt", string),
     favorited: json |> field("favorited", bool),
     favoritesCount: json |> field("favoritesCount", int),
-    author: json |> field("author", decodeAuthor),
+    author: json |> field("author", Author.fromJson),
   };
 
 let populateTags = reduce => {

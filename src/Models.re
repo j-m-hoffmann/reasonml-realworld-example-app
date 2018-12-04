@@ -29,13 +29,6 @@ type articleDetails = {
 
 type newArticle = {article: articleDetails};
 
-type author = {
-  username: string,
-  bio: option(string),
-  image: option(string),
-  following: bool,
-};
-
 type article = {
   slug: string,
   title: string,
@@ -46,7 +39,7 @@ type article = {
   updatedAt: string,
   favorited: bool,
   favoritesCount: int,
-  author,
+  author: Author.t,
 };
 
 type articleList = {

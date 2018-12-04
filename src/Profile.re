@@ -38,14 +38,6 @@ type action =
   | PendingFavoriteArticles
   | CurrentUserFetched((string, string, string));
 
-let decodeAuthor = json =>
-  Json.Decode.{
-    username: json |> field("username", string),
-    bio: json |> optional(field("bio", string)),
-    image: json |> optional(field("image", string)),
-    following: json |> field("following", bool),
-  };
-
 let extractArticleList = (jsonArticles: Js.Json.t) => {
   let parseArticle = rawArticle =>
     Json.Decode.{
@@ -58,7 +50,7 @@ let extractArticleList = (jsonArticles: Js.Json.t) => {
       updatedAt: rawArticle |> field("updatedAt", string),
       favorited: rawArticle |> field("favorited", bool),
       favoritesCount: rawArticle |> field("favoritesCount", int),
-      author: rawArticle |> field("author", decodeAuthor),
+      author: rawArticle |> field("author", Author.fromJson),
     };
   Json.Decode.(jsonArticles |> field("articles", array(parseArticle)));
 };
