@@ -7,8 +7,8 @@ type state = {
 
 type action =
   | Login((bool, list(string)))
-  | EmailUpdate(string)
-  | PasswordUpdate(string)
+  | UpdateEmail(string)
+  | UpdatePassword(string)
   | LoginPending;
 
 let goToRegister = (router, event) => {
@@ -30,11 +30,6 @@ module Encode = {
   let currentUser = (username, bio) =>
     Json.Encode.[("username", string(username)), ("bio", string(bio))];
 };
-
-let updateEmail = event => EmailUpdate(ReactEvent.Form.target(event)##value);
-
-let updatePassword = event =>
-  PasswordUpdate(ReactEvent.Form.target(event)##value);
 
 let errorDisplayList = state =>
   List.filter(
@@ -92,9 +87,8 @@ let make = (~router, _children) => {
   },
   reducer: (action, state) =>
     switch (action) {
-    | EmailUpdate(value) => ReasonReact.Update({...state, email: value})
-    | PasswordUpdate(value) =>
-      ReasonReact.Update({...state, password: value})
+    | UpdateEmail(email) => ReasonReact.Update({...state, email})
+    | UpdatePassword(password) => ReasonReact.Update({...state, password})
     | Login((hasError, errorList)) =>
       ReasonReact.Update({...state, hasValidationError: hasError, errorList})
     | LoginPending => ReasonReact.NoUpdate
@@ -128,7 +122,12 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Email"
                   value={state.email}
-                  onChange={reduce(updateEmail)}
+                  onChange={
+                    event =>
+                      send(
+                        UpdateEmail(ReactEvent.Form.target(event)##value),
+                      )
+                  }
                 />
               </fieldset>
               <fieldset className="form-group">
@@ -137,7 +136,12 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Password"
                   value={state.password}
-                  onChange={reduce(updatePassword)}
+                  onChange={
+                    event =>
+                      send(
+                        UpdatePassword(ReactEvent.Form.target(event)##value),
+                      )
+                  }
                 />
               </fieldset>
               <button
