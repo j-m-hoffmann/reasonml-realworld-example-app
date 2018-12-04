@@ -73,8 +73,7 @@ let decodeComment = json =>
 
 let followUser = (isFollowing, event) =>
   isFollowing ?
-    UnFollowUser(ReactDOMRe.domElementToObj(ReactEventRe.Mouse.target(event))##value) :
-    FollowUser(ReactDOMRe.domElementToObj(ReactEventRe.Mouse.target(event))##value);
+    UnFollowUser(ReactEvent.Mouse.target(event)##value) : FollowUser(ReactEvent.Mouse.target(event)##value);
 
 /* Add markdown parser to display properly
  */

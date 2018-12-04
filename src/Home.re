@@ -43,8 +43,7 @@ let initialState = () => {
   favoritedArticleSlug: "",
 };
 
-let showTaggedArticles = event =>
-  ShowTagList(ReactDOMRe.domElementToObj(ReactEventRe.Mouse.target(event))##innerText);
+let showTaggedArticles = event => ShowTagList(ReactEvent.Mouse.target(event)##innerText);
 
 /* article page uses this decoder as well */
 let decodeAuthor = json =>
