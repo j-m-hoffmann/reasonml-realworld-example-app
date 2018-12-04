@@ -17,15 +17,23 @@ type action =
   | FetchComments(list(Comment.t));
 
 let deleteCommentRequest = (id, slug) =>
-  JsonRequests.deleteCommentForArticle(slug, id, Effects.getTokenFromStorage()) |> ignore;
+  JsonRequests.deleteCommentForArticle(
+    slug,
+    id,
+    Effects.getTokenFromStorage(),
+  )
+  |> ignore;
 
-let followUserRequest = username => JsonRequests.followUser(username, Effects.getTokenFromStorage()) |> ignore;
+let followUserRequest = username =>
+  JsonRequests.followUser(username, Effects.getTokenFromStorage()) |> ignore;
 
-let unFollowUserRequest = username => JsonRequests.unFollowUser(username, Effects.getTokenFromStorage()) |> ignore;
+let unFollowUserRequest = username =>
+  JsonRequests.unFollowUser(username, Effects.getTokenFromStorage()) |> ignore;
 
 let followUser = (isFollowing, event) =>
   isFollowing ?
-    UnFollowUser(ReactEvent.Mouse.target(event)##value) : FollowUser(ReactEvent.Mouse.target(event)##value);
+    UnFollowUser(ReactEvent.Mouse.target(event)##value) :
+    FollowUser(ReactEvent.Mouse.target(event)##value);
 
 /* Add markdown parser to display properly */
 let dangerousHtml: string => Js.t('a) = html => {"__html": html};
@@ -49,18 +57,29 @@ let make = (~router, ~article, _children) => {
         {...state, commentList: commentsWithout},
         (_self => deleteCommentRequest(commentId, state.slug)),
       );
-    | FetchComments(comments) => ReasonReact.Update({...state, commentList: comments})
+    | FetchComments(comments) =>
+      ReasonReact.Update({...state, commentList: comments})
     | FollowUser(username) =>
-      ReasonReact.UpdateWithSideEffects({...state, isFollowing: true}, (_self => followUserRequest(username)))
+      ReasonReact.UpdateWithSideEffects(
+        {...state, isFollowing: true},
+        (_self => followUserRequest(username)),
+      )
     | UnFollowUser(username) =>
-      ReasonReact.UpdateWithSideEffects({...state, isFollowing: false}, (_self => unFollowUserRequest(username)))
+      ReasonReact.UpdateWithSideEffects(
+        {...state, isFollowing: false},
+        (_self => unFollowUserRequest(username)),
+      )
     },
   didMount: self => {
     let reduceComments = (_status, jsonPayload) =>
       jsonPayload
       |> Js.Promise.then_(result => {
            let parsedComments = Js.Json.parseExn(result);
-           let commentList = Json.Decode.{comments: parsedComments |> field("comments", list(Comment.fromJson))};
+           let commentList =
+             Json.Decode.{
+               comments:
+                 parsedComments |> field("comments", list(Comment.fromJson)),
+             };
            self.send(FetchComments(commentList.comments));
            result |> Js.Promise.resolve;
          });
@@ -73,11 +92,22 @@ let make = (~router, ~article, _children) => {
         <div className="container">
           <h1> {ReasonReact.string(article.title)} </h1>
           <div className="article-meta">
-            <a href=""> <img src={Belt.Option.getWithDefault(article.author.image, "")} /> </a>
+            <a href="">
+              <img
+                src={Belt.Option.getWithDefault(article.author.image, "")}
+              />
+            </a>
             <div className="info">
-              <a href="" className="author"> {ReasonReact.string(article.author.username)} </a>
+              <a href="" className="author">
+                {ReasonReact.string(article.author.username)}
+              </a>
               <span className="date">
-                {ReasonReact.string(Js.Date.fromString(article.createdAt) |> Js.Date.toDateString)}
+                {
+                  ReasonReact.string(
+                    Js.Date.fromString(article.createdAt)
+                    |> Js.Date.toDateString,
+                  )
+                }
               </span>
             </div>
             <button
@@ -86,7 +116,12 @@ let make = (~router, ~article, _children) => {
               onClick={e => send(followUser(state.isFollowing, e))}>
               <i className="ion-plus-round" />
               {ReasonReact.string(" ")}
-              {ReasonReact.string((state.isFollowing ? "unfollow " : "follow ") ++ article.author.username)}
+              {
+                ReasonReact.string(
+                  (state.isFollowing ? "unfollow " : "follow ")
+                  ++ article.author.username,
+                )
+              }
               <span className="counter"> {ReasonReact.string("(10)")} </span>
             </button>
             {ReasonReact.string("  ")}
@@ -101,16 +136,29 @@ let make = (~router, ~article, _children) => {
       </div>
       <div className="container page">
         <div className="row article-content">
-          <div className="col-md-12"> <div dangerouslySetInnerHTML={dangerousHtml(article.body)} /> </div>
+          <div className="col-md-12">
+            <div dangerouslySetInnerHTML={dangerousHtml(article.body)} />
+          </div>
         </div>
         <hr />
         <div className="article-actions">
           <div className="article-meta">
-            <a href="profile.html"> <img src={Belt.Option.getWithDefault(article.author.image, "")} /> </a>
+            <a href="profile.html">
+              <img
+                src={Belt.Option.getWithDefault(article.author.image, "")}
+              />
+            </a>
             <div className="info">
-              <a href="" className="author"> {ReasonReact.string(article.author.username)} </a>
+              <a href="" className="author">
+                {ReasonReact.string(article.author.username)}
+              </a>
               <span className="date">
-                {ReasonReact.string(Js.Date.fromString(article.createdAt) |> Js.Date.toDateString)}
+                {
+                  ReasonReact.string(
+                    Js.Date.fromString(article.createdAt)
+                    |> Js.Date.toDateString,
+                  )
+                }
               </span>
             </div>
             <button
@@ -119,7 +167,12 @@ let make = (~router, ~article, _children) => {
               onClick={e => send(followUser(state.isFollowing, e))}>
               <i className="ion-plus-round" />
               {ReasonReact.string(" ")}
-              {ReasonReact.string((state.isFollowing ? "unfollow " : "follow ") ++ article.author.username)}
+              {
+                ReasonReact.string(
+                  (state.isFollowing ? "unfollow " : "follow ")
+                  ++ article.author.username,
+                )
+              }
               <span className="counter"> {ReasonReact.string("(0)")} </span>
             </button>
             {ReasonReact.string(" ")}
@@ -135,17 +188,30 @@ let make = (~router, ~article, _children) => {
           <div className="col-xs-12 col-md-8 offset-md-2">
             <form className="card comment-form">
               <div className="card-block">
-                <textarea className="form-control" placeholder="Write a comment..." rows=3 />
+                <textarea
+                  className="form-control"
+                  placeholder="Write a comment..."
+                  rows=3
+                />
               </div>
               <div className="card-footer">
-                <img src="http://i.imgur.com/Qr71crq.jpg" className="comment-author-img" />
-                <button className="btn btn-sm btn-primary"> {ReasonReact.string("Post Comment")} </button>
+                <img
+                  src="http://i.imgur.com/Qr71crq.jpg"
+                  className="comment-author-img"
+                />
+                <button className="btn btn-sm btn-primary">
+                  {ReasonReact.string("Post Comment")}
+                </button>
               </div>
             </form>
             {
               Belt.List.toArray(state.commentList)
               ->Belt.Array.mapWithIndex(_, (index, comment) =>
-                  <Comment comment index deleteComment={_ => send(DeleteComment(comment.id))} />
+                  <Comment
+                    comment
+                    index
+                    deleteComment={_ => send(DeleteComment(comment.id))}
+                  />
                 )
               ->ReasonReact.array
             }
