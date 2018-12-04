@@ -7,6 +7,7 @@ type state = {
 
 type action =
   | ArticleSubmitted(DirectorRe.t)
+  | SubmitArticle
   | UpdateTitle(string)
   | UpdateDescription(string)
   | UpdateBody(string)
@@ -21,7 +22,10 @@ module Encode = {
         ("title", string(articleDetails.title)),
         ("description", string(articleDetails.description)),
         ("body", string(articleDetails.articleBody)),
-        ("tagList", parseTags(articleDetails.rawTags) |> Json.Encode.stringArray),
+        (
+          "tagList",
+          parseTags(articleDetails.rawTags) |> Json.Encode.stringArray,
+        ),
       ])
     );
 };
@@ -29,15 +33,19 @@ module Encode = {
 let submissionResponse = (_status, payload) =>
   payload |> Js.Promise.then_(result => Js.log(result) |> Js.Promise.resolve);
 
-let submitNewArticle = (router, event, {ReasonReact.state, reduce}) => {
-  event->ReactEvent.Mouse.preventDefault;
-  JsonRequests.submitNewArticle(submissionResponse, Encode.newArticle(state), Effects.getTokenFromStorage())
-  |> ignore;
-  let reduceArticleSubmission = _ => ArticleSubmitted(router);
-  reduce(reduceArticleSubmission, ());
-};
+/* let submitNewArticle = (router, event, {ReasonReact.state, reduce}) => { */
+/*   event->ReactEvent.Mouse.preventDefault; */
+/*   JsonRequests.submitNewArticle( */
+/*     submissionResponse, */
+/*     Encode.newArticle(state), */
+/*     Effects.getTokenFromStorage(), */
+/*   ) */
+/*   |> ignore; */
+/*   let reduceArticleSubmission = _ => ArticleSubmitted(router); */
+/*   reduce(reduceArticleSubmission, ()); */
+/* }; */
 
-let updateTitle = event => UpdateTitle(ReactEvent.Form.target(event)##value);
+let updateTitle = event => ReasonReact.send(UpdateTitle(ReactEvent.Form.target(event)##value));
 let updateDescription = event => UpdateDescription(ReactEvent.Form.target(event)##value);
 let updateBody = event => UpdateBody(ReactEvent.Form.target(event)##value);
 let updateTags = event => UpdateTags(ReactEvent.Form.target(event)##value);
@@ -47,16 +55,35 @@ let updateTags = event => UpdateTags(ReactEvent.Form.target(event)##value);
 let component = ReasonReact.reducerComponent("CreateArticle");
 let make = (~router, _children) => {
   ...component,
-  initialState: () => {title: "", description: "", articleBody: "", rawTags: ""},
+  initialState: () => {
+    title: "",
+    description: "",
+    articleBody: "",
+    rawTags: "",
+  },
   reducer: (action, state) =>
     switch (action) {
-    | ArticleSubmitted(router) => ReasonReact.SideEffects((_self => DirectorRe.setRoute(router, "/home")))
+    /* | ArticleSubmitted(router) => */
+    /*   ReasonReact.SideEffects( */
+    /*     (_self => DirectorRe.setRoute(router, "/home")), */
+    /*   ); */
+    | SubmitArticle =>
+      JsonRequests.submitNewArticle(
+        submissionResponse,
+        Encode.newArticle(state),
+        Effects.getTokenFromStorage(),
+      )
+      |> ignore;
+      ReasonReact.SideEffects(
+        (_self => DirectorRe.setRoute(router, "/home")),
+      );
     | UpdateTitle(title) => ReasonReact.Update({...state, title})
-    | UpdateDescription(description) => ReasonReact.Update({...state, description})
+    | UpdateDescription(description) =>
+      ReasonReact.Update({...state, description})
     | UpdateBody(body) => ReasonReact.Update({...state, articleBody: body})
     | UpdateTags(tags) => ReasonReact.Update({...state, rawTags: tags})
     },
-  render: self =>
+  render: ({state, send} as self) =>
     <div className="editor-page">
       <div className="container page">
         <div className="row">
@@ -68,8 +95,13 @@ let make = (~router, _children) => {
                     type_="text"
                     className="form-control form-control-lg"
                     placeholder="Article Title"
-                    value={self.state.title}
-                    onChange={self.reduce(updateTitle)}
+                    value={state.title}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateTitle(ReactEvent.Form.target(event)##value),
+                        )
+                    }
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -77,8 +109,15 @@ let make = (~router, _children) => {
                     type_="text"
                     className="form-control"
                     placeholder="What's this article about?"
-                    value={self.state.description}
-                    onChange={self.reduce(updateDescription)}
+                    value={state.description}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateDescription(
+                            ReactEvent.Form.target(event)##value,
+                          ),
+                        )
+                    }
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -86,8 +125,13 @@ let make = (~router, _children) => {
                     className="form-control"
                     rows=8
                     placeholder="Write your article (in markdown)"
-                    value={self.state.articleBody}
-                    onChange={self.reduce(updateBody)}
+                    value={state.articleBody}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateBody(ReactEvent.Form.target(event)##value),
+                        )
+                    }
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -95,15 +139,21 @@ let make = (~router, _children) => {
                     type_="text"
                     className="form-control"
                     placeholder="Enter tags"
-                    value={self.state.rawTags}
-                    onChange={self.reduce(updateTags)}
+                    value={state.rawTags}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateTags(ReactEvent.Form.target(event)##value),
+                        )
+                    }
                   />
                   <div className="tag-list" />
                 </fieldset>
                 <button
                   className="btn btn-lg pull-xs-right btn-primary"
                   type_="button"
-                  onClick={self.handle(submitNewArticle(router))}>
+                  /* onClick={self.handle(submitNewArticle(router))}> */
+                  onClick={_ => send(SubmitArticle)}>
                   {ReasonReact.string("Publish Article")}
                 </button>
               </fieldset>
