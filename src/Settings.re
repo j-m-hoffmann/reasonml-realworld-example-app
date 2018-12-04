@@ -52,11 +52,6 @@ let updateBio = event => UpdateBio(ReactEvent.Form.target(event)##value);
 let updateEmail = event => UpdateEmail(ReactEvent.Form.target(event)##value);
 let updatePassword = event => UpdatePassword(ReactEvent.Form.target(event)##value);
 
-let getField =
-  fun
-  | Some(field) => field
-  | None => "";
-
 let component = ReasonReact.reducerComponent("Settings");
 let make = (~router, _children) => {
   ...component,
@@ -87,9 +82,9 @@ let make = (~router, _children) => {
            self.reduce(
              _ =>
                SettingsFetched({
-                 image: getField(parsedUser.user.image),
+                 image: Belt.Option.getWithDefault(parsedUser.user.image, ""),
                  name: parsedUser.user.username,
-                 bio: getField(parsedUser.user.bio),
+                 bio: Belt.Option.getWithDefault(parsedUser.user.bio, ""),
                  email: parsedUser.user.email,
                  password: "",
                }),
