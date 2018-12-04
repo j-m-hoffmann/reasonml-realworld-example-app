@@ -52,7 +52,8 @@ let make = (~router, ~article, _children) => {
     switch (action) {
     | AddComment => ReasonReact.NoUpdate
     | DeleteComment(commentId) =>
-      let commentsWithout = Belt.List.keep(state.commentList, comment => comment.id != commentId);
+      let commentsWithout =
+        Belt.List.keep(state.commentList, comment => comment.id != commentId);
       ReasonReact.UpdateWithSideEffects(
         {...state, commentList: commentsWithout},
         (_self => deleteCommentRequest(commentId, state.slug)),
