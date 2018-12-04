@@ -32,7 +32,7 @@ let submissionResponse = (_status, payload) =>
   payload |> Js.Promise.then_(result => Js.log(result) |> Js.Promise.resolve);
 
 let submitNewArticle = (router, event, {ReasonReact.state, reduce}) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   JsonRequests.submitNewArticle(submissionResponse, Encode.newArticle(state), Effects.getTokenFromStorage())
   |> ignore;
   let reduceArticleSubmission = _ => ArticleSubmitted(router);

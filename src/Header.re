@@ -5,7 +5,7 @@ let show = ReasonReact.string;
 let pointerStyle = () => ReactDOMRe.Style.make(~cursor="pointer", ());
 
 let navigateTo = (router, event, routeName) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   DirectorRe.setRoute(router, routeName);
 };
 

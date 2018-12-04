@@ -14,7 +14,7 @@ type action =
   | LoginPending;
 
 let goToRegister = (router, event) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   DirectorRe.setRoute(router, "/register");
 };
 
@@ -39,7 +39,7 @@ let errorDisplayList = state =>
      );
 
 let loginUser = (route, event, {ReasonReact.state, reduce}) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   let reduceByAuthResult = (_status, jsonPayload) =>
     jsonPayload
     |> Js.Promise.then_(json => {

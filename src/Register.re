@@ -32,7 +32,7 @@ let component = ReasonReact.reducerComponent("Register");
 let show = ReasonReact.string;
 
 let register = (route, {ReasonReact.state, reduce}, event) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   let jsonRequest = Encode.user(state);
   let updateState = (_status, jsonPayload) =>
     jsonPayload
@@ -56,7 +56,7 @@ let register = (route, {ReasonReact.state, reduce}, event) => {
 };
 
 let goToLogin = (router, event) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   DirectorRe.setRoute(router, "/login");
 };
 

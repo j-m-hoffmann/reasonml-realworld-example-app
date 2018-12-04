@@ -87,7 +87,7 @@ let reduceMyArtcles = (reduceFunc, _status, payload) =>
      });
 
 let clickMyArticles = (event, {ReasonReact.state, reduce}) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   let reduceFunc = articles => reduce(_ => MyArticles(articles), ());
 
   JsonRequests.getMyArticles(reduceMyArtcles(reduceFunc), state.username, Effects.getTokenFromStorage()) |> ignore;
@@ -96,12 +96,12 @@ let clickMyArticles = (event, {ReasonReact.state, reduce}) => {
 };
 
 let clickProfileSettings = (router, event, {ReasonReact.state: _state}) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   DirectorRe.setRoute(router, "/settings");
 };
 
 let clickMyFavorites = (event, {ReasonReact.state, reduce}) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   let reduceFunc = articles => reduce(_ => FavoriteArticle(articles), ());
   JsonRequests.getFavoritedArticles(reduceMyArtcles(reduceFunc), state.username, Effects.getTokenFromStorage())
   |> ignore;
@@ -126,7 +126,7 @@ let reduceByAuthArticles = ({ReasonReact.state, reduce}, _status, jsonPayload) =
 
 /* These functions were copied from  */
 let goToArticle = (router, articleCallback, article, event, {ReasonReact.state}) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   articleCallback(article);
   DirectorRe.setRoute(router, "/article");
 };

@@ -111,25 +111,25 @@ let populateFeed = reduce => {
 };
 
 let showMyFeed = (event, {ReasonReact.state: _state, reduce}) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   populateFeed(reduce);
   reduce(_ => ShowMyFeed, ());
 };
 
 let showGlobalFeed = (event, {ReasonReact.state: _state, reduce}) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   populateGlobalFeed(reduce, 0);
   reduce(_ => ShowGlobalFeed, ());
 };
 
 let goToArticle = (router, articleCallback, article, event, {ReasonReact.state: _state}) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   articleCallback(article);
   DirectorRe.setRoute(router, "/article");
 };
 
 let goToProfile = (router, event, {ReasonReact.state: _state}) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   DirectorRe.setRoute(router, "/profile");
 };
 
@@ -164,7 +164,7 @@ let rec range = (a, b) =>
 let renderPager = ({ReasonReact.state: _state, reduce, ReasonReact.handle}, articleCount) => {
   let pageRanges = articleCount / 10 |> range(1);
   let reduceArticles = (currentPageNumber, event, _self) => {
-    ReactEventRe.Mouse.preventDefault(event);
+    event->ReactEvent.Mouse.preventDefault;
     reduce(_ => ArticlesByPage(currentPageNumber), ());
   };
 

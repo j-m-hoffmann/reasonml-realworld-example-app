@@ -35,7 +35,7 @@ module Encode = {
 };
 
 let updateSettings = (router, event, {ReasonReact.state}) => {
-  ReactEventRe.Mouse.preventDefault(event);
+  event->ReactEvent.Mouse.preventDefault;
   let responseCatch = (_status, payload) => {
     DirectorRe.setRoute(router, "/profile");
     payload
