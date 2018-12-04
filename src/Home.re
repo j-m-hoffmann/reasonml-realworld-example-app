@@ -180,16 +180,13 @@ let renderPager = ({ReasonReact.state: _state, reduce, ReasonReact.handle}, arti
   |> ReasonReact.arrayToElement;
 };
 
-let displayImage =
-  fun
-  | Some(image) => image
-  | None => "";
-
 let renderArticle = ({ReasonReact.state: _state, reduce}, handle, router, articleCallback, index, article) =>
   <div key={string_of_int(index)} className="article-preview">
     <div>
       <div className="article-meta">
-        <a href="#" onClick={handle(goToProfile(router))}> <img src={displayImage(article.author.image)} /> </a>
+        <a href="#" onClick={handle(goToProfile(router))}>
+          <img src={Belt.Option.getWithDefault(article.author.image, "")} />
+        </a>
         <div className="info">
           <a href="#" onClick={handle(goToProfile(router))} className="author">
             {ReasonReact.string(article.author.username)}

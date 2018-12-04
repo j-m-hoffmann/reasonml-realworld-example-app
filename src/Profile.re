@@ -129,18 +129,13 @@ let goToArticle = (router, articleCallback, article, event, {ReasonReact.state})
   DirectorRe.setRoute(router, "/article");
 };
 
-let displayImage =
-  fun
-  | Some(image) => image
-  | None => "";
-
 let renderArticle = (handle, router, articleCallback, isFavorites, index, article) =>
   <div key={string_of_int(index)} className="article-preview">
     <div>
       <div className="article-meta">
         {
           if (isFavorites) {
-            <a href="profile.html"> <img src={displayImage(article.author.image)} /> </a>;
+            <a href="profile.html"> <img src={Belt.Option.getWithDefault(article.author.image, "")} /> </a>;
           } else {
             <a href="#" />;
           }

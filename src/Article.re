@@ -17,11 +17,6 @@ type state = {
   isFollowing: bool,
 };
 
-let displayImage =
-  fun
-  | Some(image) => image
-  | None => "";
-
 type action =
   | AddComment
   | DeleteComment(int)
@@ -35,7 +30,7 @@ let renderComment = (reduce, index, comment) =>
     <div className="card-block"> <p className="card-text"> {ReasonReact.string(comment.body)} </p> </div>
     <div className="card-footer">
       <a href="" className="comment-author">
-        <img src={displayImage(comment.author.image)} className="comment-author-img" />
+        <img src={Belt.Option.getWithDefault(comment.author.image, "")} className="comment-author-img" />
       </a>
       {ReasonReact.string(" ")}
       <a href="" className="comment-author"> {ReasonReact.string(comment.author.username)} </a>
@@ -121,7 +116,7 @@ let make = (~router, ~article, _children) => {
         <div className="container">
           <h1> {ReasonReact.string(article.title)} </h1>
           <div className="article-meta">
-            <a href=""> <img src={displayImage(article.author.image)} /> </a>
+            <a href=""> <img src={Belt.Option.getWithDefault(article.author.image, "")} /> </a>
             <div className="info">
               <a href="" className="author"> {ReasonReact.string(article.author.username)} </a>
               <span className="date">
@@ -154,7 +149,7 @@ let make = (~router, ~article, _children) => {
         <hr />
         <div className="article-actions">
           <div className="article-meta">
-            <a href="profile.html"> <img src={displayImage(article.author.image)} /> </a>
+            <a href="profile.html"> <img src={Belt.Option.getWithDefault(article.author.image, "")} /> </a>
             <div className="info">
               <a href="" className="author"> {ReasonReact.string(article.author.username)} </a>
               <span className="date">
