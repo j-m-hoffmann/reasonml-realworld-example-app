@@ -39,11 +39,10 @@ let submitNewArticle = (router, event, {ReasonReact.state, reduce}) => {
   reduce(reduceArticleSubmission, ());
 };
 
-let updateTitle = event => UpdateTitle(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
-let updateDescription = event =>
-  UpdateDescription(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
-let updateBody = event => UpdateBody(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
-let updateTags = event => UpdateTags(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
+let updateTitle = event => UpdateTitle(ReactEvent.Form.target(event)##value);
+let updateDescription = event => UpdateDescription(ReactEvent.Form.target(event)##value);
+let updateBody = event => UpdateBody(ReactEvent.Form.target(event)##value);
+let updateTags = event => UpdateTags(ReactEvent.Form.target(event)##value);
 
 /* TODO: Add validation for body and title to be required */
 

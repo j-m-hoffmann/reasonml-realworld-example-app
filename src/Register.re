@@ -62,11 +62,11 @@ let goToLogin = (router, event) => {
 
 let login = _event => Login;
 
-let updateName = event => NameUpdate(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
+let updateName = event => NameUpdate(ReactEvent.Form.target(event)##value);
 
-let updateEmail = event => EmailUpdate(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
+let updateEmail = event => EmailUpdate(ReactEvent.Form.target(event)##value);
 
-let updatePassword = event => PasswordUpdate(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
+let updatePassword = event => PasswordUpdate(ReactEvent.Form.target(event)##value);
 
 let errorDisplayList = state =>
   List.filter(errorMessage => String.length(errorMessage) > 0, state.errorList)

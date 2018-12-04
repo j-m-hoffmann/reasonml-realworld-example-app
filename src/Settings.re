@@ -48,11 +48,11 @@ let updateSettings = (router, event, {ReasonReact.state}) => {
   JsonRequests.updateUser(responseCatch, Encode.user(state), Effects.getTokenFromStorage()) |> ignore;
 };
 
-let updateImage = event => UpdateImage(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
-let updateName = event => UpdateName(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
-let updateBio = event => UpdateBio(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
-let updateEmail = event => UpdateEmail(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
-let updatePassword = event => UpdatePassword(ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value);
+let updateImage = event => UpdateImage(ReactEvent.Form.target(event)##value);
+let updateName = event => UpdateName(ReactEvent.Form.target(event)##value);
+let updateBio = event => UpdateBio(ReactEvent.Form.target(event)##value);
+let updateEmail = event => UpdateEmail(ReactEvent.Form.target(event)##value);
+let updatePassword = event => UpdatePassword(ReactEvent.Form.target(event)##value);
 
 let getField =
   fun
