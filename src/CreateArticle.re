@@ -1,5 +1,3 @@
-let show = ReasonReact.string;
-
 type state = {
   title: string,
   description: string,
@@ -23,10 +21,7 @@ module Encode = {
         ("title", string(articleDetails.title)),
         ("description", string(articleDetails.description)),
         ("body", string(articleDetails.articleBody)),
-        (
-          "tagList",
-          parseTags(articleDetails.rawTags) |> Json.Encode.stringArray,
-        ),
+        ("tagList", parseTags(articleDetails.rawTags) |> Json.Encode.stringArray),
       ])
     );
 };
@@ -36,19 +31,14 @@ let submissionResponse = (_status, payload) =>
 
 let submitNewArticle = (router, event, {ReasonReact.state, reduce}) => {
   event->ReactEvent.Mouse.preventDefault;
-  JsonRequests.submitNewArticle(
-    submissionResponse,
-    Encode.newArticle(state),
-    Effects.getTokenFromStorage(),
-  )
+  JsonRequests.submitNewArticle(submissionResponse, Encode.newArticle(state), Effects.getTokenFromStorage())
   |> ignore;
   let reduceArticleSubmission = _ => ArticleSubmitted(router);
   reduce(reduceArticleSubmission, ());
 };
 
 let updateTitle = event => UpdateTitle(ReactEvent.Form.target(event)##value);
-let updateDescription = event =>
-  UpdateDescription(ReactEvent.Form.target(event)##value);
+let updateDescription = event => UpdateDescription(ReactEvent.Form.target(event)##value);
 let updateBody = event => UpdateBody(ReactEvent.Form.target(event)##value);
 let updateTags = event => UpdateTags(ReactEvent.Form.target(event)##value);
 
@@ -57,21 +47,12 @@ let updateTags = event => UpdateTags(ReactEvent.Form.target(event)##value);
 let component = ReasonReact.reducerComponent("CreateArticle");
 let make = (~router, _children) => {
   ...component,
-  initialState: () => {
-    title: "",
-    description: "",
-    articleBody: "",
-    rawTags: "",
-  },
+  initialState: () => {title: "", description: "", articleBody: "", rawTags: ""},
   reducer: (action, state) =>
     switch (action) {
-    | ArticleSubmitted(router) =>
-      ReasonReact.SideEffects(
-        (_self => DirectorRe.setRoute(router, "/home")),
-      )
+    | ArticleSubmitted(router) => ReasonReact.SideEffects((_self => DirectorRe.setRoute(router, "/home")))
     | UpdateTitle(title) => ReasonReact.Update({...state, title})
-    | UpdateDescription(description) =>
-      ReasonReact.Update({...state, description})
+    | UpdateDescription(description) => ReasonReact.Update({...state, description})
     | UpdateBody(body) => ReasonReact.Update({...state, articleBody: body})
     | UpdateTags(tags) => ReasonReact.Update({...state, rawTags: tags})
     },
@@ -87,8 +68,8 @@ let make = (~router, _children) => {
                     type_="text"
                     className="form-control form-control-lg"
                     placeholder="Article Title"
-                    value=self.state.title
-                    onChange=(self.reduce(updateTitle))
+                    value={self.state.title}
+                    onChange={self.reduce(updateTitle)}
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -96,8 +77,8 @@ let make = (~router, _children) => {
                     type_="text"
                     className="form-control"
                     placeholder="What's this article about?"
-                    value=self.state.description
-                    onChange=(self.reduce(updateDescription))
+                    value={self.state.description}
+                    onChange={self.reduce(updateDescription)}
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -105,8 +86,8 @@ let make = (~router, _children) => {
                     className="form-control"
                     rows=8
                     placeholder="Write your article (in markdown)"
-                    value=self.state.articleBody
-                    onChange=(self.reduce(updateBody))
+                    value={self.state.articleBody}
+                    onChange={self.reduce(updateBody)}
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -114,16 +95,16 @@ let make = (~router, _children) => {
                     type_="text"
                     className="form-control"
                     placeholder="Enter tags"
-                    value=self.state.rawTags
-                    onChange=(self.reduce(updateTags))
+                    value={self.state.rawTags}
+                    onChange={self.reduce(updateTags)}
                   />
                   <div className="tag-list" />
                 </fieldset>
                 <button
                   className="btn btn-lg pull-xs-right btn-primary"
                   type_="button"
-                  onClick=(self.handle(submitNewArticle(router)))>
-                  (show("Publish Article"))
+                  onClick={self.handle(submitNewArticle(router))}>
+                  {ReasonReact.string("Publish Article")}
                 </button>
               </fieldset>
             </form>

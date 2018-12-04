@@ -29,18 +29,19 @@ type action =
   | UnFollowUser(string)
   | FetchComments(list(comment));
 
-let show = ReasonReact.string;
 let component = ReasonReact.reducerComponent("Article");
 let renderComment = (reduce, index, comment) =>
   <div className="card" key={string_of_int(index)}>
-    <div className="card-block"> <p className="card-text"> {show(comment.body)} </p> </div>
+    <div className="card-block"> <p className="card-text"> {ReasonReact.string(comment.body)} </p> </div>
     <div className="card-footer">
       <a href="" className="comment-author">
         <img src={displayImage(comment.author.image)} className="comment-author-img" />
       </a>
-      {show(" ")}
-      <a href="" className="comment-author"> {show(comment.author.username)} </a>
-      <span className="date-posted"> {show(Js.Date.fromString(comment.createdAt) |> Js.Date.toDateString)} </span>
+      {ReasonReact.string(" ")}
+      <a href="" className="comment-author"> {ReasonReact.string(comment.author.username)} </a>
+      <span className="date-posted">
+        {ReasonReact.string(Js.Date.fromString(comment.createdAt) |> Js.Date.toDateString)}
+      </span>
       <span className="mod-options">
         <i className="ion-trash-a" onClick={reduce(_event => DeleteComment(comment.id))} />
       </span>
@@ -75,8 +76,7 @@ let followUser = (isFollowing, event) =>
   isFollowing ?
     UnFollowUser(ReactEvent.Mouse.target(event)##value) : FollowUser(ReactEvent.Mouse.target(event)##value);
 
-/* Add markdown parser to display properly
- */
+/* Add markdown parser to display properly */
 let dangerousHtml: string => Js.t('a) = html => {"__html": html};
 
 let make = (~router, ~article, _children) => {
@@ -119,28 +119,30 @@ let make = (~router, ~article, _children) => {
     <div className="article-page">
       <div className="banner">
         <div className="container">
-          <h1> {show(article.title)} </h1>
+          <h1> {ReasonReact.string(article.title)} </h1>
           <div className="article-meta">
             <a href=""> <img src={displayImage(article.author.image)} /> </a>
             <div className="info">
-              <a href="" className="author"> {show(article.author.username)} </a>
-              <span className="date"> {show(Js.Date.fromString(article.createdAt) |> Js.Date.toDateString)} </span>
+              <a href="" className="author"> {ReasonReact.string(article.author.username)} </a>
+              <span className="date">
+                {ReasonReact.string(Js.Date.fromString(article.createdAt) |> Js.Date.toDateString)}
+              </span>
             </div>
             <button
               className="btn btn-sm btn-outline-secondary"
               value={article.author.username}
               onClick={self.reduce(followUser(self.state.isFollowing))}>
               <i className="ion-plus-round" />
-              {show(" ")}
-              {show((self.state.isFollowing ? "unfollow " : "follow ") ++ article.author.username)}
-              <span className="counter"> {show("(10)")} </span>
+              {ReasonReact.string(" ")}
+              {ReasonReact.string((self.state.isFollowing ? "unfollow " : "follow ") ++ article.author.username)}
+              <span className="counter"> {ReasonReact.string("(10)")} </span>
             </button>
             {ReasonReact.string("  ")}
             <button className="btn btn-sm btn-outline-primary">
               <i className="ion-heart" />
               {ReasonReact.string(" ")}
-              {show("Favorite Post")}
-              <span className="counter"> {show("(0)")} </span>
+              {ReasonReact.string("Favorite Post")}
+              <span className="counter"> {ReasonReact.string("(0)")} </span>
             </button>
           </div>
         </div>
@@ -154,24 +156,26 @@ let make = (~router, ~article, _children) => {
           <div className="article-meta">
             <a href="profile.html"> <img src={displayImage(article.author.image)} /> </a>
             <div className="info">
-              <a href="" className="author"> {show(article.author.username)} </a>
-              <span className="date"> {show(Js.Date.fromString(article.createdAt) |> Js.Date.toDateString)} </span>
+              <a href="" className="author"> {ReasonReact.string(article.author.username)} </a>
+              <span className="date">
+                {ReasonReact.string(Js.Date.fromString(article.createdAt) |> Js.Date.toDateString)}
+              </span>
             </div>
             <button
               className="btn btn-sm btn-outline-secondary"
               value={article.author.username}
               onClick={self.reduce(followUser(self.state.isFollowing))}>
               <i className="ion-plus-round" />
-              {show(" ")}
-              {show((self.state.isFollowing ? "unfollow " : "follow ") ++ article.author.username)}
-              <span className="counter"> {show("(0)")} </span>
+              {ReasonReact.string(" ")}
+              {ReasonReact.string((self.state.isFollowing ? "unfollow " : "follow ") ++ article.author.username)}
+              <span className="counter"> {ReasonReact.string("(0)")} </span>
             </button>
-            {show(" ")}
+            {ReasonReact.string(" ")}
             <button className="btn btn-sm btn-outline-primary">
               <i className="ion-heart" />
               {ReasonReact.string(" ")}
-              {show("Favorite Post")}
-              <span className="counter"> {show("(0)")} </span>
+              {ReasonReact.string("Favorite Post")}
+              <span className="counter"> {ReasonReact.string("(0)")} </span>
             </button>
           </div>
         </div>
@@ -183,7 +187,7 @@ let make = (~router, ~article, _children) => {
               </div>
               <div className="card-footer">
                 <img src="http://i.imgur.com/Qr71crq.jpg" className="comment-author-img" />
-                <button className="btn btn-sm btn-primary"> {show("Post Comment")} </button>
+                <button className="btn btn-sm btn-primary"> {ReasonReact.string("Post Comment")} </button>
               </div>
             </form>
             {
