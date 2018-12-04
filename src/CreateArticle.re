@@ -6,7 +6,7 @@ type state = {
 };
 
 type action =
-  | ArticleSubmitted(DirectorRe.t)
+  /* | ArticleSubmitted(DirectorRe.t) */
   | SubmitArticle
   | UpdateTitle(string)
   | UpdateDescription(string)
@@ -45,10 +45,10 @@ let submissionResponse = (_status, payload) =>
 /*   reduce(reduceArticleSubmission, ()); */
 /* }; */
 
-let updateTitle = event => ReasonReact.send(UpdateTitle(ReactEvent.Form.target(event)##value));
-let updateDescription = event => UpdateDescription(ReactEvent.Form.target(event)##value);
-let updateBody = event => UpdateBody(ReactEvent.Form.target(event)##value);
-let updateTags = event => UpdateTags(ReactEvent.Form.target(event)##value);
+/*let updateTitle = event => UpdateTitle(ReactEvent.Form.target(event)##value);*/
+/*let updateDescription = event => UpdateDescription(ReactEvent.Form.target(event)##value);*/
+/*let updateBody = event => UpdateBody(ReactEvent.Form.target(event)##value);*/
+/*let updateTags = event => UpdateTags(ReactEvent.Form.target(event)##value);*/
 
 /* TODO: Add validation for body and title to be required */
 
