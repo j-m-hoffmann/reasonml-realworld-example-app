@@ -38,12 +38,6 @@ type action =
   | PendingFavoriteArticles
   | CurrentUserFetched((string, string, string));
 
-let getDefaultFieldFor = fieldName =>
-  switch (fieldName) {
-  | Some(name) => name
-  | None => ""
-  };
-
 let decodeAuthor = json =>
   Json.Decode.{
     username: json |> field("username", string),
@@ -191,9 +185,9 @@ let make = (~articleCallback, ~router, _children) => {
   didMount: self => {
     let (username, bio, image) = Effects.getUserFromStorage();
 
-    let currentUsername = getDefaultFieldFor(username);
-    let currentBio = getDefaultFieldFor(bio);
-    let currentImage = getDefaultFieldFor(image);
+    let currentUsername = Belt.Option.getWithDefault(username, "");
+    let currentBio = Belt.Option.getWithDefault(bio, "");
+    let currentImage = Belt.Option.getWithDefault(image, "");
     let token = Effects.getTokenFromStorage();
 
     JsonRequests.getMyArticles(reduceByAuthArticles(self), currentUsername, token) |> ignore;
