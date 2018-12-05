@@ -1,8 +1,8 @@
 type state = {
-  image: string,
-  name: string,
   bio: string,
   email: string,
+  image: string,
+  name: string,
   password: string,
 };
 
@@ -55,7 +55,7 @@ let updatePassword = event => UpdatePassword(ReactEvent.Form.target(event)##valu
 let component = ReasonReact.reducerComponent("Settings");
 let make = (~router, _children) => {
   ...component,
-  initialState: () => {image: "", name: "", bio: "", email: "", password: ""},
+  initialState: () => {bio: "", email: "", image: "", name: "", password: ""},
   reducer: (action, state) =>
     switch (action) {
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
