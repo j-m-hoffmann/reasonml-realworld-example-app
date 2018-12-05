@@ -98,7 +98,7 @@ let make = (~router, _children) => {
               if (state.hasValidationError) {
                 Array.of_list(errorDisplayList(state)) |> ReasonReact.arrayToElement;
               } else {
-                ReasonReact.nullElement;
+                ReasonReact.null;
               }
             }
             <form>
