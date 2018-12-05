@@ -7,13 +7,13 @@ type state = {
 };
 
 type action =
-  | UpdateEmail(string)
-  | UpdatePassword(string)
+  | SettingsFetched(state)
+  | SettingsUpdated
   | UpdateBio(string)
+  | UpdateEmail(string)
   | UpdateImage(string)
   | UpdateName(string)
-  | SettingsFetched(state)
-  | SettingsUpdated;
+  | UpdatePassword(string);
 
 module Encode = {
   let userSettings = (settings: state) =>
@@ -52,37 +52,33 @@ let make = (~router, _children) => {
   initialState: () => {bio: "", email: "", image: "", name: "", password: ""},
   reducer: (action, state) =>
     switch (action) {
-    | UpdateEmail(email) => ReasonReact.Update({...state, email})
-    | UpdatePassword(password) => ReasonReact.Update({...state, password})
+    | SettingsFetched({bio, email, image, name}) =>
+      ReasonReact.Update({...state, bio, email, image, name})
+    | SettingsUpdated => ReasonReact.NoUpdate
     | UpdateBio(bio) => ReasonReact.Update({...state, bio})
+    | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdateImage(image) => ReasonReact.Update({...state, image})
     | UpdateName(name) => ReasonReact.Update({...state, name})
-    | SettingsUpdated => ReasonReact.NoUpdate
-    | SettingsFetched(updatedState) =>
-      ReasonReact.Update({
-        ...state,
-        email: updatedState.email,
-        name: updatedState.name,
-        bio: updatedState.bio,
-        image: updatedState.image,
-      })
+    | UpdatePassword(password) => ReasonReact.Update({...state, password})
     },
   didMount: self => {
+    open JsonRequests;
     let reduceCurrentUser = (_status, jsonPayload) =>
       jsonPayload
       |> Js.Promise.then_(result => {
-           let parsedUser = JsonRequests.parseNewUser(result);
+           let registered = parseNewUser(result);
 
            self.send(_ =>
              SettingsFetched({
-               image: Belt.Option.getWithDefault(parsedUser.user.image, ""),
-               name: parsedUser.user.username,
-               bio: Belt.Option.getWithDefault(parsedUser.user.bio, ""),
-               email: parsedUser.user.email,
+               bio: Belt.Option.getWithDefault(registered.user.bio, ""),
+               email: registered.user.email,
+               image: Belt.Option.getWithDefault(registered.user.image, ""),
+               name: registered.user.username,
                password: "",
              })
            );
-           parsedUser.user |> Js.Promise.resolve;
+
+           registered.user->Js.Promise.resolve;
          });
 
     let displayResult = result => {
@@ -90,16 +86,18 @@ let make = (~router, _children) => {
         DirectorRe.setRoute(router, "/login");
       };
 
-      let usersToken = JsonRequests.getUserGraph(result) |> JsonRequests.parseUser;
-      JsonRequests.getCurrentUser(reduceCurrentUser, Some(usersToken.token)) |> ignore;
+      getUserGraph(result)->User.fromJson(_).token
+      ->Some
+      ->getCurrentUser(reduceCurrentUser, _)
+      ->ignore;
 
-      result |> Js.Promise.resolve;
+      result->Js.Promise.resolve;
     };
 
-    let reduceUser = (_status, jsonPayload) => jsonPayload |> Js.Promise.then_(displayResult);
+    let reduceUser = (_status, jsonPayload) =>
+      jsonPayload |> Js.Promise.then_(displayResult);
 
-    JsonRequests.getCurrentUser(reduceUser, Effects.getTokenFromStorage()) |> ignore;
-    ReasonReact.NoUpdate;
+    getCurrentUser(reduceUser, Effects.getTokenFromStorage())->ignore;
   },
   render: ({state, send, handle}) =>
     <div className="settings-page">
