@@ -11,6 +11,19 @@ type t = {
   author: Author.t,
 };
 
+let empty = {
+  slug: "",
+  title: "",
+  description: "",
+  body: "",
+  tagList: [||],
+  createdAt: "",
+  updatedAt: "",
+  favorited: false,
+  favoritesCount: 0,
+  author: Author.none,
+};
+
 type commentList = {comments: list(Comment.t)};
 
 type state = {
