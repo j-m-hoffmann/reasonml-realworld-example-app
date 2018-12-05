@@ -13,7 +13,7 @@ let defaultArticle = {
   author: Author.none,
 };
 
-type state = {currentArticle: article};
+type state = article;
 
 type action =
   | SetCurrentArticle(article);
@@ -26,15 +26,12 @@ let component = ReasonReact.reducerComponent("Body");
 /* Just like any other variant data can be carried around with variants with the routes */
 let make = (~route, ~router, _children) => {
   ...component,
-  initialState: () => {currentArticle: defaultArticle},
+  initialState: () => defaultArticle,
   reducer: (action, _state) =>
     switch (action) {
-    | SetCurrentArticle(article) =>
-      ReasonReact.Update({currentArticle: article})
+    | SetCurrentArticle(article) => ReasonReact.Update(article)
     },
   render: self => {
-    let {ReasonReact.state, reduce} = self;
-    let article = state.currentArticle;
     let select_subpage = route =>
       switch (route) {
       | Routes.Home =>
@@ -42,9 +39,9 @@ let make = (~route, ~router, _children) => {
       | Routes.Register => <Register router />
       | Routes.Login => <Login router />
       | Routes.Settings => <Settings router />
-      | Routes.Article => <Article router article />
+      | Routes.Article => <Article router state />
       | Routes.CreateArticle => <CreateArticle router />
-      | Routes.EditArticle => <Article router article />
+      | Routes.EditArticle => <Article router state />
       | Routes.Profile =>
         <Profile articleCallback={articleCallback(reduce)} router />
       };
