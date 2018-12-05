@@ -109,7 +109,7 @@ let make = (~router, _children) => {
     JsonRequests.getCurrentUser(reduceUser, Effects.getTokenFromStorage()) |> ignore;
     ReasonReact.NoUpdate;
   },
-  render: self =>
+  render: ({state, send}) =>
     <div className="settings-page">
       <div className="container page">
         <div className="row">
@@ -122,8 +122,13 @@ let make = (~router, _children) => {
                     className="form-control"
                     type_="text"
                     placeholder="URL of profile picture"
-                    value={self.state.image}
-                    onChange={self.reduce(updateImage)}
+                    value={state.image}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateImage(ReactEvent.Form.target(event)##value),
+                        )
+                    }
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -131,8 +136,13 @@ let make = (~router, _children) => {
                     className="form-control form-control-lg"
                     type_="text"
                     placeholder="Your Name"
-                    value={self.state.name}
-                    onChange={self.reduce(updateName)}
+                    value={state.name}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateName(ReactEvent.Form.target(event)##value),
+                        )
+                    }
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -140,8 +150,13 @@ let make = (~router, _children) => {
                     className="form-control form-control-lg"
                     rows=8
                     placeholder="Short bio about you"
-                    value={self.state.bio}
-                    onChange={self.reduce(updateBio)}
+                    value={state.bio}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateBio(ReactEvent.Form.target(event)##value),
+                        )
+                    }
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -149,8 +164,13 @@ let make = (~router, _children) => {
                     className="form-control form-control-lg"
                     type_="text"
                     placeholder="Email"
-                    value={self.state.email}
-                    onChange={self.reduce(updateEmail)}
+                    value={state.email}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateEmail(ReactEvent.Form.target(event)##value),
+                        )
+                    }
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -158,12 +178,20 @@ let make = (~router, _children) => {
                     className="form-control form-control-lg"
                     type_="password"
                     placeholder="Password"
-                    value={self.state.password}
-                    onChange={self.reduce(updatePassword)}
+                    value={state.password}
+                    onChange={
+                      event =>
+                        send(
+                          UpdatePassword(
+                            ReactEvent.Form.target(event)##value,
+                          ),
+                        )
+                    }
                   />
                 </fieldset>
                 <button
-                  className="btn btn-lg btn-primary pull-xs-right" onClick={self.handle(updateSettings(router))}>
+                  className="btn btn-lg btn-primary pull-xs-right"
+                  onClick={handle(updateSettings(router))}>
                   {ReasonReact.string("Update Settings")}
                 </button>
               </fieldset>
