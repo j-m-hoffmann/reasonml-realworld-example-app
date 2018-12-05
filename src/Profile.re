@@ -31,12 +31,12 @@ let initialState = {
 };
 
 type action =
-  | MyArticles(array(Article.t))
+  | CurrentUserFetched((string, string, string))
   | FavoriteArticle(array(Article.t))
+  | MyArticles(array(Article.t))
   | NoData
-  | PendingMyArticles
   | PendingFavoriteArticles
-  | CurrentUserFetched((string, string, string));
+  | PendingMyArticles;
 
 let extractArticleList = (jsonArticles: Js.Json.t) => {
   let parseArticle = rawArticle =>
