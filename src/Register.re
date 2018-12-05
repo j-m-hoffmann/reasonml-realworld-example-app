@@ -79,10 +79,10 @@ let make = (~router, _children) => {
   reducer: (action, state) =>
     switch (action) {
     | Login => ReasonReact.NoUpdate
-    | Register((hasError, errorList)) =>
-      ReasonReact.Update({...state, hasValidationError: hasError, errorList})
-    | UpdateEmail(value) => ReasonReact.Update({...state, email: value})
-    | UpdateName(value) => ReasonReact.Update({...state, username: value})
+    | Register((hasValidationError, errorList)) =>
+      ReasonReact.Update({...state, hasValidationError, errorList})
+    | UpdateEmail(email) => ReasonReact.Update({...state, email})
+    | UpdateName(username) => ReasonReact.Update({...state, username})
     | UpdatePassword(value) =>
       ReasonReact.Update({...state, password: value})
     },
