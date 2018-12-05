@@ -1,9 +1,9 @@
 type t =
-  | Home
-  | Register
-  | Login
-  | Settings
   | Article
-  | Profile
   | CreateArticle
-  | EditArticle;
+  | EditArticle
+  | Home
+  | Login
+  | Profile
+  | Register
+  | Settings;
