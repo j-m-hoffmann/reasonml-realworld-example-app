@@ -1,44 +1,44 @@
 open Models;
 
 type action =
-  | TagsFetched(array(string))
-  | ShowMyFeed
-  | ShowGlobalFeed
+  | ArticlesByPage(int)
   | ArticlesFetched(articleList)
-  | MyArticlesFetched(articleList)
-  | TagArticlesFetched(articleList)
-  | ShowTagList(string)
   | FavoriteArticle(string, bool)
-  | ArticlesByPage(int);
+  | MyArticlesFetched(articleList)
+  | ShowGlobalFeed
+  | ShowMyFeed
+  | ShowTagList(string)
+  | TagArticlesFetched(articleList)
+  | TagsFetched(array(string));
 
 type state = {
-  myFeedDisplay: ReactDOMRe.style,
-  globalFeedDisplay: ReactDOMRe.style,
-  tagFeedDisplay: ReactDOMRe.style,
-  myFeedActiveClass: string,
-  globalfeedActiveClass: string,
-  tagFeedActiveClass: string,
-  tags: array(string),
-  articles: array(Article.t),
   articleCount: int,
-  showTagTab: bool,
+  articles: array(Article.t),
   currentTagName: string,
   favoritedArticleSlug: string,
+  globalFeedDisplay: ReactDOMRe.style,
+  globalfeedActiveClass: string,
+  myFeedActiveClass: string,
+  myFeedDisplay: ReactDOMRe.style,
+  showTagTab: bool,
+  tagFeedActiveClass: string,
+  tagFeedDisplay: ReactDOMRe.style,
+  tags: array(string),
 };
 
 let initialState = () => {
-  tags: [||],
-  myFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
-  globalFeedDisplay: ReactDOMRe.Style.make(~display="block", ()),
-  tagFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
-  myFeedActiveClass: "nav-link disabled",
-  globalfeedActiveClass: "nav-link active",
-  tagFeedActiveClass: "nav-link disabled",
-  articles: [||],
   articleCount: 0,
-  showTagTab: false,
+  articles: [||],
   currentTagName: "",
   favoritedArticleSlug: "",
+  globalFeedDisplay: ReactDOMRe.Style.make(~display="block", ()),
+  globalfeedActiveClass: "nav-link active",
+  myFeedActiveClass: "nav-link disabled",
+  myFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
+  showTagTab: false,
+  tagFeedActiveClass: "nav-link disabled",
+  tagFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
+  tags: [||],
 };
 
 let showTaggedArticles = event =>
