@@ -74,7 +74,12 @@ let clickMyArticles = (event, {ReasonReact.state, reduce}) => {
   event->ReactEvent.Mouse.preventDefault;
   let reduceFunc = articles => reduce(_ => MyArticles(articles), ());
 
-  JsonRequests.getMyArticles(reduceMyArtcles(reduceFunc), state.username, Effects.getTokenFromStorage()) |> ignore;
+  JsonRequests.getMyArticles(
+    reduceMyArtcles(reduceFunc),
+    state.username,
+    Effects.getTokenFromStorage(),
+  )
+  |> ignore;
 
   reduce(_ => PendingMyArticles, ());
 };
@@ -87,21 +92,28 @@ let clickProfileSettings = (router, event, {ReasonReact.state: _state}) => {
 let clickMyFavorites = (event, {ReasonReact.state, reduce}) => {
   event->ReactEvent.Mouse.preventDefault;
   let reduceFunc = articles => reduce(_ => FavoriteArticle(articles), ());
-  JsonRequests.getFavoritedArticles(reduceMyArtcles(reduceFunc), state.username, Effects.getTokenFromStorage())
+  JsonRequests.getFavoritedArticles(
+    reduceMyArtcles(reduceFunc),
+    state.username,
+    Effects.getTokenFromStorage(),
+  )
   |> ignore;
 
   reduce(_ => PendingFavoriteArticles, ());
 };
 
 /* side effect */
-let reduceByAuthArticles = ({ReasonReact.state, reduce}, _status, jsonPayload) =>
+let reduceByAuthArticles =
+    ({ReasonReact.state, reduce}, _status, jsonPayload) =>
   jsonPayload
   |> Js.Promise.then_(payload => {
        let jsonArticles = Js.Json.parseExn(payload);
-       let articleCount = Json.Decode.(jsonArticles |> field("articlesCount", int));
+       let articleCount =
+         Json.Decode.(jsonArticles |> field("articlesCount", int));
 
        switch (articleCount) {
-       | count when count > 0 => reduce(_ => MyArticles(extractArticleList(jsonArticles)), ())
+       | count when count > 0 =>
+         reduce(_ => MyArticles(extractArticleList(jsonArticles)), ())
        | _ => reduce(_ => NoData, ())
        };
 
@@ -109,27 +121,39 @@ let reduceByAuthArticles = ({ReasonReact.state, reduce}, _status, jsonPayload) =
      });
 
 /* These functions were copied from  */
-let goToArticle = (router, articleCallback, article, event, {ReasonReact.state}) => {
+let goToArticle =
+    (router, articleCallback, article, event, {ReasonReact.state}) => {
   event->ReactEvent.Mouse.preventDefault;
   articleCallback(article);
   DirectorRe.setRoute(router, "/article");
 };
 
-let renderArticle = (handle, router, articleCallback, isFavorites, index, article) =>
+let renderArticle =
+    (handle, router, articleCallback, isFavorites, index, article) =>
   <div key={string_of_int(index)} className="article-preview">
     <div>
       <div className="article-meta">
         {
           if (isFavorites) {
-            <a href="profile.html"> <img src={Belt.Option.getWithDefault(article.author.image, "")} /> </a>;
+            <a href="profile.html">
+              <img
+                src={Belt.Option.getWithDefault(article.author.image, "")}
+              />
+            </a>;
           } else {
             <a href="#" />;
           }
         }
         <div className="info">
-          <a href="" className="author"> {ReasonReact.string(article.author.username)} </a>
+          <a href="" className="author">
+            {ReasonReact.string(article.author.username)}
+          </a>
           <span className="date">
-            {ReasonReact.string(Js.Date.fromString(article.createdAt) |> Js.Date.toDateString)}
+            {
+              ReasonReact.string(
+                Js.Date.fromString(article.createdAt) |> Js.Date.toDateString,
+              )
+            }
           </span>
         </div>
         <button className="btn btn-outline-primary btn-sm pull-xs-right">
@@ -137,7 +161,10 @@ let renderArticle = (handle, router, articleCallback, isFavorites, index, articl
           {ReasonReact.string(string_of_int(article.favoritesCount))}
         </button>
       </div>
-      <a href="#" onClick={handle(goToArticle(router, articleCallback, article))} className="preview-link">
+      <a
+        href="#"
+        onClick={handle(goToArticle(router, articleCallback, article))}
+        className="preview-link">
         <h1> {ReasonReact.string(article.title)} </h1>
         <p> {ReasonReact.string(article.description)} </p>
         <span> {ReasonReact.string("Read more...")} </span>
@@ -169,7 +196,8 @@ let make = (~articleCallback, ~router, _children) => {
         myFeedActiveClass: "nav-link disabled",
         favfeedActiveClass: "nav-link active",
       })
-    | CurrentUserFetched((username, bio, image)) => ReasonReact.Update({...state, username, bio, image})
+    | CurrentUserFetched((username, bio, image)) =>
+      ReasonReact.Update({...state, username, bio, image})
     | NoData => ReasonReact.NoUpdate
     | PendingFavoriteArticles => ReasonReact.NoUpdate
     | PendingMyArticles => ReasonReact.NoUpdate
@@ -182,8 +210,16 @@ let make = (~articleCallback, ~router, _children) => {
     let currentImage = Belt.Option.getWithDefault(image, "");
     let token = Effects.getTokenFromStorage();
 
-    JsonRequests.getMyArticles(reduceByAuthArticles(self), currentUsername, token) |> ignore;
-    self.reduce(_ => CurrentUserFetched((currentUsername, currentBio, currentImage)), ());
+    JsonRequests.getMyArticles(
+      reduceByAuthArticles(self),
+      currentUsername,
+      token,
+    )
+    |> ignore;
+    self.reduce(
+      _ => CurrentUserFetched((currentUsername, currentBio, currentImage)),
+      (),
+    );
     ReasonReact.NoUpdate;
   },
   render: self => {
@@ -212,12 +248,18 @@ let make = (~articleCallback, ~router, _children) => {
             <div className="articles-toggle">
               <ul className="nav nav-pills outline-active">
                 <li className="nav-item">
-                  <a className={state.myFeedActiveClass} href="#" onClick={self.handle(clickMyArticles)}>
+                  <a
+                    className={state.myFeedActiveClass}
+                    href="#"
+                    onClick={self.handle(clickMyArticles)}>
                     {ReasonReact.string("My Articles")}
                   </a>
                 </li>
                 <li className="nav-item">
-                  <a className={state.favfeedActiveClass} href="#" onClick={self.handle(clickMyFavorites)}>
+                  <a
+                    className={state.favfeedActiveClass}
+                    href="#"
+                    onClick={self.handle(clickMyFavorites)}>
                     {ReasonReact.string("Favorited Articles")}
                   </a>
                 </li>
@@ -225,13 +267,19 @@ let make = (~articleCallback, ~router, _children) => {
             </div>
             <div style={state.isMyArticleDisplay}>
               {
-                Array.mapi(renderArticle(self.handle, router, articleCallback, false), state.myArticles)
+                Array.mapi(
+                  renderArticle(self.handle, router, articleCallback, false),
+                  state.myArticles,
+                )
                 |> ReasonReact.arrayToElement
               }
             </div>
             <div style={state.isFavArticleDisplay}>
               {
-                Array.mapi(renderArticle(self.handle, router, articleCallback, true), state.favoriteArticles)
+                Array.mapi(
+                  renderArticle(self.handle, router, articleCallback, true),
+                  state.favoriteArticles,
+                )
                 |> ReasonReact.arrayToElement
               }
             </div>
