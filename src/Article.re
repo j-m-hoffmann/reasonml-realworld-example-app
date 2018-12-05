@@ -11,6 +11,20 @@ type t = {
   author: Author.t,
 };
 
+let fromJson = json =>
+  Json.Decode.{
+    slug: json |> field("slug", string),
+    title: json |> field("title", string),
+    description: json |> field("description", string),
+    body: json |> field("body", string),
+    tagList: [||],
+    createdAt: json |> field("createdAt", string),
+    updatedAt: json |> field("updatedAt", string),
+    favorited: json |> field("favorited", bool),
+    favoritesCount: json |> field("favoritesCount", int),
+    author: json |> field("author", Author.fromJson),
+  };
+
 let empty = {
   slug: "",
   title: "",

@@ -38,22 +38,6 @@ type action =
   | PendingFavoriteArticles
   | PendingMyArticles;
 
-let extractArticleList = (jsonArticles: Js.Json.t) => {
-  let parseArticle = rawArticle =>
-    Json.Decode.{
-      slug: rawArticle |> field("slug", string),
-      title: rawArticle |> field("title", string),
-      description: rawArticle |> field("description", string),
-      body: rawArticle |> field("body", string),
-      tagList: [||],
-      createdAt: rawArticle |> field("createdAt", string),
-      updatedAt: rawArticle |> field("updatedAt", string),
-      favorited: rawArticle |> field("favorited", bool),
-      favoritesCount: rawArticle |> field("favoritesCount", int),
-      author: rawArticle |> field("author", Author.fromJson),
-    };
-  Json.Decode.(jsonArticles |> field("articles", array(parseArticle)));
-};
 
 let reduceMyArtcles = (reduceFunc, _status, payload) =>
   payload
@@ -62,7 +46,8 @@ let reduceMyArtcles = (reduceFunc, _status, payload) =>
 
        let articleList =
          Json.Decode.{
-           articles: parsedArticles |> extractArticleList,
+           articles:
+             parsedArticles |> field("articles", array(Article.fromJson)),
            articlesCount: parsedArticles |> field("articlesCount", int),
          };
        reduceFunc(articleList.articles);

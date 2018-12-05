@@ -29,20 +29,6 @@ type state = {
 let showTaggedArticles = event =>
   ShowTagList(ReactEvent.Mouse.target(event)##innerText);
 
-let decodeArticles = json =>
-  Json.Decode.{
-    slug: json |> field("slug", string),
-    title: json |> field("title", string),
-    description: json |> field("description", string),
-    body: json |> field("body", string),
-    tagList: json |> field("tagList", array(string)),
-    createdAt: json |> field("createdAt", string),
-    updatedAt: json |> field("updatedAt", string),
-    favorited: json |> field("favorited", bool),
-    favoritesCount: json |> field("favoritesCount", int),
-    author: json |> field("author", Author.fromJson),
-  };
-
 let populateTags = reduce => {
   let reduceTags = (_status, jsonPayload) =>
     jsonPayload
@@ -66,7 +52,7 @@ let reduceFeed = (reduceToAction, _state, jsonPayload) =>
        let articleList =
          Json.Decode.{
            articles:
-             parsedArticles |> field("articles", array(decodeArticles)),
+             parsedArticles |> field("articles", array(Article.fromJson)),
            articlesCount: parsedArticles |> field("articlesCount", int),
          };
 
