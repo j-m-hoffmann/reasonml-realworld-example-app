@@ -46,12 +46,6 @@ let updateSettings = (router, event, {ReasonReact.state}) => {
   JsonRequests.updateUser(responseCatch, Encode.user(state), Effects.getTokenFromStorage()) |> ignore;
 };
 
-let updateImage = event => UpdateImage(ReactEvent.Form.target(event)##value);
-let updateName = event => UpdateName(ReactEvent.Form.target(event)##value);
-let updateBio = event => UpdateBio(ReactEvent.Form.target(event)##value);
-let updateEmail = event => UpdateEmail(ReactEvent.Form.target(event)##value);
-let updatePassword = event => UpdatePassword(ReactEvent.Form.target(event)##value);
-
 let component = ReasonReact.reducerComponent("Settings");
 let make = (~router, _children) => {
   ...component,
@@ -109,7 +103,7 @@ let make = (~router, _children) => {
     JsonRequests.getCurrentUser(reduceUser, Effects.getTokenFromStorage()) |> ignore;
     ReasonReact.NoUpdate;
   },
-  render: ({state, send}) =>
+  render: ({state, send, handle}) =>
     <div className="settings-page">
       <div className="container page">
         <div className="row">
