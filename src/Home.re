@@ -19,7 +19,7 @@ type state = {
   globalfeedActiveClass: string,
   tagFeedActiveClass: string,
   tags: array(string),
-  articles: array(article),
+  articles: array(Article.t),
   articleCount: int,
   showTagTab: bool,
   currentTagName: string,

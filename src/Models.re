@@ -43,6 +43,6 @@ type article = {
 };
 
 type articleList = {
-  articles: array(article),
+  articles: array(Article.t),
   articlesCount: int,
 };

@@ -1,4 +1,15 @@
-open Models;
+type t = {
+  slug: string,
+  title: string,
+  description: string,
+  body: string,
+  tagList: array(string),
+  createdAt: string,
+  updatedAt: string,
+  favorited: bool,
+  favoritesCount: int,
+  author: Author.t,
+};
 
 type commentList = {comments: list(Comment.t)};
 

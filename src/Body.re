@@ -13,10 +13,10 @@ let defaultArticle = {
   author: Author.none,
 };
 
-type state = article;
+type state = Article.t;
 
 type action =
-  | SetCurrentArticle(article);
+  | SetCurrentArticle(Article.t);
 
 let articleCallback = (reduce, currentArticle) =>
   reduce(_ => SetCurrentArticle(currentArticle), ());

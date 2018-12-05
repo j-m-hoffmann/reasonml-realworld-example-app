@@ -1,8 +1,8 @@
 open Models;
 
 type state = {
-  myArticles: array(article),
-  favoriteArticles: array(article),
+  myArticles: array(Article.t),
+  favoriteArticles: array(Article.t),
   showMyArticles: bool,
   showFavArticle: bool,
   username: string,
@@ -10,7 +10,7 @@ type state = {
   image: string,
   isMyArticleDisplay: ReactDOMRe.style,
   isFavArticleDisplay: ReactDOMRe.style,
-  articles: array(article),
+  articles: array(Article.t),
   myFeedActiveClass: string,
   favfeedActiveClass: string,
 };
@@ -31,8 +31,8 @@ let initialState = {
 };
 
 type action =
-  | MyArticles(array(article))
-  | FavoriteArticle(array(article))
+  | MyArticles(array(Article.t))
+  | FavoriteArticle(array(Article.t))
   | NoData
   | PendingMyArticles
   | PendingFavoriteArticles
