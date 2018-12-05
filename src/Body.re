@@ -10,7 +10,7 @@ let defaultArticle = {
   updatedAt: "",
   favorited: false,
   favoritesCount: 0,
-  author: defaultAuthor,
+  author: Author.none,
 };
 
 type state = {currentArticle: article};
