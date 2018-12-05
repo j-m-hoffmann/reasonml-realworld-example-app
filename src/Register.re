@@ -8,11 +8,11 @@ type action =
   | PasswordUpdate(string);
 
 type state = {
-  username: string,
   email: string,
-  password: string,
-  hasValidationError: bool,
   errorList: list(string),
+  hasValidationError: bool,
+  password: string,
+  username: string,
 };
 
 module Encode = {
@@ -60,12 +60,6 @@ let goToLogin = (router, event) => {
 
 let login = _event => Login;
 
-let updateName = event => NameUpdate(ReactEvent.Form.target(event)##value);
-
-let updateEmail = event => EmailUpdate(ReactEvent.Form.target(event)##value);
-
-let updatePassword = event => PasswordUpdate(ReactEvent.Form.target(event)##value);
-
 let errorDisplayList = state =>
   List.filter(errorMessage => String.length(errorMessage) > 0, state.errorList)
   |> List.mapi((acc, errorMessage) =>
@@ -84,8 +78,7 @@ let make = (~router, _children) => {
     | Login => ReasonReact.NoUpdate
     | Register((hasError, errorList)) => ReasonReact.Update({...state, hasValidationError: hasError, errorList})
     },
-  render: self => {
-    let {ReasonReact.state, reduce} = self;
+  render: ({state, send}) => {
     <div className="auth-page">
       <div className="container page">
         <div className="row">
@@ -108,7 +101,7 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Your Name"
                   value={state.username}
-                  onChange={reduce(updateName)}
+                  onChange={event => send(NameUpdate(ReactEvent.Form.target(event)##value))}
                 />
               </fieldset>
               <fieldset className="form-group">
@@ -117,7 +110,7 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Email"
                   value={state.email}
-                  onChange={reduce(updateEmail)}
+                  onChange={event => send(EmailUpdate(ReactEvent.Form.target(event)##value))}
                 />
               </fieldset>
               <fieldset className="form-group">
@@ -126,7 +119,7 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Password"
                   value={state.password}
-                  onChange={reduce(updatePassword)}
+                  onChange={event => send(PasswordUpdate(ReactEvent.Form.target(event)##value))}
                 />
               </fieldset>
               <button onClick={reduce(register(router, self))} className="btn btn-lg btn-primary pull-xs-right">
