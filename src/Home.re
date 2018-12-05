@@ -166,8 +166,8 @@ let renderPager =
       </li>,
     pageRanges,
   )
-  |> Array.of_list
-  |> ReasonReact.arrayToElement;
+  ->Array.of_list
+  ->ReasonReact.array;
 };
 
 let renderArticle =
@@ -195,7 +195,7 @@ let renderArticle =
           <span className="date">
             {
               ReasonReact.string(
-                Js.Date.fromString(article.createdAt) |> Js.Date.toDateString,
+                Js.Date.fromString(article.createdAt)->Js.Date.toDateString,
               )
             }
           </span>
@@ -217,10 +217,7 @@ let renderArticle =
         <p> {ReasonReact.string(article.description)} </p>
         <span> {ReasonReact.string("Read more...")} </span>
         <ul className="tag-list">
-          {
-            Array.mapi(renderArticleTag, article.tagList)
-            |> ReasonReact.arrayToElement
-          }
+          {Array.mapi(renderArticleTag, article.tagList)->ReasonReact.array}
         </ul>
       </a>
     </div>
@@ -353,8 +350,8 @@ let make = (~articleCallback, ~router, _children) => {
     populateGlobalFeed(self.reduce, 0);
     ReasonReact.NoUpdate;
   },
-  render: self => {
-    let {ReasonReact.state} = self;
+  render: ({state, send} as self) => {
+    let mapi = Belt.Array.mapWithIndex;
     let currentTagName = state.currentTagName;
     <div className="home-page">
       <div className="banner">
@@ -393,29 +390,29 @@ let make = (~articleCallback, ~router, _children) => {
             </div>
             <div style={state.myFeedDisplay}>
               {
-                Array.mapi(
+                mapi(
                   renderArticle(self, self.handle, router, articleCallback),
                   state.articles,
                 )
-                |> ReasonReact.arrayToElement
+                ->ReasonReact.array
               }
             </div>
             <div style={state.globalFeedDisplay}>
               {
-                Array.mapi(
+                mapi(
                   renderArticle(self, self.handle, router, articleCallback),
                   state.articles,
                 )
-                |> ReasonReact.arrayToElement
+                ->ReasonReact.array
               }
             </div>
             <div style={state.tagFeedDisplay}>
               {
-                Array.mapi(
+                mapi(
                   renderArticle(self, self.handle, router, articleCallback),
                   state.articles,
                 )
-                |> ReasonReact.arrayToElement
+                ->ReasonReact.array
               }
             </div>
             <div>
@@ -430,10 +427,7 @@ let make = (~articleCallback, ~router, _children) => {
             <div className="sidebar">
               <p> {ReasonReact.string("Popular Tags")} </p>
               <div className="tag-list">
-                {
-                  Array.mapi(renderTag(self), state.tags)
-                  |> ReasonReact.arrayToElement
-                }
+                {mapi(renderTag(self), state.tags)->ReasonReact.array}
               </div>
             </div>
           </div>
