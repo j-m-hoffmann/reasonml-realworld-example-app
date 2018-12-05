@@ -1,5 +1,3 @@
-open JsonRequests;
-
 type state = {
   email: string,
   errorList: list(string),
@@ -30,12 +28,13 @@ module Encode = {
 let component = ReasonReact.reducerComponent("Register");
 
 let register = (route, {ReasonReact.state, send}, event) => {
+  open JsonRequests;
   event->ReactEvent.Mouse.preventDefault;
   let updateState = (_status, jsonPayload) =>
     jsonPayload
     |> Js.Promise.then_(json => {
          let newUser = parseNewUser(json);
-         let updatedState =
+         let newState =
            switch (newUser.errors) {
            | None =>
              DirectorRe.setRoute(route, "/home");
@@ -43,12 +42,12 @@ let register = (route, {ReasonReact.state, send}, event) => {
            | Some(_errors) => {
                ...state,
                validationFailed: true,
-               errorList: newUser |> Convert.toErrorListFromResponse,
+               errorList: newUser->Convert.toErrorListFromResponse,
              }
            };
-         send(_ => Register(updatedState))->Js.Promise.resolve;
+         send(_ => Register(newState))->Js.Promise.resolve;
        });
-  JsonRequests.registerNewUser(updateState, Encode.user(state)) |> ignore;
+  registerNewUser(updateState, Encode.user(state))->ignore;
   Register((false, ["Hitting server."]));
 };
 
@@ -90,14 +89,17 @@ let make = (~router, _children) => {
       <div className="container page">
         <div className="row">
           <div className="col-md-6 offset-md-3 col-xs-12">
-            <h1 className="text-xs-center"> {ReasonReact.string("Sign up")} </h1>
+            <h1 className="text-xs-center">
+              {ReasonReact.string("Sign up")}
+            </h1>
             <p className="text-xs-center">
-              <a href="#" onClick={goToLogin(router)}> {ReasonReact.string("Have an account?")} </a>
+              <a href="#" onClick={goToLogin(router)}>
+                {ReasonReact.string("Have an account?")}
+              </a>
             </p>
             {
               if (state.validationFailed) {
-                Array.of_list(errorDisplayList(state))
-                |> ReasonReact.array;
+                Array.of_list(errorDisplayList(state)) |> ReasonReact.array;
               } else {
                 ReasonReact.null;
               }
@@ -143,12 +145,14 @@ let make = (~router, _children) => {
                   }
                 />
               </fieldset>
-              <button onClick={reduce(register(router, self))} className="btn btn-lg btn-primary pull-xs-right">
+              <button
+                onClick={_ => handle(register(router, self))}
+                className="btn btn-lg btn-primary pull-xs-right">
                 {ReasonReact.string("Sign up")}
               </button>
             </form>
           </div>
         </div>
       </div>
-    </div>
+    </div>,
 };
