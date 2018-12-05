@@ -3,8 +3,8 @@ open JsonRequests;
 type action =
   | Login
   | Register((bool, list(string)))
-  | UpdateName(string)
   | UpdateEmail(string)
+  | UpdateName(string)
   | UpdatePassword(string);
 
 type state = {
@@ -69,15 +69,22 @@ let errorDisplayList = state =>
 /* TODO: use the route to go the next home screen when registered successfully */
 let make = (~router, _children) => {
   ...component,
-  initialState: () => {username: "", email: "", password: "", hasValidationError: false, errorList: []},
+  initialState: () => {
+    email: "",
+    errorList: [],
+    hasValidationError: false,
+    password: "",
+    username: "",
+  },
   reducer: (action, state) =>
     switch (action) {
-    | UpdateName(value) => ReasonReact.Update({...state, username: value})
+    | Login => ReasonReact.NoUpdate
+    | Register((hasError, errorList)) =>
+      ReasonReact.Update({...state, hasValidationError: hasError, errorList})
     | UpdateEmail(value) => ReasonReact.Update({...state, email: value})
+    | UpdateName(value) => ReasonReact.Update({...state, username: value})
     | UpdatePassword(value) =>
       ReasonReact.Update({...state, password: value})
-    | Login => ReasonReact.NoUpdate
-    | Register((hasError, errorList)) => ReasonReact.Update({...state, hasValidationError: hasError, errorList})
     },
   render: ({state, send}) => {
     <div className="auth-page">
