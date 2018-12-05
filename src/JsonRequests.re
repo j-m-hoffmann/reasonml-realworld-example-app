@@ -29,17 +29,6 @@ type newUserResponse =
   | Succeed(user)
   | Failed(user);
 
-let parseUser = json =>
-  Json.Decode.{
-    id: json |> field("id", int),
-    email: json |> field("email", string),
-    createdAt: json |> field("createdAt", string),
-    updatedAt: json |> field("updatedAt", string),
-    username: json |> field("username", string),
-    bio: json |> optional(field("bio", string)),
-    image: json |> optional(field("image", string)),
-    token: json |> field("token", string),
-  };
 
 let parseNormalResp = json => {
   user: Json.Decode.(json |> field("user", parseUser)),
@@ -47,16 +36,6 @@ let parseNormalResp = json => {
 };
 
 
-let parseEmptyDefaultError = () => {
-  id: 0,
-  email: "",
-  createdAt: "",
-  updatedAt: "",
-  username: "",
-  bio: None,
-  image: None,
-  token: "",
-};
 
 let parseErrorResp = errors => {user: parseEmptyDefaultError(), errors};
 
@@ -71,13 +50,13 @@ let tee = (func, output) => {
   output;
 };
 
-let parseNewUser = responseText => {
+let parseNewUser = (responseText: string): User.registered => {
   let json = Js.Json.parseExn(responseText);
   let possibleErrors =
-    Json.Decode.(json |> optional(field("errors", parseErrors)));
+    Json.Decode.(optional(field("errors", Errors.fromJson), json));
   switch (possibleErrors) {
-  | Some(errors) => parseErrorResp(errors)
-  | None => parseNormalResp(json)
+  | None => {user: User.fromJson(json), errors: None}
+  | Some(errors) => {user: User.empty, errors}
   };
 };
 
