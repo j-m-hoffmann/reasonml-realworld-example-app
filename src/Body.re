@@ -45,10 +45,6 @@ let make = (~route, ~router, _children) => {
       | Routes.Profile =>
         <Profile articleCallback={articleCallback(reduce)} router />
       };
-    <div>
-      <Header router />
-      <div> {route |> select_subpage} </div>
-      <Footer />
-    </div>;
+    <div> <Header router /> {select_subpage(route)} <Footer /> </div>;
   },
 };
