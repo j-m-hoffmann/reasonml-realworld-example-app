@@ -40,7 +40,8 @@ let dangerousHtml: string => Js.t('a) = html => {"__html": html};
 
 let component = ReasonReact.reducerComponent("Article");
 
-let make = (~router, ~article, _children) => {
+/* let make = (~router, ~article, _children) => { */
+let make = (~article, _children) => {
   ...component,
   initialState: () => {
     slug: article.slug,
