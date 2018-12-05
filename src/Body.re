@@ -29,7 +29,7 @@ let make = (~route, ~router, _children) => {
   initialState: () => defaultArticle,
   reducer: (action, _state) =>
     switch (action) {
-    | SetCurrentArticle(article) => ReasonReact.Update(article)
+    | SetCurrentArticle(current) => ReasonReact.Update(current)
     },
   render: self => {
     let select_subpage = route =>
