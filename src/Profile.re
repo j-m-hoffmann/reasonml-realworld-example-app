@@ -38,7 +38,6 @@ type action =
   | PendingFavoriteArticles
   | PendingMyArticles;
 
-
 let reduceMyArtcles = (reduceFunc, _status, payload) =>
   payload
   |> Js.Promise.then_(result => {
@@ -207,8 +206,8 @@ let make = (~articleCallback, ~router, _children) => {
     );
     ReasonReact.NoUpdate;
   },
-  render: self => {
-    let {ReasonReact.state, reduce} = self;
+  render: ({state, reduce}) => {
+    let mapi = Belt.Array.mapWithIndex;
     <div className="profile-page">
       <div className="user-info">
         <div className="container">
@@ -252,20 +251,20 @@ let make = (~articleCallback, ~router, _children) => {
             </div>
             <div style={state.isMyArticleDisplay}>
               {
-                Array.mapi(
+                mapi(
                   renderArticle(self.handle, router, articleCallback, false),
                   state.myArticles,
                 )
-                |> ReasonReact.arrayToElement
+                ->ReasonReact.array
               }
             </div>
             <div style={state.isFavArticleDisplay}>
               {
-                Array.mapi(
+                mapi(
                   renderArticle(self.handle, router, articleCallback, true),
                   state.favoriteArticles,
                 )
-                |> ReasonReact.arrayToElement
+                ->ReasonReact.array
               }
             </div>
           </div>
