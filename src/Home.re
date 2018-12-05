@@ -26,21 +26,6 @@ type state = {
   tags: array(string),
 };
 
-let initialState = () => {
-  articleCount: 0,
-  articles: [||],
-  currentTagName: "",
-  favoritedArticleSlug: "",
-  globalFeedDisplay: ReactDOMRe.Style.make(~display="block", ()),
-  globalfeedActiveClass: "nav-link active",
-  myFeedActiveClass: "nav-link disabled",
-  myFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
-  showTagTab: false,
-  tagFeedActiveClass: "nav-link disabled",
-  tagFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
-  tags: [||],
-};
-
 let showTaggedArticles = event =>
   ShowTagList(ReactEvent.Mouse.target(event)##innerText);
 
@@ -259,7 +244,20 @@ let component = ReasonReact.reducerComponent("Home");
 
 let make = (~articleCallback, ~router, _children) => {
   ...component,
-  initialState,
+  initialState: () => {
+    articleCount: 0,
+    articles: [||],
+    currentTagName: "",
+    favoritedArticleSlug: "",
+    globalFeedDisplay: ReactDOMRe.Style.make(~display="block", ()),
+    globalfeedActiveClass: "nav-link active",
+    myFeedActiveClass: "nav-link disabled",
+    myFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
+    showTagTab: false,
+    tagFeedActiveClass: "nav-link disabled",
+    tagFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
+    tags: [||],
+  },
   reducer: (action, state) =>
     switch (action) {
     | TagsFetched(tagList) => ReasonReact.Update({...state, tags: tagList})
