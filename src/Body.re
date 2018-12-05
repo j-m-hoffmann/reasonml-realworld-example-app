@@ -1,7 +1,5 @@
 open Models;
 
-let defaultAuthor = {username: "", bio: None, image: None, following: false};
-
 let defaultArticle = {
   slug: "",
   title: "",

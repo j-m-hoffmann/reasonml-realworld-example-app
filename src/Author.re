@@ -5,6 +5,8 @@ type t = {
   following: bool,
 };
 
+let none = {username: "", bio: None, image: None, following: false};
+
 let fromJson = json =>
   Json.Decode.{
     username: json |> field("username", string),
