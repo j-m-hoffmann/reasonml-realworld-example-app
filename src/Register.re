@@ -3,7 +3,7 @@ open JsonRequests;
 type state = {
   email: string,
   errorList: list(string),
-  hasValidationError: bool,
+  validationFailed: bool,
   password: string,
   username: string,
 };
@@ -29,7 +29,7 @@ module Encode = {
 
 let component = ReasonReact.reducerComponent("Register");
 
-let register = (route, {ReasonReact.state, reduce}, event) => {
+let register = (route, {ReasonReact.state, send}, event) => {
   event->ReactEvent.Mouse.preventDefault;
   let updateState = (_status, jsonPayload) =>
     jsonPayload
@@ -37,16 +37,16 @@ let register = (route, {ReasonReact.state, reduce}, event) => {
          let newUser = parseNewUser(json);
          let updatedState =
            switch (newUser.errors) {
-           | Some(_user) =>
+           | None =>
              DirectorRe.setRoute(route, "/home");
-             {...state, hasValidationError: false};
-           | None => {...state, hasValidationError: true, errorList: newUser |> Convert.toErrorListFromResponse}
+             {...state, validationFailed: false};
+           | Some(_errors) => {
+               ...state,
+               validationFailed: true,
+               errorList: newUser |> Convert.toErrorListFromResponse,
+             }
            };
-         reduce(
-           _payload => Register((updatedState.hasValidationError, updatedState.errorList)),
-           "this came back from promise",
-         )
-         |> Js.Promise.resolve;
+         send(_ => Register(updatedState))->Js.Promise.resolve;
        });
   JsonRequests.registerNewUser(updateState, Encode.user(state)) |> ignore;
   Register((false, ["Hitting server."]));
@@ -71,21 +71,21 @@ let make = (~router, _children) => {
   initialState: () => {
     email: "",
     errorList: [],
-    hasValidationError: false,
+    validationFailed: false,
     password: "",
     username: "",
   },
   reducer: (action, state) =>
     switch (action) {
     | Login => ReasonReact.NoUpdate
-    | Register((hasValidationError, errorList)) =>
-      ReasonReact.Update({...state, hasValidationError, errorList})
+    | Register({validationFailed, errorList}) =>
+      ReasonReact.Update({...state, validationFailed, errorList})
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdateName(username) => ReasonReact.Update({...state, username})
     | UpdatePassword(value) =>
       ReasonReact.Update({...state, password: value})
     },
-  render: ({state, send}) => {
+  render: ({state, send}) =>
     <div className="auth-page">
       <div className="container page">
         <div className="row">
@@ -95,8 +95,9 @@ let make = (~router, _children) => {
               <a href="#" onClick={goToLogin(router)}> {ReasonReact.string("Have an account?")} </a>
             </p>
             {
-              if (state.hasValidationError) {
-                Array.of_list(errorDisplayList(state)) |> ReasonReact.arrayToElement;
+              if (state.validationFailed) {
+                Array.of_list(errorDisplayList(state))
+                |> ReasonReact.array;
               } else {
                 ReasonReact.null;
               }
@@ -108,7 +109,10 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Your Name"
                   value={state.username}
-                  onChange={event => send(UpdateName(ReactEvent.Form.target(event)##value))}
+                  onChange={
+                    event =>
+                      send(UpdateName(ReactEvent.Form.target(event)##value))
+                  }
                 />
               </fieldset>
               <fieldset className="form-group">
@@ -117,7 +121,12 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Email"
                   value={state.email}
-                  onChange={event => send(UpdateEmail(ReactEvent.Form.target(event)##value))}
+                  onChange={
+                    event =>
+                      send(
+                        UpdateEmail(ReactEvent.Form.target(event)##value),
+                      )
+                  }
                 />
               </fieldset>
               <fieldset className="form-group">
@@ -126,7 +135,12 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Password"
                   value={state.password}
-                  onChange={event => send(UpdatePassword(ReactEvent.Form.target(event)##value))}
+                  onChange={
+                    event =>
+                      send(
+                        UpdatePassword(ReactEvent.Form.target(event)##value),
+                      )
+                  }
                 />
               </fieldset>
               <button onClick={reduce(register(router, self))} className="btn btn-lg btn-primary pull-xs-right">
@@ -136,6 +150,5 @@ let make = (~router, _children) => {
           </div>
         </div>
       </div>
-    </div>;
-  },
+    </div>
 };
