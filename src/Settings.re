@@ -73,16 +73,14 @@ let make = (~router, _children) => {
       |> Js.Promise.then_(result => {
            let parsedUser = JsonRequests.parseNewUser(result);
 
-           self.reduce(
-             _ =>
-               SettingsFetched({
-                 image: Belt.Option.getWithDefault(parsedUser.user.image, ""),
-                 name: parsedUser.user.username,
-                 bio: Belt.Option.getWithDefault(parsedUser.user.bio, ""),
-                 email: parsedUser.user.email,
-                 password: "",
-               }),
-             (),
+           self.send(_ =>
+             SettingsFetched({
+               image: Belt.Option.getWithDefault(parsedUser.user.image, ""),
+               name: parsedUser.user.username,
+               bio: Belt.Option.getWithDefault(parsedUser.user.bio, ""),
+               email: parsedUser.user.email,
+               password: "",
+             })
            );
            parsedUser.user |> Js.Promise.resolve;
          });
