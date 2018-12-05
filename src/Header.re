@@ -7,10 +7,14 @@ let navigateTo = (router, event, routeName) => {
   DirectorRe.setRoute(router, routeName);
 };
 
-let goToRegistration = (router, routeName, event) => navigateTo(router, event, routeName);
-let goToHome = (router, routeName, event) => navigateTo(router, event, routeName);
-let goToSettings = (router, routeName, event) => navigateTo(router, event, routeName);
-let goToCreateArticle = (router, routeName, event) => navigateTo(router, event, routeName);
+let goToRegistration = (router, routeName, event) =>
+  navigateTo(router, event, routeName);
+let goToHome = (router, routeName, event) =>
+  navigateTo(router, event, routeName);
+let goToSettings = (router, routeName, event) =>
+  navigateTo(router, event, routeName);
+let goToCreateArticle = (router, routeName, event) =>
+  navigateTo(router, event, routeName);
 
 let displayUsername = () => {
   let (optionalName, _, _) = Effects.getUserFromStorage();
@@ -24,11 +28,19 @@ let displayUsername = () => {
 let displayByLogin = router =>
   switch (Effects.getTokenFromStorage()) {
   | Some(_token) =>
-    <a className="nav-link" style={pointerStyle()} href="#" onClick={goToRegistration(router, "/profile")}>
+    <a
+      className="nav-link"
+      style={pointerStyle()}
+      href="#"
+      onClick={goToRegistration(router, "/profile")}>
       {ReasonReact.string(displayUsername())}
     </a>
   | None =>
-    <a className="nav-link" style={pointerStyle()} href="#" onClick={goToRegistration(router, "/register")}>
+    <a
+      className="nav-link"
+      style={pointerStyle()}
+      href="#"
+      onClick={goToRegistration(router, "/register")}>
       {ReasonReact.string("Sign up")}
     </a>
   };
@@ -39,10 +51,16 @@ let make = (~router, _children) => {
     <div>
       <nav className="navbar navbar-light">
         <div className="container">
-          <a className="navbar-brand" href="index.html"> {ReasonReact.string("conduit")} </a>
+          <a className="navbar-brand" href="index.html">
+            {ReasonReact.string("conduit")}
+          </a>
           <ul className="nav navbar-nav pull-xs-right">
             <li className="nav-item">
-              <a className="nav-link active" style={pointerStyle()} href="#" onClick={goToHome(router, "/home")}>
+              <a
+                className="nav-link active"
+                style={pointerStyle()}
+                href="#"
+                onClick={goToHome(router, "/home")}>
                 {ReasonReact.string("Home")}
               </a>
             </li>
@@ -57,7 +75,11 @@ let make = (~router, _children) => {
               </a>
             </li>
             <li className="nav-item">
-              <a className="nav-link" style={pointerStyle()} href="#" onClick={goToSettings(router, "/settings")}>
+              <a
+                className="nav-link"
+                style={pointerStyle()}
+                href="#"
+                onClick={goToSettings(router, "/settings")}>
                 <i className="ion-gear-a" />
                 {ReasonReact.string(" Settings")}
               </a>
