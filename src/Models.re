@@ -9,14 +9,8 @@ type user = {
   token: string,
 };
 
-type errorDetails = {
-  email: option(array(string)),
-  password: option(array(string)),
-  username: option(array(string)),
-};
-
 type registeredUser = {
-  errors: option(errorDetails),
+  errors: option(Errors.t),
   user,
 };
 

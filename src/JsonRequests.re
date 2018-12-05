@@ -46,14 +46,6 @@ let parseNormalResp = json => {
   errors: None,
 };
 
-let parseErrors = json =>
-  Some(
-    Json.Decode.{
-      email: json |> optional(field("email", array(string))),
-      password: json |> optional(field("password", array(string))),
-      username: json |> optional(field("username", array(string))),
-    },
-  );
 
 let parseEmptyDefaultError = () => {
   id: 0,
