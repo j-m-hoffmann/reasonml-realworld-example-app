@@ -1,33 +1,33 @@
 open Models;
 
 type state = {
-  myArticles: array(Article.t),
-  favoriteArticles: array(Article.t),
-  showMyArticles: bool,
-  showFavArticle: bool,
-  username: string,
-  bio: string,
-  image: string,
-  isMyArticleDisplay: ReactDOMRe.style,
-  isFavArticleDisplay: ReactDOMRe.style,
   articles: array(Article.t),
-  myFeedActiveClass: string,
+  bio: string,
   favfeedActiveClass: string,
+  favoriteArticles: array(Article.t),
+  image: string,
+  isFavArticleDisplay: ReactDOMRe.style,
+  isMyArticleDisplay: ReactDOMRe.style,
+  myArticles: array(Article.t),
+  myFeedActiveClass: string,
+  showFavArticle: bool,
+  showMyArticles: bool,
+  username: string,
 };
 
 let initialState = {
-  myArticles: [||],
-  favoriteArticles: [||],
-  showMyArticles: true,
-  showFavArticle: false,
-  username: "",
-  bio: "",
-  isMyArticleDisplay: ReactDOMRe.Style.make(~display="block", ()),
-  isFavArticleDisplay: ReactDOMRe.Style.make(~display="none", ()),
-  myFeedActiveClass: "nav-link disabled",
-  favfeedActiveClass: "nav-link active",
   articles: [||],
+  bio: "",
+  favfeedActiveClass: "nav-link active",
+  favoriteArticles: [||],
   image: "",
+  isFavArticleDisplay: ReactDOMRe.Style.make(~display="none", ()),
+  isMyArticleDisplay: ReactDOMRe.Style.make(~display="block", ()),
+  myArticles: [||],
+  myFeedActiveClass: "nav-link disabled",
+  showFavArticle: false,
+  showMyArticles: true,
+  username: "",
 };
 
 type action =
