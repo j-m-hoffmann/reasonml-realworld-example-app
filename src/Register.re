@@ -1,12 +1,5 @@
 open JsonRequests;
 
-type action =
-  | Login
-  | Register((bool, list(string)))
-  | UpdateEmail(string)
-  | UpdateName(string)
-  | UpdatePassword(string);
-
 type state = {
   email: string,
   errorList: list(string),
@@ -14,6 +7,13 @@ type state = {
   password: string,
   username: string,
 };
+
+type action =
+  | Login
+  | Register((bool, list(string)))
+  | UpdateEmail(string)
+  | UpdateName(string)
+  | UpdatePassword(string);
 
 module Encode = {
   let encodeUserCredentials = creds => {
