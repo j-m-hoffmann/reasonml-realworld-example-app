@@ -26,18 +26,8 @@ let toJson = listedElements =>
   listedElements |> Js.Dict.fromList |> Js.Json.object_;
 
 type newUserResponse =
-  | Succeed(user)
-  | Failed(user);
-
-
-let parseNormalResp = json => {
-  user: Json.Decode.(json |> field("user", parseUser)),
-  errors: None,
-};
-
-
-
-let parseErrorResp = errors => {user: parseEmptyDefaultError(), errors};
+  | Success(User.registered)
+  | Failure(User.registered);
 
 let hasErrors = checkId =>
   switch (checkId) {
