@@ -31,7 +31,6 @@ let component = ReasonReact.reducerComponent("Register");
 
 let register = (route, {ReasonReact.state, reduce}, event) => {
   event->ReactEvent.Mouse.preventDefault;
-  let jsonRequest = Encode.user(state);
   let updateState = (_status, jsonPayload) =>
     jsonPayload
     |> Js.Promise.then_(json => {
@@ -49,7 +48,7 @@ let register = (route, {ReasonReact.state, reduce}, event) => {
          )
          |> Js.Promise.resolve;
        });
-  JsonRequests.registerNewUser(updateState, jsonRequest) |> ignore;
+  JsonRequests.registerNewUser(updateState, Encode.user(state)) |> ignore;
   Register((false, ["Hitting server."]));
 };
 
