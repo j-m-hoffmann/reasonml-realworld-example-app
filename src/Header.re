@@ -1,6 +1,6 @@
 let component = ReasonReact.statelessComponent("Header");
 
-let pointerStyle = () => ReactDOMRe.Style.make(~cursor="pointer", ());
+let pointer = ReactDOMRe.Style.make(~cursor="pointer", ());
 
 let navigateTo = (router, event, routeName) => {
   event->ReactEvent.Mouse.preventDefault;
@@ -30,7 +30,7 @@ let displayByLogin = router =>
   | Some(_token) =>
     <a
       className="nav-link"
-      style={pointerStyle()}
+      style=pointer
       href="#"
       onClick={goToRegistration(router, "/profile")}>
       {ReasonReact.string(displayUsername())}
@@ -38,7 +38,7 @@ let displayByLogin = router =>
   | None =>
     <a
       className="nav-link"
-      style={pointerStyle()}
+      style=pointer
       href="#"
       onClick={goToRegistration(router, "/register")}>
       {ReasonReact.string("Sign up")}
@@ -58,7 +58,7 @@ let make = (~router, _children) => {
             <li className="nav-item">
               <a
                 className="nav-link active"
-                style={pointerStyle()}
+                style=pointer
                 href="#"
                 onClick={goToHome(router, "/home")}>
                 {ReasonReact.string("Home")}
@@ -67,7 +67,7 @@ let make = (~router, _children) => {
             <li className="nav-item">
               <a
                 className="nav-link"
-                style={pointerStyle()}
+                style=pointer
                 href="#"
                 onClick={goToCreateArticle(router, "/article/create")}>
                 <i className="ion-compose" />
@@ -77,7 +77,7 @@ let make = (~router, _children) => {
             <li className="nav-item">
               <a
                 className="nav-link"
-                style={pointerStyle()}
+                style=pointer
                 href="#"
                 onClick={goToSettings(router, "/settings")}>
                 <i className="ion-gear-a" />
