@@ -42,7 +42,7 @@ let errorDisplayList = state =>
        </ul>
      );
 
-let loginUser = (route, event, {ReasonReact.state, reduce}) => {
+let loginUser = (route, event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
   let reduceByAuthResult = (_status, jsonPayload) =>
     jsonPayload
@@ -66,13 +66,14 @@ let loginUser = (route, event, {ReasonReact.state, reduce}) => {
              {...state, hasValidationError: false};
            };
          /* TODO: Create a reducer to do nothing with succesful login so the state doesn't try to update */
-         let callLoginReducer = _payload =>
-           Login((updatedState.hasValidationError, updatedState.errorList));
-         reduce(callLoginReducer, ()) |> Js.Promise.resolve;
+         send(_ =>
+           Login((updatedState.hasValidationError, updatedState.errorList))
+         )
+         |> Js.Promise.resolve;
        });
   JsonRequests.authenticateUser(reduceByAuthResult, Encode.user(state))
   |> ignore;
-  reduce(_ => LoginPending, ());
+  send(_ => LoginPending);
 };
 
 let component = ReasonReact.reducerComponent("Login");
@@ -93,8 +94,7 @@ let make = (~router, _children) => {
       ReasonReact.Update({...state, hasValidationError: hasError, errorList})
     | LoginPending => ReasonReact.NoUpdate
     },
-  render: self => {
-    let {ReasonReact.state, reduce} = self;
+  render: ({state, send}) =>
     <div className="auth-page">
       <div className="container page">
         <div className="row">
@@ -153,6 +153,5 @@ let make = (~router, _children) => {
           </div>
         </div>
       </div>
-    </div>;
-  },
+    </div>,
 };

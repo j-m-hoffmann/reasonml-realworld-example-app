@@ -5,8 +5,8 @@ type state = Article.t;
 type action =
   | SetCurrentArticle(Article.t);
 
-let articleCallback = (reduce, currentArticle) =>
-  reduce(_ => SetCurrentArticle(currentArticle), ());
+let articleCallback = (self, currentArticle) =>
+  self.ReasonReact.send(_ => SetCurrentArticle(currentArticle));
 
 let component = ReasonReact.reducerComponent("Body");
 
@@ -21,8 +21,7 @@ let make = (~route, ~router, _children) => {
   render: self => {
     let select_subpage = route =>
       switch (route) {
-      | Routes.Home =>
-        <Home articleCallback={articleCallback(reduce)} router />
+      | Routes.Home => <Home articleCallback={articleCallback(self)} router />
       | Routes.Register => <Register router />
       | Routes.Login => <Login router />
       | Routes.Settings => <Settings router />
@@ -30,7 +29,7 @@ let make = (~route, ~router, _children) => {
       | Routes.CreateArticle => <CreateArticle router />
       | Routes.EditArticle => <Article router state />
       | Routes.Profile =>
-        <Profile articleCallback={articleCallback(reduce)} router />
+        <Profile articleCallback={articleCallback(self)} router />
       };
     <div> <Header router /> {select_subpage(route)} <Footer /> </div>;
   },

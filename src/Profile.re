@@ -54,9 +54,9 @@ let reduceMyArtcles = (reduceFunc, _status, payload) =>
        articleList |> Js.Promise.resolve;
      });
 
-let clickMyArticles = (event, {ReasonReact.state, reduce}) => {
+let clickMyArticles = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
-  let reduceFunc = articles => reduce(_ => MyArticles(articles), ());
+  let reduceFunc = articles => send(_ => MyArticles(articles));
 
   JsonRequests.getMyArticles(
     reduceMyArtcles(reduceFunc),
@@ -65,7 +65,7 @@ let clickMyArticles = (event, {ReasonReact.state, reduce}) => {
   )
   |> ignore;
 
-  reduce(_ => PendingMyArticles, ());
+  send(_ => PendingMyArticles);
 };
 
 let clickProfileSettings = (router, event, {ReasonReact.state: _state}) => {
@@ -73,9 +73,9 @@ let clickProfileSettings = (router, event, {ReasonReact.state: _state}) => {
   DirectorRe.setRoute(router, "/settings");
 };
 
-let clickMyFavorites = (event, {ReasonReact.state, reduce}) => {
+let clickMyFavorites = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
-  let reduceFunc = articles => reduce(_ => FavoriteArticle(articles), ());
+  let reduceFunc = articles => send(_ => FavoriteArticle(articles));
   JsonRequests.getFavoritedArticles(
     reduceMyArtcles(reduceFunc),
     state.username,
@@ -83,12 +83,11 @@ let clickMyFavorites = (event, {ReasonReact.state, reduce}) => {
   )
   |> ignore;
 
-  reduce(_ => PendingFavoriteArticles, ());
+  send(_ => PendingFavoriteArticles);
 };
 
 /* side effect */
-let reduceByAuthArticles =
-    ({ReasonReact.state, reduce}, _status, jsonPayload) =>
+let reduceByAuthArticles = ({ReasonReact.state, send}, _status, jsonPayload) =>
   jsonPayload
   |> Js.Promise.then_(payload => {
        let jsonArticles = Js.Json.parseExn(payload);
@@ -97,8 +96,8 @@ let reduceByAuthArticles =
 
        switch (articleCount) {
        | count when count > 0 =>
-         reduce(_ => MyArticles(extractArticleList(jsonArticles)), ())
-       | _ => reduce(_ => NoData, ())
+         send(_ => MyArticles(extractArticleList(jsonArticles)))
+       | _ => send(_ => NoData)
        };
 
        payload |> Js.Promise.resolve;
@@ -206,7 +205,7 @@ let make = (~articleCallback, ~router, _children) => {
     );
     ReasonReact.NoUpdate;
   },
-  render: ({state, reduce}) => {
+  render: ({state, send}) => {
     let mapi = Belt.Array.mapWithIndex;
     <div className="profile-page">
       <div className="user-info">

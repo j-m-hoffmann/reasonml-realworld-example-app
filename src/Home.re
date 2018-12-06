@@ -26,9 +26,6 @@ type state = {
   tags: array(string),
 };
 
-let showTaggedArticles = event =>
-  ShowTagList(ReactEvent.Mouse.target(event)##innerText);
-
 let populateTags = self => {
   let reduceTags = (_status, jsonPayload) =>
     jsonPayload
@@ -75,22 +72,21 @@ let populateGlobalFeed = (self, pageNumber) => {
 };
 
 let populateFeed = reduce => {
-  let reduceFunc = articleList =>
-    reduce(_ => MyArticlesFetched(articleList), ());
+  let reduceFunc = articleList => send(_ => MyArticlesFetched(articleList));
   JsonRequests.getFeed(Effects.getTokenFromStorage(), reduceFeed(reduceFunc))
   |> ignore;
 };
 
-let showMyFeed = (event, {ReasonReact.state: _state, reduce}) => {
+let showMyFeed = (event, {ReasonReact.state: _state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
   populateFeed(reduce);
-  reduce(_ => ShowMyFeed, ());
+  send(_ => ShowMyFeed);
 };
 
-let showGlobalFeed = (event, {ReasonReact.state: _state, reduce}) => {
+let showGlobalFeed = (event, {ReasonReact.state: _state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
   populateGlobalFeed(reduce, 0);
-  reduce(_ => ShowGlobalFeed, ());
+  send(_ => ShowGlobalFeed);
 };
 
 let goToArticle =
@@ -123,9 +119,14 @@ let updateFavoritedCount = (articles, currentSlug) => {
   Array.map(updateCurrentArticle, articles);
 };
 
-let renderTag = ({ReasonReact.state: _state, reduce}, index, tag) =>
+let renderTag = (self, index, tag) =>
   <a
-    onClick={reduce(showTaggedArticles)}
+    onClick={
+      event =>
+        self.ReasonReact.send(
+          ShowTagList(ReactEvent.Mouse.target(event)##innerText),
+        )
+    }
     href="#"
     key={string_of_int(index)}
     className="tag-pill tag-default">
@@ -145,11 +146,11 @@ let rec range = (a, b) =>
   };
 
 let renderPager =
-    ({ReasonReact.state: _state, reduce, ReasonReact.handle}, articleCount) => {
+    ({ReasonReact.state: _state, send, ReasonReact.handle}, articleCount) => {
   let pageRanges = articleCount / 10 |> range(1);
   let reduceArticles = (currentPageNumber, event, _self) => {
     event->ReactEvent.Mouse.preventDefault;
-    reduce(_ => ArticlesByPage(currentPageNumber), ());
+    send(_ => ArticlesByPage(currentPageNumber));
   };
 
   /* Add the logic to highlight the current page */
@@ -172,7 +173,7 @@ let renderPager =
 
 let renderArticle =
     (
-      {ReasonReact.state: _state, reduce},
+      {ReasonReact.state: _state, send},
       handle,
       router,
       articleCallback,
@@ -203,7 +204,7 @@ let renderArticle =
         <button
           className="btn btn-outline-primary btn-sm pull-xs-right"
           onClick={
-            reduce(_ => FavoriteArticle(article.slug, article.favorited))
+            send(_ => FavoriteArticle(article.slug, article.favorited))
           }>
           <i className="ion-heart" />
           {ReasonReact.string(string_of_int(article.favoritesCount))}

@@ -30,7 +30,7 @@ module Encode = {
 let submissionResponse = (_status, payload) =>
   payload |> Js.Promise.then_(result => Js.log(result) |> Js.Promise.resolve);
 
-/* let submitNewArticle = (router, event, {ReasonReact.state, reduce}) => { */
+/* let submitNewArticle = (router, event, {ReasonReact.state, send}) => { */
 /*   event->ReactEvent.Mouse.preventDefault; */
 /*   JsonRequests.submitNewArticle( */
 /*     submissionResponse, */
@@ -38,8 +38,7 @@ let submissionResponse = (_status, payload) =>
 /*     Effects.getTokenFromStorage(), */
 /*   ) */
 /*   |> ignore; */
-/*   let reduceArticleSubmission = _ => ArticleSubmitted(router); */
-/*   reduce(reduceArticleSubmission, ()); */
+/*   send(_ => ArticleSubmitted(router)); */
 /* }; */
 
 /*let updateTitle = event => UpdateTitle(ReactEvent.Form.target(event)##value);*/
@@ -62,7 +61,9 @@ let make = (~router, _children) => {
     | SubmitArticle =>
       JsonRequests.submitNewArticle(submissionResponse, Encode.newArticle(state), Effects.getTokenFromStorage())
       |> ignore;
-      ReasonReact.SideEffects((_self => DirectorRe.setRoute(router, "/home")));
+      ReasonReact.SideEffects(
+        (_self => DirectorRe.setRoute(router, "/home")),
+      );
     | UpdateTitle(title) => ReasonReact.Update({...state, title})
     | UpdateDescription(description) => ReasonReact.Update({...state, description})
     | UpdateBody(body) => ReasonReact.Update({...state, articleBody: body})
@@ -81,7 +82,12 @@ let make = (~router, _children) => {
                     className="form-control form-control-lg"
                     placeholder="Article Title"
                     value={state.title}
-                    onChange={event => send(UpdateTitle(ReactEvent.Form.target(event)##value))}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateTitle(ReactEvent.Form.target(event)##value),
+                        )
+                    }
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -90,7 +96,14 @@ let make = (~router, _children) => {
                     className="form-control"
                     placeholder="What's this article about?"
                     value={state.description}
-                    onChange={event => send(UpdateDescription(ReactEvent.Form.target(event)##value))}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateDescription(
+                            ReactEvent.Form.target(event)##value,
+                          ),
+                        )
+                    }
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -99,7 +112,12 @@ let make = (~router, _children) => {
                     rows=8
                     placeholder="Write your article (in markdown)"
                     value={state.articleBody}
-                    onChange={event => send(UpdateBody(ReactEvent.Form.target(event)##value))}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateBody(ReactEvent.Form.target(event)##value),
+                        )
+                    }
                   />
                 </fieldset>
                 <fieldset className="form-group">
@@ -108,7 +126,12 @@ let make = (~router, _children) => {
                     className="form-control"
                     placeholder="Enter tags"
                     value={state.rawTags}
-                    onChange={event => send(UpdateTags(ReactEvent.Form.target(event)##value))}
+                    onChange={
+                      event =>
+                        send(
+                          UpdateTags(ReactEvent.Form.target(event)##value),
+                        )
+                    }
                   />
                   <div className="tag-list" />
                 </fieldset>
