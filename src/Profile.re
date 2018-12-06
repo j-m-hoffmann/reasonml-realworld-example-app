@@ -200,7 +200,7 @@ let make = (~articleCallback, ~router, _children) => {
       token,
     )
     |> ignore;
-    self.reduce(
+    self.send(
       _ => CurrentUserFetched((currentUsername, currentBio, currentImage)),
       (),
     );

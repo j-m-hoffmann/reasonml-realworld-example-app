@@ -29,14 +29,14 @@ type state = {
 let showTaggedArticles = event =>
   ShowTagList(ReactEvent.Mouse.target(event)##innerText);
 
-let populateTags = reduce => {
+let populateTags = self => {
   let reduceTags = (_status, jsonPayload) =>
     jsonPayload
     |> Js.Promise.then_(result => {
          let parsedPopularTags = Js.Json.parseExn(result);
          let tags =
            Json.Decode.(parsedPopularTags |> field("tags", array(string)));
-         reduce(_ => TagsFetched(tags), ());
+         self.send(_ => TagsFetched(tags), ());
 
          tags |> Js.Promise.resolve;
        })
@@ -60,9 +60,9 @@ let reduceFeed = (reduceToAction, _state, jsonPayload) =>
        articleList |> Js.Promise.resolve;
      });
 
-let populateGlobalFeed = (reduce, pageNumber) => {
+let populateGlobalFeed = (self, pageNumber) => {
   let reduceFunc = articleList =>
-    reduce(_ => ArticlesFetched(articleList), ());
+    self.send(_ => ArticlesFetched(articleList), ());
 
   /* Get the right page if there are more than 10 articles */
   JsonRequests.getGlobalArticles(
@@ -300,7 +300,7 @@ let make = (~articleCallback, ~router, _children) => {
         (
           self => {
             let reduceFunc = articleList =>
-              self.reduce(_ => TagArticlesFetched(articleList), ());
+              self.send(_ => TagArticlesFetched(articleList), ());
             JsonRequests.getArticlesByTag(
               reduceFeed(reduceFunc),
               currentTagName,
@@ -333,7 +333,7 @@ let make = (~articleCallback, ~router, _children) => {
         (
           self => {
             let reduceFunc = articleList =>
-              self.reduce(_ => ArticlesFetched(articleList), ());
+              self.send(_ => ArticlesFetched(articleList), ());
             JsonRequests.getGlobalArticles(
               reduceFeed(reduceFunc),
               Effects.getTokenFromStorage(),
@@ -346,8 +346,8 @@ let make = (~articleCallback, ~router, _children) => {
       )
     },
   didMount: self => {
-    populateTags(self.reduce);
-    populateGlobalFeed(self.reduce, 0);
+    populateTags(self);
+    populateGlobalFeed(self, 0);
     ReasonReact.NoUpdate;
   },
   render: ({state, send} as self) => {
