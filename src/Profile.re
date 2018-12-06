@@ -15,21 +15,6 @@ type state = {
   username: string,
 };
 
-let initialState = {
-  articles: [||],
-  bio: "",
-  favfeedActiveClass: "nav-link active",
-  favoriteArticles: [||],
-  image: "",
-  isFavArticleDisplay: ReactDOMRe.Style.make(~display="none", ()),
-  isMyArticleDisplay: ReactDOMRe.Style.make(~display="block", ()),
-  myArticles: [||],
-  myFeedActiveClass: "nav-link disabled",
-  showFavArticle: false,
-  showMyArticles: true,
-  username: "",
-};
-
 type action =
   | CurrentUserFetched((string, string, string))
   | FavoriteArticles(array(Article.t))
@@ -148,7 +133,20 @@ let renderArticle =
 let component = ReasonReact.reducerComponent("Profile");
 let make = (~articleCallback, ~router, _children) => {
   ...component,
-  initialState: () => initialState,
+  initialState: () => {
+    articles: [||],
+    bio: "",
+    favfeedActiveClass: "nav-link active",
+    favoriteArticles: [||],
+    image: "",
+    isFavArticleDisplay: ReactDOMRe.Style.make(~display="none", ()),
+    isMyArticleDisplay: ReactDOMRe.Style.make(~display="block", ()),
+    myArticles: [||],
+    myFeedActiveClass: "nav-link disabled",
+    showFavArticle: false,
+    showMyArticles: true,
+    username: "",
+  },
   reducer: (action, state) =>
     switch (action) {
     | MyArticles(myArticles) =>
