@@ -151,21 +151,21 @@ let make = (~articleCallback, ~router, _children) => {
   initialState: () => initialState,
   reducer: (action, state) =>
     switch (action) {
-    | MyArticles(articleList) =>
+    | MyArticles(myArticles) =>
       ReasonReact.Update({
         ...state,
         isMyArticleDisplay: ReactDOMRe.Style.make(~display="block", ()),
         isFavArticleDisplay: ReactDOMRe.Style.make(~display="none", ()),
-        myArticles: articleList,
+        myArticles,
         myFeedActiveClass: "nav-link active",
         favfeedActiveClass: "nav-link disabled",
       })
-    | FavoriteArticles(articleList) =>
+    | FavoriteArticles(favoriteArticles) =>
       ReasonReact.Update({
         ...state,
         isMyArticleDisplay: ReactDOMRe.Style.make(~display="none", ()),
         isFavArticleDisplay: ReactDOMRe.Style.make(~display="block", ()),
-        favoriteArticles: articleList,
+        favoriteArticles,
         myFeedActiveClass: "nav-link disabled",
         favfeedActiveClass: "nav-link active",
       })
