@@ -13,18 +13,19 @@ type action =
   | UpdateName(string)
   | UpdatePassword(string);
 
-module Encode = {
-  let encodeUserCredentials = creds => {
-    open! Json.Encode;
+let toJson = user =>
+  Json.Encode.(
     object_([
-      ("email", string(creds.email)),
-      ("password", string(creds.password)),
-      ("username", string(creds.username)),
-    ]);
-  };
-  let user = r =>
-    Json.Encode.(object_([("user", encodeUserCredentials(r))]));
-};
+      (
+        "user",
+        object_([
+          ("email", string(user.email)),
+          ("password", string(user.password)),
+          ("username", string(user.username)),
+        ]),
+      ),
+    ])
+  );
 
 let component = ReasonReact.reducerComponent("Register");
 
@@ -48,7 +49,7 @@ let register = (route, {ReasonReact.state, send}, event) => {
            };
          send(Register(newState))->Js.Promise.resolve;
        });
-  registerNewUser(updateState, Encode.user(state))->ignore;
+  registerNewUser(updateState, toJson(state))->ignore;
   send(Register((false, ["Hitting server."])));
 };
 
