@@ -15,23 +15,25 @@ type action =
   | UpdateName(string)
   | UpdatePassword(string);
 
-module Encode = {
-  let userSettings = (settings: state) =>
-    Json.Encode.(
-      object_([
-        ("email", string(settings.email)),
-        ("password", string(settings.password)),
-        ("image", string(settings.image)),
-        ("username", string(settings.name)),
-        ("bio", string(settings.bio)),
-      ])
-    );
+let toJson = settings =>
+  Json.Encode.(
+    object_([
+      (
+        "user",
+        object_([
+          ("email", string(settings.email)),
+          ("password", string(settings.password)),
+          ("image", string(settings.image)),
+          ("username", string(settings.name)),
+          ("bio", string(settings.bio)),
+        ]),
+      ),
+    ])
+  );
 
-  let user = (settings: state) =>
-    Json.Encode.(object_([("user", userSettings(settings))]));
-
-  let token = currentUser => Json.Encode.[("token", string(currentUser))];
-};
+/*module Encode = {*/
+/*let token = currentUser => Json.Encode.[("token", string(currentUser))];*/
+/*};*/
 
 let updateSettings = (router, event, {ReasonReact.state}) => {
   event->ReactEvent.Mouse.preventDefault;
@@ -46,7 +48,7 @@ let updateSettings = (router, event, {ReasonReact.state}) => {
   };
   JsonRequests.updateUser(
     responseCatch,
-    Encode.user(state),
+    toJson(state),
     LocalStorage.getToken(),
   )
   |> ignore;
