@@ -58,8 +58,7 @@ let make = (~router, _children) => {
   initialState: () => {bio: "", email: "", image: "", name: "", password: ""},
   reducer: (action, state) =>
     switch (action) {
-    | SettingsFetched({bio, email, image, name}) =>
-      ReasonReact.Update({...state, bio, email, image, name})
+    | SettingsFetched(newState) => ReasonReact.Update(newState)
     | SettingsUpdated => ReasonReact.NoUpdate
     | UpdateBio(bio) => ReasonReact.Update({...state, bio})
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
@@ -74,14 +73,14 @@ let make = (~router, _children) => {
       |> Js.Promise.then_(result => {
            let registered = parseNewUser(result);
 
-           self.send(_ =>
+           self.send(
              SettingsFetched({
                bio: Belt.Option.getWithDefault(registered.user.bio, ""),
                email: registered.user.email,
                image: Belt.Option.getWithDefault(registered.user.image, ""),
                name: registered.user.username,
                password: "",
-             })
+             }),
            );
 
            registered.user->Js.Promise.resolve;

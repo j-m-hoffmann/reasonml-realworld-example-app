@@ -59,7 +59,7 @@ let reduceFeed = (reduceToAction, _state, jsonPayload) =>
 
 let populateGlobalFeed = (self, pageNumber) => {
   let reduceFunc = articleList =>
-    self.send(_ => ArticlesFetched(articleList), ());
+    self.ReasonReact.send(ArticlesFetched(articleList));
 
   /* Get the right page if there are more than 10 articles */
   JsonRequests.getGlobalArticles(
@@ -71,22 +71,23 @@ let populateGlobalFeed = (self, pageNumber) => {
   |> ignore;
 };
 
-let populateFeed = reduce => {
-  let reduceFunc = articleList => send(_ => MyArticlesFetched(articleList));
+let populateMyFeed = self => {
+  let reduceFunc = articleList =>
+    self.ReasonReact.send(_ => MyArticlesFetched(articleList));
   JsonRequests.getFeed(LocalStorage.getToken(), reduceFeed(reduceFunc))
   |> ignore;
 };
 
-let showMyFeed = (event, {ReasonReact.state: _state, send}) => {
+let showMyFeed = (event, self) => {
   event->ReactEvent.Mouse.preventDefault;
-  populateFeed(reduce);
-  send(_ => ShowMyFeed);
+  populateMyFeed(self);
+  self.send(_ => ShowMyFeed);
 };
 
-let showGlobalFeed = (event, {ReasonReact.state: _state, send}) => {
+let showGlobalFeed = (event, self) => {
   event->ReactEvent.Mouse.preventDefault;
-  populateGlobalFeed(reduce, 0);
-  send(_ => ShowGlobalFeed);
+  populateGlobalFeed(self, 0);
+  self.send(ShowGlobalFeed);
 };
 
 let goToArticle =
@@ -301,7 +302,7 @@ let make = (~articleCallback, ~router, _children) => {
         (
           self => {
             let reduceFunc = articleList =>
-              self.send(_ => TagArticlesFetched(articleList), ());
+              self.send(TagArticlesFetched(articleList));
             JsonRequests.getArticlesByTag(
               reduceFeed(reduceFunc),
               currentTagName,
@@ -328,7 +329,7 @@ let make = (~articleCallback, ~router, _children) => {
         (
           self => {
             let reduceFunc = articleList =>
-              self.send(_ => ArticlesFetched(articleList), ());
+              self.send(ArticlesFetched(articleList));
             JsonRequests.getGlobalArticles(
               reduceFeed(reduceFunc),
               LocalStorage.getToken(),
@@ -345,7 +346,7 @@ let make = (~articleCallback, ~router, _children) => {
     populateGlobalFeed(self, 0);
     ReasonReact.NoUpdate;
   },
-  render: ({state, send} as self) => {
+  render: ({state, handle}) => {
     let mapi = Belt.Array.mapWithIndex;
     let currentTagName = state.currentTagName;
     <div className="home-page">
@@ -364,7 +365,7 @@ let make = (~articleCallback, ~router, _children) => {
                   <a
                     className={state.myFeedActiveClass}
                     href="#"
-                    onClick={self.handle(showMyFeed)}>
+                    onClick={handle(showMyFeed)}>
                     {ReasonReact.string("Your Feed")}
                   </a>
                 </li>
@@ -372,7 +373,7 @@ let make = (~articleCallback, ~router, _children) => {
                   <a
                     className={state.globalfeedActiveClass}
                     href="#"
-                    onClick={self.handle(showGlobalFeed)}>
+                    onClick={handle(showGlobalFeed)}>
                     {ReasonReact.string("Global Feed")}
                   </a>
                 </li>
