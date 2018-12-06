@@ -192,7 +192,6 @@ let make = (~articleCallback, ~router, _children) => {
     self.send(_ =>
       CurrentUserFetched((currentUsername, currentBio, currentImage))
     );
-    ReasonReact.NoUpdate;
   },
   render: ({state, send}) => {
     let mapi = Belt.Array.mapWithIndex;
