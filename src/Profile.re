@@ -32,13 +32,13 @@ let initialState = {
 
 type action =
   | CurrentUserFetched((string, string, string))
-  | FavoriteArticle(array(Article.t))
+  | FavoriteArticles(array(Article.t))
   | MyArticles(array(Article.t))
   | NoData
   | PendingFavoriteArticles
   | PendingMyArticles;
 
-let reduceMyArtcles = (reduceFunc, _status, payload) =>
+let reduceMyArticles = (reduceFunc, _status, payload) =>
   payload
   |> Js.Promise.then_(result => {
        let articleList = Js.Json.parseExn(result)->ArticleList.fromJson;
@@ -51,7 +51,7 @@ let clickMyArticles = (event, {ReasonReact.state, send}) => {
   let reduceFunc = articles => send(_ => MyArticles(articles));
 
   JsonRequests.getMyArticles(
-    reduceMyArtcles(reduceFunc),
+    reduceMyArticles(reduceFunc),
     state.username,
     LocalStorage.getToken(),
   )
@@ -67,9 +67,9 @@ let clickProfileSettings = (router, event, {ReasonReact.state: _state}) => {
 
 let clickMyFavorites = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
-  let reduceFunc = articles => send(_ => FavoriteArticle(articles));
+  let reduceFunc = articles => send(_ => FavoriteArticles(articles));
   JsonRequests.getFavoritedArticles(
-    reduceMyArtcles(reduceFunc),
+    reduceMyArticles(reduceFunc),
     state.username,
     LocalStorage.getToken(),
   )
@@ -102,7 +102,7 @@ let goToArticle =
 };
 
 let renderArticle =
-    (handle, router, articleCallback, isFavorites, index, article) =>
+    (handle, router, articleCallback, isFavorites, index, article: Article.t) =>
   <div key={string_of_int(index)} className="article-preview">
     <div>
       <div className="article-meta">
@@ -160,7 +160,7 @@ let make = (~articleCallback, ~router, _children) => {
         myFeedActiveClass: "nav-link active",
         favfeedActiveClass: "nav-link disabled",
       })
-    | FavoriteArticle(articleList) =>
+    | FavoriteArticles(articleList) =>
       ReasonReact.Update({
         ...state,
         isMyArticleDisplay: ReactDOMRe.Style.make(~display="none", ()),
