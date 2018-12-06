@@ -57,11 +57,8 @@ let loginUser = (route, event, {ReasonReact.state, send}) => {
              }
            | None =>
              let loggedIn = JsonRequests.parseNewUser(json);
-             Effects.saveTokenToStorage(loggedIn.user.token);
-             Effects.saveUserToStorage(
-               loggedIn.user.username,
-               loggedIn.user.bio,
-             );
+             LocalStorage.saveToken(loggedIn.user.token);
+             LocalStorage.saveUser(loggedIn.user.username, loggedIn.user.bio);
              DirectorRe.setRoute(route, "/home");
              {...state, hasValidationError: false};
            };

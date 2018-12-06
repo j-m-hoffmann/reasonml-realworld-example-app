@@ -27,7 +27,8 @@ module Encode = {
       ])
     );
 
-  let user = (settings: state) => Json.Encode.(object_([("user", userSettings(settings))]));
+  let user = (settings: state) =>
+    Json.Encode.(object_([("user", userSettings(settings))]));
 
   let token = currentUser => Json.Encode.[("token", string(currentUser))];
 };
@@ -43,7 +44,12 @@ let updateSettings = (router, event, {ReasonReact.state}) => {
        })
     |> ignore;
   };
-  JsonRequests.updateUser(responseCatch, Encode.user(state), Effects.getTokenFromStorage()) |> ignore;
+  JsonRequests.updateUser(
+    responseCatch,
+    Encode.user(state),
+    LocalStorage.getToken(),
+  )
+  |> ignore;
 };
 
 let component = ReasonReact.reducerComponent("Settings");
@@ -97,14 +103,16 @@ let make = (~router, _children) => {
     let reduceUser = (_status, jsonPayload) =>
       jsonPayload |> Js.Promise.then_(displayResult);
 
-    getCurrentUser(reduceUser, Effects.getTokenFromStorage())->ignore;
+    getCurrentUser(reduceUser, LocalStorage.getToken())->ignore;
   },
   render: ({state, send, handle}) =>
     <div className="settings-page">
       <div className="container page">
         <div className="row">
           <div className="col-md-6 offset-md-3 col-xs-12">
-            <h1 className="text-xs-center"> {ReasonReact.string("Your Settings")} </h1>
+            <h1 className="text-xs-center">
+              {ReasonReact.string("Your Settings")}
+            </h1>
             <form>
               <fieldset>
                 <fieldset className="form-group">

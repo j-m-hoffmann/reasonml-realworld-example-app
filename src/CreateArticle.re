@@ -70,7 +70,7 @@ let make = (~router, _children) => {
       JsonRequests.submitNewArticle(
         submissionResponse,
         Encode.newArticle(state),
-        Effects.getTokenFromStorage(),
+        LocalStorage.getToken(),
       )
       |> ignore;
       ReasonReact.SideEffects(

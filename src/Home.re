@@ -64,7 +64,7 @@ let populateGlobalFeed = (self, pageNumber) => {
   /* Get the right page if there are more than 10 articles */
   JsonRequests.getGlobalArticles(
     reduceFeed(reduceFunc),
-    Effects.getTokenFromStorage(),
+    LocalStorage.getToken(),
     10,
     pageNumber * 10,
   )
@@ -73,7 +73,7 @@ let populateGlobalFeed = (self, pageNumber) => {
 
 let populateFeed = reduce => {
   let reduceFunc = articleList => send(_ => MyArticlesFetched(articleList));
-  JsonRequests.getFeed(Effects.getTokenFromStorage(), reduceFeed(reduceFunc))
+  JsonRequests.getFeed(LocalStorage.getToken(), reduceFeed(reduceFunc))
   |> ignore;
 };
 
@@ -305,7 +305,7 @@ let make = (~articleCallback, ~router, _children) => {
             JsonRequests.getArticlesByTag(
               reduceFeed(reduceFunc),
               currentTagName,
-              Effects.getTokenFromStorage(),
+              LocalStorage.getToken(),
             )
             |> ignore;
           }
@@ -317,15 +317,9 @@ let make = (~articleCallback, ~router, _children) => {
         (
           _self =>
             !isCurrentlyFav ?
-              JsonRequests.favoriteArticle(
-                Effects.getTokenFromStorage(),
-                slug,
-              )
+              JsonRequests.favoriteArticle(LocalStorage.getToken(), slug)
               |> ignore :
-              JsonRequests.unfavoriteArticle(
-                Effects.getTokenFromStorage(),
-                slug,
-              )
+              JsonRequests.unfavoriteArticle(LocalStorage.getToken(), slug)
               |> ignore
         ),
       )
@@ -337,7 +331,7 @@ let make = (~articleCallback, ~router, _children) => {
               self.send(_ => ArticlesFetched(articleList), ());
             JsonRequests.getGlobalArticles(
               reduceFeed(reduceFunc),
-              Effects.getTokenFromStorage(),
+              LocalStorage.getToken(),
               10,
               currentPage * 10,
             )

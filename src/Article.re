@@ -55,18 +55,14 @@ type action =
   | FetchComments(list(Comment.t));
 
 let deleteCommentRequest = (id, slug) =>
-  JsonRequests.deleteCommentForArticle(
-    slug,
-    id,
-    Effects.getTokenFromStorage(),
-  )
+  JsonRequests.deleteCommentForArticle(slug, id, LocalStorage.getToken())
   |> ignore;
 
 let followUserRequest = username =>
-  JsonRequests.followUser(username, Effects.getTokenFromStorage()) |> ignore;
+  JsonRequests.followUser(username, LocalStorage.getToken()) |> ignore;
 
 let unFollowUserRequest = username =>
-  JsonRequests.unFollowUser(username, Effects.getTokenFromStorage()) |> ignore;
+  JsonRequests.unFollowUser(username, LocalStorage.getToken()) |> ignore;
 
 let followUser = (isFollowing, event) =>
   isFollowing ?

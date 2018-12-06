@@ -17,7 +17,7 @@ let goToCreateArticle = (router, routeName, event) =>
   navigateTo(router, event, routeName);
 
 let displayUsername = () => {
-  let (optionalName, _, _) = Effects.getUserFromStorage();
+  let (optionalName, _, _) = LocalStorage.getUserFromStorage();
   switch (optionalName) {
   | Some(name) => name
   | None => "Username Missing"
@@ -26,7 +26,7 @@ let displayUsername = () => {
 
 /* This really should be in a reducer component since we are doing a side effect here. */
 let displayByLogin = router =>
-  switch (Effects.getTokenFromStorage()) {
+  switch (LocalStorage.getToken()) {
   | Some(_token) =>
     <a
       className="nav-link"

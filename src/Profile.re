@@ -61,7 +61,7 @@ let clickMyArticles = (event, {ReasonReact.state, send}) => {
   JsonRequests.getMyArticles(
     reduceMyArtcles(reduceFunc),
     state.username,
-    Effects.getTokenFromStorage(),
+    LocalStorage.getToken(),
   )
   |> ignore;
 
@@ -79,7 +79,7 @@ let clickMyFavorites = (event, {ReasonReact.state, send}) => {
   JsonRequests.getFavoritedArticles(
     reduceMyArtcles(reduceFunc),
     state.username,
-    Effects.getTokenFromStorage(),
+    LocalStorage.getToken(),
   )
   |> ignore;
 
@@ -186,12 +186,12 @@ let make = (~articleCallback, ~router, _children) => {
     | PendingMyArticles => ReasonReact.NoUpdate
     },
   didMount: self => {
-    let (username, bio, image) = Effects.getUserFromStorage();
+    let (username, bio, image) = LocalStorage.getUserFromStorage();
 
     let currentUsername = Belt.Option.getWithDefault(username, "");
     let currentBio = Belt.Option.getWithDefault(bio, "");
     let currentImage = Belt.Option.getWithDefault(image, "");
-    let token = Effects.getTokenFromStorage();
+    let token = LocalStorage.getToken();
 
     JsonRequests.getMyArticles(
       reduceByAuthArticles(self),
