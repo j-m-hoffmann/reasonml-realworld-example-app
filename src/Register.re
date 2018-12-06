@@ -7,6 +7,7 @@ type state = {
 };
 
 type action =
+  | GoToLogin
   | Login
   | Register(bool, list(string))
   | UpdateEmail(string)
@@ -54,13 +55,6 @@ let register = (route, {ReasonReact.state, send}, event) => {
   send(Register(false, ["Hitting server."]));
 };
 
-let goToLogin = (router, event) => {
-  event->ReactEvent.Mouse.preventDefault;
-  DirectorRe.setRoute(router, "/login");
-};
-
-let login = _event => Login;
-
 let errorDisplayList = state =>
   List.filter(
     errorMessage => String.length(errorMessage) > 0,
@@ -84,6 +78,8 @@ let make = (~router, _children) => {
   },
   reducer: (action, state) =>
     switch (action) {
+    | GoToLogin =>
+      ReasonReact.SideEffect((_ => DirectorRe.setRoute(router, "/login")))
     | Login => ReasonReact.NoUpdate
     | Register(validationFailed, errorList) =>
       ReasonReact.Update({...state, validationFailed, errorList})
@@ -101,7 +97,14 @@ let make = (~router, _children) => {
               {ReasonReact.string("Sign up")}
             </h1>
             <p className="text-xs-center">
-              <a href="#" onClick={goToLogin(router)}>
+              <a
+                href="#"
+                onClick={
+                  event => {
+                    event->ReactEvent.Mouse.preventDefault;
+                    send(GoToLogin);
+                  }
+                }>
                 {ReasonReact.string("Have an account?")}
               </a>
             </p>
