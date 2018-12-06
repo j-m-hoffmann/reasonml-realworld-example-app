@@ -109,10 +109,9 @@ let make = (~router, _children) => {
             </p>
             {
               if (state.hasValidationError) {
-                Array.of_list(errorDisplayList(state))
-                |> ReasonReact.arrayToElement;
+                Array.of_list(errorDisplayList(state)) |> ReasonReact.array;
               } else {
-                ReasonReact.nullElement;
+                ReasonReact.null;
               }
             }
             <form>
@@ -145,7 +144,7 @@ let make = (~router, _children) => {
                 />
               </fieldset>
               <button
-                onClick={self.handle(loginUser(router))}
+                onClick={event => self.handle(loginUser(router))}
                 className="btn btn-lg btn-primary pull-xs-right">
                 {ReasonReact.string("Sign in")}
               </button>
