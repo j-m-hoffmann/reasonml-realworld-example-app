@@ -44,17 +44,6 @@ let toJson = credentials =>
     ])
   );
 
-let errorDisplayList = state =>
-  List.filter(
-    errorMessage => String.length(errorMessage) > 0,
-    state.errorList,
-  )
-  |> List.mapi((acc, errorMessage) =>
-       <ul className="error-messages" key={string_of_int(acc)}>
-         <li> {ReasonReact.string(errorMessage)} </li>
-       </ul>
-     );
-
 let loginUser = (route, event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
   let reduceByAuthResult = (_status, jsonPayload) =>
@@ -118,7 +107,7 @@ let make = (~router, _children) => {
             </p>
             {
               if (state.hasValidationError) {
-                Array.of_list(errorDisplayList(state)) |> ReasonReact.array;
+                <ErrorMessages errors={state.errorList} />;
               } else {
                 ReasonReact.null;
               }

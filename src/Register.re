@@ -55,17 +55,6 @@ let register = (route, {ReasonReact.state, send}, event) => {
   send(Register(false, ["Hitting server."]));
 };
 
-let errorDisplayList = state =>
-  List.filter(
-    errorMessage => String.length(errorMessage) > 0,
-    state.errorList,
-  )
-  |> List.mapi((acc, errorMessage) =>
-       <ul className="error-messages" key={string_of_int(acc)}>
-         <li> {ReasonReact.string(errorMessage)} </li>
-       </ul>
-     );
-
 /* TODO: use the route to go the next home screen when registered successfully */
 let make = (~router, _children) => {
   ...component,
@@ -110,7 +99,7 @@ let make = (~router, _children) => {
             </p>
             {
               if (state.validationFailed) {
-                Array.of_list(errorDisplayList(state)) |> ReasonReact.array;
+                <ErrorMessages errors={state.errorList} />;
               } else {
                 ReasonReact.null;
               }
