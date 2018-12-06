@@ -16,20 +16,33 @@ let goToRegister = (router, event) => {
   DirectorRe.setRoute(router, "/register");
 };
 
-module Encode = {
-  let encodeUserCredentials = creds => {
-    open! Json.Encode;
-    object_([
-      ("email", string(creds.email)),
-      ("password", string(creds.password)),
-    ]);
-  };
-  let user = topLevelUser =>
-    Json.Encode.(object_([("user", encodeUserCredentials(topLevelUser))]));
+/*module Encode = {*/
+/*let encodeUserCredentials = creds => {*/
+/*open! Json.Encode;*/
+/*object_([*/
+/*("email", string(creds.email)),*/
+/*("password", string(creds.password)),*/
+/*]);*/
+/*};*/
+/*let user = topLevelUser =>*/
+/*Json.Encode.(object_([("user", encodeUserCredentials(topLevelUser))]));*/
 
-  let currentUser = (username, bio) =>
-    Json.Encode.[("username", string(username)), ("bio", string(bio))];
-};
+/*let currentUser = (username, bio) =>*/
+/*Json.Encode.[("username", string(username)), ("bio", string(bio))];*/
+/*};*/
+
+let toJson = credentials =>
+  Json.Encode.(
+    object_([
+      (
+        "user",
+        object_([
+          ("email", string(credentials.email)),
+          ("password", string(credentials.password)),
+        ]),
+      ),
+    ])
+  );
 
 let errorDisplayList = state =>
   List.filter(
@@ -68,8 +81,7 @@ let loginUser = (route, event, {ReasonReact.state, send}) => {
          )
          |> Js.Promise.resolve;
        });
-  JsonRequests.authenticateUser(reduceByAuthResult, Encode.user(state))
-  |> ignore;
+  JsonRequests.authenticateUser(reduceByAuthResult, toJson(state)) |> ignore;
   send(_ => LoginPending);
 };
 
