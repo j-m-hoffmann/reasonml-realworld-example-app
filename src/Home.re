@@ -2,13 +2,13 @@ open Models;
 
 type action =
   | ArticlesByPage(int)
-  | ArticlesFetched(articleList)
+  | ArticlesFetched(ArticleList.t)
   | FavoriteArticle(string, bool)
-  | MyArticlesFetched(articleList)
+  | MyArticlesFetched(ArticleList.t)
   | ShowGlobalFeed
   | ShowMyFeed
   | ShowTagList(string)
-  | TagArticlesFetched(articleList)
+  | TagArticlesFetched(ArticleList.t)
   | TagsFetched(array(string));
 
 type state = {
@@ -44,15 +44,7 @@ let populateTags = self => {
 let reduceFeed = (reduceToAction, _state, jsonPayload) =>
   jsonPayload
   |> Js.Promise.then_(result => {
-       let parsedArticles = Js.Json.parseExn(result);
-
-       let articleList =
-         Json.Decode.{
-           articles:
-             parsedArticles |> field("articles", array(Article.fromJson)),
-           articlesCount: parsedArticles |> field("articlesCount", int),
-         };
-
+       let articleList = Js.Json.parseExn(result)->ArticleList.fromJson;
        reduceToAction(articleList);
        articleList |> Js.Promise.resolve;
      });

@@ -41,16 +41,8 @@ type action =
 let reduceMyArtcles = (reduceFunc, _status, payload) =>
   payload
   |> Js.Promise.then_(result => {
-       let parsedArticles = Js.Json.parseExn(result);
-
-       let articleList =
-         Json.Decode.{
-           articles:
-             parsedArticles |> field("articles", array(Article.fromJson)),
-           articlesCount: parsedArticles |> field("articlesCount", int),
-         };
+       let articleList = Js.Json.parseExn(result)->ArticleList.fromJson;
        reduceFunc(articleList.articles);
-
        articleList |> Js.Promise.resolve;
      });
 
@@ -87,20 +79,18 @@ let clickMyFavorites = (event, {ReasonReact.state, send}) => {
 };
 
 /* side effect */
-let reduceByAuthArticles = ({ReasonReact.state, send}, _status, jsonPayload) =>
+let reduceByAuthArticles = (self, _status, jsonPayload) =>
   jsonPayload
-  |> Js.Promise.then_(payload => {
-       let jsonArticles = Js.Json.parseExn(payload);
-       let articleCount =
-         Json.Decode.(jsonArticles |> field("articlesCount", int));
+  |> Js.Promise.then_(result => {
+       let articleList = Js.Json.parseExn(result)->ArticleList.fromJson;
 
-       switch (articleCount) {
+       switch (articleList.articlesCount) {
        | count when count > 0 =>
-         send(_ => MyArticles(extractArticleList(jsonArticles)))
-       | _ => send(_ => NoData)
+         self.ReasonReact.send(_ => MyArticles(articleList.articles))
+       | _ => self.ReasonReact.send(_ => NoData)
        };
 
-       payload |> Js.Promise.resolve;
+       result |> Js.Promise.resolve;
      });
 
 /* These functions were copied from  */
