@@ -92,7 +92,7 @@ let make = (~router, _children) => {
       ReasonReact.Update({...state, hasValidationError: hasError, errorList})
     | LoginPending => ReasonReact.NoUpdate
     },
-  render: ({state, send}) =>
+  render: ({state, send, handle}) =>
     <div className="auth-page">
       <div className="container page">
         <div className="row">
@@ -142,7 +142,7 @@ let make = (~router, _children) => {
                 />
               </fieldset>
               <button
-                onClick={event => self.handle(loginUser(router))}
+                onClick={handle(loginUser(router))}
                 className="btn btn-lg btn-primary pull-xs-right">
                 {ReasonReact.string("Sign in")}
               </button>
