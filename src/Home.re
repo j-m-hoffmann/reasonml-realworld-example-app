@@ -33,7 +33,7 @@ let populateTags = self => {
          let parsedPopularTags = Js.Json.parseExn(result);
          let tags =
            Json.Decode.(parsedPopularTags |> field("tags", array(string)));
-         self.send(_ => TagsFetched(tags), ());
+         self.ReasonReact.send(_ => TagsFetched(tags));
 
          tags |> Js.Promise.resolve;
        })
