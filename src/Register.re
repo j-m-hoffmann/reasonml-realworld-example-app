@@ -46,10 +46,10 @@ let register = (route, {ReasonReact.state, send}, event) => {
                errorList: newUser->Convert.toErrorListFromResponse,
              }
            };
-         send(_ => Register(newState))->Js.Promise.resolve;
+         send(Register(newState))->Js.Promise.resolve;
        });
   registerNewUser(updateState, Encode.user(state))->ignore;
-  Register((false, ["Hitting server."]));
+  send(Register((false, ["Hitting server."])));
 };
 
 let goToLogin = (router, event) => {
