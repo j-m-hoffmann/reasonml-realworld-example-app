@@ -189,9 +189,8 @@ let make = (~articleCallback, ~router, _children) => {
       token,
     )
     |> ignore;
-    self.send(
-      _ => CurrentUserFetched((currentUsername, currentBio, currentImage)),
-      (),
+    self.send(_ =>
+      CurrentUserFetched((currentUsername, currentBio, currentImage))
     );
     ReasonReact.NoUpdate;
   },
