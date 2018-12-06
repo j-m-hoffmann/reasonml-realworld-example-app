@@ -258,23 +258,19 @@ let make = (~articleCallback, ~router, _children) => {
         globalfeedActiveClass: "nav-link active",
         tagFeedActiveClass: "nav-link disabled",
       })
-    | ArticlesFetched(articleList) =>
+    | ArticlesFetched({articles, articleCount}) =>
       ReasonReact.Update({
         ...state,
-        articles: articleList.articles,
-        articleCount: articleList.articlesCount,
+        articles,
+        articleCount,
         tagFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
       })
-    | MyArticlesFetched(articleList) =>
+    | MyArticlesFetched({articles, articleCount}) =>
+      ReasonReact.Update({...state, articles, articleCount})
+    | TagArticlesFetched({articles}) =>
       ReasonReact.Update({
         ...state,
-        articles: articleList.articles,
-        articleCount: articleList.articlesCount,
-      })
-    | TagArticlesFetched(articleList) =>
-      ReasonReact.Update({
-        ...state,
-        articles: articleList.articles,
+        articles,
         myFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
         globalFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
         tagFeedDisplay: ReactDOMRe.Style.make(~display="block", ()),
