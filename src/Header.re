@@ -17,7 +17,7 @@ let goToCreateArticle = (router, routeName, event) =>
   navigateTo(router, event, routeName);
 
 let displayUsername = () => {
-  let (optionalName, _, _) = LocalStorage.getUserFromStorage();
+  let (optionalName, _, _) = LocalStorage.getUser();
   switch (optionalName) {
   | Some(name) => name
   | None => "Username Missing"

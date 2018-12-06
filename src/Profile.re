@@ -186,7 +186,7 @@ let make = (~articleCallback, ~router, _children) => {
     | PendingMyArticles => ReasonReact.NoUpdate
     },
   didMount: self => {
-    let (username, bio, image) = LocalStorage.getUserFromStorage();
+    let (username, bio, image) = LocalStorage.getUser();
 
     let currentUsername = Belt.Option.getWithDefault(username, "");
     let currentBio = Belt.Option.getWithDefault(bio, "");
