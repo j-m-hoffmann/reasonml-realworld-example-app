@@ -22,7 +22,8 @@ module Encode = {
       ("username", string(creds.username)),
     ]);
   };
-  let user = r => Json.Encode.(object_([("user", encodeUserCredentials(r))]));
+  let user = r =>
+    Json.Encode.(object_([("user", encodeUserCredentials(r))]));
 };
 
 let component = ReasonReact.reducerComponent("Register");
@@ -59,9 +60,14 @@ let goToLogin = (router, event) => {
 let login = _event => Login;
 
 let errorDisplayList = state =>
-  List.filter(errorMessage => String.length(errorMessage) > 0, state.errorList)
+  List.filter(
+    errorMessage => String.length(errorMessage) > 0,
+    state.errorList,
+  )
   |> List.mapi((acc, errorMessage) =>
-       <ul className="error-messages" key={string_of_int(acc)}> <li> {ReasonReact.string(errorMessage)} </li> </ul>
+       <ul className="error-messages" key={string_of_int(acc)}>
+         <li> {ReasonReact.string(errorMessage)} </li>
+       </ul>
      );
 
 /* TODO: use the route to go the next home screen when registered successfully */
