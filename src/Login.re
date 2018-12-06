@@ -6,7 +6,7 @@ type state = {
 };
 
 type action =
-  | Login((bool, list(string)))
+  | Login(bool, list(string))
   | UpdateEmail(string)
   | UpdatePassword(string)
   | LoginPending;
@@ -77,7 +77,7 @@ let loginUser = (route, event, {ReasonReact.state, send}) => {
            };
          /* TODO: Create a reducer to do nothing with succesful login so the state doesn't try to update */
          send(_ =>
-           Login((updatedState.hasValidationError, updatedState.errorList))
+           Login(updatedState.hasValidationError, updatedState.errorList)
          )
          |> Js.Promise.resolve;
        });
@@ -99,7 +99,7 @@ let make = (~router, _children) => {
     switch (action) {
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdatePassword(password) => ReasonReact.Update({...state, password})
-    | Login((hasError, errorList)) =>
+    | Login(hasError, errorList) =>
       ReasonReact.Update({...state, hasValidationError: hasError, errorList})
     | LoginPending => ReasonReact.NoUpdate
     },

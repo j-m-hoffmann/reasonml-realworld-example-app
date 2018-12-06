@@ -8,7 +8,7 @@ type state = {
 
 type action =
   | Login
-  | Register((bool, list(string)))
+  | Register(bool, list(string))
   | UpdateEmail(string)
   | UpdateName(string)
   | UpdatePassword(string);
@@ -47,10 +47,11 @@ let register = (route, {ReasonReact.state, send}, event) => {
                errorList: newUser->Convert.toErrorListFromResponse,
              }
            };
-         send(Register(newState))->Js.Promise.resolve;
+         send(Register(newState.validationFailed, newState.errorList))
+         ->Js.Promise.resolve;
        });
   registerNewUser(updateState, toJson(state))->ignore;
-  send(Register((false, ["Hitting server."])));
+  send(Register(false, ["Hitting server."]));
 };
 
 let goToLogin = (router, event) => {
@@ -84,7 +85,7 @@ let make = (~router, _children) => {
   reducer: (action, state) =>
     switch (action) {
     | Login => ReasonReact.NoUpdate
-    | Register({validationFailed, errorList}) =>
+    | Register(validationFailed, errorList) =>
       ReasonReact.Update({...state, validationFailed, errorList})
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdateName(username) => ReasonReact.Update({...state, username})
