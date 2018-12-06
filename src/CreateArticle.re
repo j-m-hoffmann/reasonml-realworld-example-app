@@ -22,7 +22,10 @@ module Encode = {
         ("title", string(articleDetails.title)),
         ("description", string(articleDetails.description)),
         ("body", string(articleDetails.articleBody)),
-        ("tagList", parseTags(articleDetails.rawTags) |> Json.Encode.stringArray),
+        (
+          "tagList",
+          parseTags(articleDetails.rawTags) |> Json.Encode.stringArray,
+        ),
       ])
     );
 };
@@ -51,7 +54,12 @@ let submissionResponse = (_status, payload) =>
 let component = ReasonReact.reducerComponent("CreateArticle");
 let make = (~router, _children) => {
   ...component,
-  initialState: () => {title: "", description: "", articleBody: "", rawTags: ""},
+  initialState: () => {
+    title: "",
+    description: "",
+    articleBody: "",
+    rawTags: "",
+  },
   reducer: (action, state) =>
     switch (action) {
     /* | ArticleSubmitted(router) => */
@@ -59,13 +67,18 @@ let make = (~router, _children) => {
     /*     (_self => DirectorRe.setRoute(router, "/home")), */
     /*   ); */
     | SubmitArticle =>
-      JsonRequests.submitNewArticle(submissionResponse, Encode.newArticle(state), Effects.getTokenFromStorage())
+      JsonRequests.submitNewArticle(
+        submissionResponse,
+        Encode.newArticle(state),
+        Effects.getTokenFromStorage(),
+      )
       |> ignore;
       ReasonReact.SideEffects(
         (_self => DirectorRe.setRoute(router, "/home")),
       );
     | UpdateTitle(title) => ReasonReact.Update({...state, title})
-    | UpdateDescription(description) => ReasonReact.Update({...state, description})
+    | UpdateDescription(description) =>
+      ReasonReact.Update({...state, description})
     | UpdateBody(body) => ReasonReact.Update({...state, articleBody: body})
     | UpdateTags(tags) => ReasonReact.Update({...state, rawTags: tags})
     },
