@@ -1,5 +1,5 @@
 open Config;
-open Models;
+/*open Models;*/
 
 let make_headers = (token: option(string)) => {
   let content_type = ("content-type", "application/json");
@@ -42,11 +42,11 @@ let tee = (func, output) => {
 
 let parseNewUser = (responseText: string): User.registered => {
   let json = Js.Json.parseExn(responseText);
-  let possibleErrors =
+  let errors =
     Json.Decode.(optional(field("errors", Errors.fromJson), json));
-  switch (possibleErrors) {
+  switch (errors) {
   | None => {user: User.fromJson(json), errors: None}
-  | Some(errors) => {user: User.empty, errors}
+  | _ => {user: User.empty, errors}
   };
 };
 
