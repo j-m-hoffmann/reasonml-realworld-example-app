@@ -35,17 +35,16 @@ let toJson = settings =>
 /*let token = currentUser => Json.Encode.[("token", string(currentUser))];*/
 /*};*/
 
-let updateSettings = (router, event, {ReasonReact.state}) => {
+let updateSettings = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
-  let responseCatch = (_status, payload) => {
-    DirectorRe.setRoute(router, "/profile");
+  let responseCatch = (_status, payload) =>
     payload
     |> Js.Promise.then_(result => {
          Js.log(result);
+         send(SettingsUpdated);
          result |> Js.Promise.resolve;
        })
     |> ignore;
-  };
   JsonRequests.updateUser(
     responseCatch,
     toJson(state),
@@ -61,7 +60,8 @@ let make = (~router, _children) => {
   reducer: (action, state) =>
     switch (action) {
     | SettingsFetched(newState) => ReasonReact.Update(newState)
-    | SettingsUpdated => ReasonReact.NoUpdate
+    | SettingsUpdated =>
+      ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/profile")))
     | UpdateBio(bio) => ReasonReact.Update({...state, bio})
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdateImage(image) => ReasonReact.Update({...state, image})
@@ -190,7 +190,7 @@ let make = (~router, _children) => {
                 </fieldset>
                 <button
                   className="btn btn-lg btn-primary pull-xs-right"
-                  onClick={handle(updateSettings(router))}>
+                  onClick={handle(updateSettings)}>
                   {ReasonReact.string("Update Settings")}
                 </button>
               </fieldset>
