@@ -1,5 +1,3 @@
-open Models;
-
 let formatError = (fieldName, value) => {
   let prependFieldName = (fieldName, fieldValue) =>
     fieldName ++ " " ++ fieldValue;
@@ -13,8 +11,8 @@ let formatError = (fieldName, value) => {
   };
 };
 
-let toErrorListFromResponse = errorGraph =>
-  switch (errorGraph.errors) {
+let toErrorListFromResponse = ({errors}: User.registered) =>
+  switch (errors) {
   | Some(errors) =>
     (formatError("Email", errors.email) |> Array.to_list)
     @ (formatError("Username", errors.username) |> Array.to_list)
