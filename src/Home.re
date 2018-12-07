@@ -1,5 +1,3 @@
-open Models;
-
 type action =
   | ArticlesByPage(int)
   | ArticlesFetched(ArticleList.t)
