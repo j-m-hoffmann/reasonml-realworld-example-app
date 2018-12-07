@@ -10,8 +10,8 @@ type action =
   | LoginSuccessful(User.t)
   | LoginFailed(list(string))
   | UpdateEmail(string)
-  | UpdatePassword(string)
-  | LoginPending;
+  | UpdatePassword(string);
+/*| LoginPending;*/
 
 /*module Encode = {*/
 /*let encodeUserCredentials = creds => {*/
@@ -56,8 +56,8 @@ let loginUser = (event, {ReasonReact.state, send}) => {
            )
          ->Js.Promise.resolve
        );
-  JsonRequests.authenticateUser(reduceByAuthResult, toJson(state))->ignore;
-  send(LoginPending);
+  authenticateUser(reduceByAuthResult, toJson(state))->ignore;
+  /*send(LoginPending);*/
 };
 
 let component = ReasonReact.reducerComponent("Login");
@@ -90,7 +90,7 @@ let make = (~router, _children) => {
       ReasonReact.Update({...state, errorList, loginFailed: true})
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdatePassword(password) => ReasonReact.Update({...state, password})
-    | LoginPending => ReasonReact.NoUpdate
+    /*| LoginPending => ReasonReact.NoUpdate*/
     },
   render: ({state, send, handle}) =>
     <div className="auth-page">
