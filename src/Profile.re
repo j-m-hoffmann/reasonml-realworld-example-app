@@ -16,6 +16,7 @@ type state = {
 type action =
   | CurrentUserFetched((string, string, string))
   | FavoriteArticles(array(Article.t))
+  | GoToSettings
   | MyArticles(array(Article.t))
   | NoData
   | PendingFavoriteArticles;
@@ -40,11 +41,6 @@ let clickMyArticles = (event, {ReasonReact.state, send}) => {
   )
   |> ignore;
   /*send(PendingMyArticles);*/
-};
-
-let clickProfileSettings = (router, event, {ReasonReact.state: _state}) => {
-  event->ReactEvent.Mouse.preventDefault;
-  DirectorRe.setRoute(router, "/settings");
 };
 
 let clickMyFavorites = (event, {ReasonReact.state, send}) => {
@@ -166,6 +162,10 @@ let make = (~articleCallback, ~router, _children) => {
       })
     | CurrentUserFetched((username, bio, image)) =>
       ReasonReact.Update({...state, username, bio, image})
+    | GoToSettings =>
+      ReasonReact.SideEffects(
+        (_ => DirectorRe.setRoute(router, "/settings")),
+      )
     | NoData => ReasonReact.NoUpdate
     | PendingFavoriteArticles => ReasonReact.NoUpdate
     /*| PendingMyArticles => ReasonReact.NoUpdate*/
@@ -200,7 +200,12 @@ let make = (~articleCallback, ~router, _children) => {
               <p> {ReasonReact.string(state.bio)} </p>
               <button
                 className="btn btn-sm btn-outline-secondary action-btn"
-                onClick={handle(clickProfileSettings(router))}>
+                onClick={
+                  event => {
+                    event->ReactEvent.Mouse.preventDefault;
+                    send(GoToSettings);
+                  }
+                }>
                 <i className="ion-plus-round" />
                 {ReasonReact.string("Edit Profile Settings")}
               </button>
