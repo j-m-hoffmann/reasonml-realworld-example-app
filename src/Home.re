@@ -12,7 +12,7 @@ type action =
   | TagsFetched(array(string));
 
 type state = {
-  articleCount: int,
+  articlesCount: int,
   articles: array(Article.t),
   currentTagName: string,
   favoritedArticleSlug: string,
@@ -222,7 +222,7 @@ let component = ReasonReact.reducerComponent("Home");
 let make = (~articleCallback, ~router, _children) => {
   ...component,
   initialState: () => {
-    articleCount: 0,
+    articlesCount: 0,
     articles: [||],
     currentTagName: "",
     favoritedArticleSlug: "",
@@ -258,15 +258,15 @@ let make = (~articleCallback, ~router, _children) => {
         globalfeedActiveClass: "nav-link active",
         tagFeedActiveClass: "nav-link disabled",
       })
-    | ArticlesFetched({articles, articleCount}) =>
+    | ArticlesFetched({articles, articlesCount}) =>
       ReasonReact.Update({
         ...state,
         articles,
-        articleCount,
+        articlesCount,
         tagFeedDisplay: ReactDOMRe.Style.make(~display="none", ()),
       })
-    | MyArticlesFetched({articles, articleCount}) =>
-      ReasonReact.Update({...state, articles, articleCount})
+    | MyArticlesFetched({articles, articlesCount}) =>
+      ReasonReact.Update({...state, articles, articlesCount})
     | TagArticlesFetched({articles}) =>
       ReasonReact.Update({
         ...state,
@@ -401,7 +401,7 @@ let make = (~articleCallback, ~router, _children) => {
             <div>
               <nav>
                 <ul className="pagination">
-                  {renderPager(self, state.articleCount)}
+                  {renderPager(self, state.articlesCount)}
                 </ul>
               </nav>
             </div>
