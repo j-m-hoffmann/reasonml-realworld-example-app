@@ -6,15 +6,11 @@ type state = {
 };
 
 type action =
+  | GoToRegister
   | Login(bool, list(string))
   | UpdateEmail(string)
   | UpdatePassword(string)
   | LoginPending;
-
-let goToRegister = (router, event) => {
-  event->ReactEvent.Mouse.preventDefault;
-  DirectorRe.setRoute(router, "/register");
-};
 
 /*module Encode = {*/
 /*let encodeUserCredentials = creds => {*/
@@ -86,6 +82,8 @@ let make = (~router, _children) => {
   },
   reducer: (action, state) =>
     switch (action) {
+    | GoToRegister =>
+      ReasonReact.SideEffect(DirectorRe.setRoute(router, "/register"))
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdatePassword(password) => ReasonReact.Update({...state, password})
     | Login(hasError, errorList) =>
@@ -101,7 +99,14 @@ let make = (~router, _children) => {
               {ReasonReact.string("Sign in")}
             </h1>
             <p className="text-xs-center">
-              <a href="#" onClick={goToRegister(router)}>
+              <a
+                href="#"
+                onClick={
+                  event => {
+                    event->ReactEvent.Mouse.preventDefault;
+                    send(GoToRegister);
+                  }
+                }>
                 {ReasonReact.string("Need an account?")}
               </a>
             </p>
