@@ -95,20 +95,20 @@ let goToProfile = (router, event, {ReasonReact.state: _state}) => {
 };
 
 let updateFavoritedCount = (articles, currentSlug) => {
-  let updateCurrentArticle = article => {
-    let incDecFavCount =
-      fun
-      | true => article.favoritesCount + 1
-      | false => article.favoritesCount - 1;
-
+  let updateCurrentArticle = (article: Article.t) =>
+    /*let incDecFavCount =*/
+    /*fun*/
+    /*| true => article.favoritesCount + 1*/
+    /*| false => article.favoritesCount - 1;*/
     article.slug == currentSlug ?
       {
         ...article,
         favorited: !article.favorited,
-        favoritesCount: incDecFavCount(!article.favorited),
+        favoritesCount:
+          article.favorited ?
+            article.favoritesCount - 1 : article.favoritesCount + 1,
       } :
       article;
-  };
   Array.map(updateCurrentArticle, articles);
 };
 
