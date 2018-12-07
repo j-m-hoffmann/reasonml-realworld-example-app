@@ -33,7 +33,7 @@ let populateTags = self => {
          let parsedPopularTags = Js.Json.parseExn(result);
          let tags =
            Json.Decode.(parsedPopularTags |> field("tags", array(string)));
-         self.ReasonReact.send(_ => TagsFetched(tags));
+         self.ReasonReact.send(TagsFetched(tags));
 
          tags |> Js.Promise.resolve;
        })
@@ -65,7 +65,7 @@ let populateGlobalFeed = (self, pageNumber) => {
 
 let populateMyFeed = self => {
   let reduceFunc = articleList =>
-    self.ReasonReact.send(_ => MyArticlesFetched(articleList));
+    self.ReasonReact.send(MyArticlesFetched(articleList));
   JsonRequests.getFeed(LocalStorage.getToken(), reduceFeed(reduceFunc))
   |> ignore;
 };
@@ -73,7 +73,7 @@ let populateMyFeed = self => {
 let showMyFeed = (event, self) => {
   event->ReactEvent.Mouse.preventDefault;
   populateMyFeed(self);
-  self.send(_ => ShowMyFeed);
+  self.ReasonReact.send(ShowMyFeed);
 };
 
 let showGlobalFeed = (event, self) => {
@@ -143,7 +143,7 @@ let renderPager =
   let pageRanges = articleCount / 10 |> range(1);
   let reduceArticles = (currentPageNumber, event, _self) => {
     event->ReactEvent.Mouse.preventDefault;
-    send(_ => ArticlesByPage(currentPageNumber));
+    send(ArticlesByPage(currentPageNumber));
   };
 
   /* Add the logic to highlight the current page */
@@ -197,7 +197,7 @@ let renderArticle =
         <button
           className="btn btn-outline-primary btn-sm pull-xs-right"
           onClick={
-            send(_ => FavoriteArticle(article.slug, article.favorited))
+            _event => send(FavoriteArticle(article.slug, article.favorited))
           }>
           <i className="ion-heart" />
           {ReasonReact.string(string_of_int(article.favoritesCount))}
@@ -332,7 +332,6 @@ let make = (~articleCallback, ~router, _children) => {
   didMount: self => {
     populateTags(self);
     populateGlobalFeed(self, 0);
-    ReasonReact.NoUpdate;
   },
   render: ({state, handle}) => {
     let mapi = Belt.Array.mapWithIndex;
