@@ -1,7 +1,7 @@
 type state = {
   email: string,
   password: string,
-  hasValidationError: bool,
+  loginFailed: bool,
   errorList: list(string),
 };
 
@@ -67,7 +67,7 @@ let make = (~router, _children) => {
   initialState: () => {
     email: "",
     password: "",
-    hasValidationError: false,
+    loginFailed: false,
     errorList: [],
   },
   reducer: (action, state) =>
@@ -87,7 +87,7 @@ let make = (~router, _children) => {
         ),
       )
     | LoginFailed(errorList) =>
-      ReasonReact.Update({...state, errorList, hasValidationError: true})
+      ReasonReact.Update({...state, errorList, loginFailed: true})
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdatePassword(password) => ReasonReact.Update({...state, password})
     | LoginPending => ReasonReact.NoUpdate
@@ -113,7 +113,7 @@ let make = (~router, _children) => {
               </a>
             </p>
             {
-              if (state.hasValidationError) {
+              if (state.loginFailed) {
                 <ErrorMessages errors={state.errorList} />;
               } else {
                 ReasonReact.null;
