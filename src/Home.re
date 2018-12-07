@@ -137,8 +137,8 @@ let renderArticleTag = (index, tag) =>
 /*};*/
 
 let renderPager = ({send, ReasonReact.handle}, articlesCount) => {
-  let pageRanges = Belt.List.makeBy(articlesCount / 10, i => i + 1);
-  /*let pageRanges = Belt.Array.makeBy(articlesCount / 10, i => i + 1);*/
+  /*let pageRanges = Belt.List.makeBy(articlesCount / 10, i => i + 1);*/
+  let pageRanges = Belt.Array.makeBy(articlesCount / 10, i => i + 1);
   /*let pageRanges = range(1, articlesCount / 10);*/
   let reduceArticles = (currentPageNumber, event, _self) => {
     event->ReactEvent.Mouse.preventDefault;
@@ -146,20 +146,17 @@ let renderPager = ({send, ReasonReact.handle}, articlesCount) => {
   };
 
   /* Add the logic to highlight the current page */
-  List.map(
-    currentPageNumber =>
-      <li
-        className="page-item ng-scope" key={string_of_int(currentPageNumber)}>
-        <a
-          className="page-link ng-binding"
-          href=""
-          onClick={handle(reduceArticles(currentPageNumber))}>
-          {ReasonReact.string(string_of_int(currentPageNumber))}
-        </a>
-      </li>,
-    pageRanges,
+  Belt.Array.map(pageRanges, currentPageNumber =>
+    <li className="page-item ng-scope" key={string_of_int(currentPageNumber)}>
+      <a
+        className="page-link ng-binding"
+        href=""
+        onClick={handle(reduceArticles(currentPageNumber))}>
+        {ReasonReact.string(string_of_int(currentPageNumber))}
+      </a>
+    </li>
   )
-  ->Array.of_list
+  /*->Array.of_list*/
   ->ReasonReact.array;
 };
 
