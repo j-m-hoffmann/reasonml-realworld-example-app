@@ -7,7 +7,8 @@ type state = {
 
 type action =
   | GoToRegister
-  | Login(bool, list(string))
+  | LoginSuccessful(User.t)
+  | LoginFailed(list(string))
   | UpdateEmail(string)
   | UpdatePassword(string)
   | LoginPending;
@@ -40,34 +41,23 @@ let toJson = credentials =>
     ])
   );
 
-let loginUser = (route, event, {ReasonReact.state, send}) => {
+let loginUser = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
+  open JsonRequests;
   let reduceByAuthResult = (_status, jsonPayload) =>
     jsonPayload
-    |> Js.Promise.then_(json => {
-         let newUser = JsonRequests.checkForErrors(json);
-         let updatedState =
-           switch (newUser) {
-           | Some(errors) => {
-               ...state,
-               hasValidationError: true,
-               errorList: errors |> JsonRequests.convertErrorsToList,
-             }
-           | None =>
-             let loggedIn = JsonRequests.parseNewUser(json);
-             LocalStorage.saveToken(loggedIn.user.token);
-             LocalStorage.saveUser(loggedIn.user.username, loggedIn.user.bio);
-             DirectorRe.setRoute(route, "/home");
-             {...state, hasValidationError: false};
-           };
-         /* TODO: Create a reducer to do nothing with succesful login so the state doesn't try to update */
-         send(_ =>
-           Login(updatedState.hasValidationError, updatedState.errorList)
-         )
-         |> Js.Promise.resolve;
-       });
-  JsonRequests.authenticateUser(reduceByAuthResult, toJson(state)) |> ignore;
-  send(_ => LoginPending);
+    |> Js.Promise.then_(json =>
+         checkForErrors(json)
+         ->(
+             fun
+             | None => send(LoginSuccessful(parseNewUser(json).user))
+             | Some(errors) =>
+               send(LoginFailed(convertErrorsToList(errors)))
+           )
+         ->Js.Promise.resolve
+       );
+  JsonRequests.authenticateUser(reduceByAuthResult, toJson(state))->ignore;
+  send(LoginPending);
 };
 
 let component = ReasonReact.reducerComponent("Login");
@@ -83,11 +73,23 @@ let make = (~router, _children) => {
   reducer: (action, state) =>
     switch (action) {
     | GoToRegister =>
-      ReasonReact.SideEffect(DirectorRe.setRoute(router, "/register"))
+      ReasonReact.SideEffects(
+        (_ => DirectorRe.setRoute(router, "/register")),
+      )
+    | LoginSuccessful(user) =>
+      ReasonReact.SideEffects(
+        (
+          _ => {
+            LocalStorage.saveToken(user.token);
+            LocalStorage.saveUser(user.username, user.bio, user.image);
+            DirectorRe.setRoute(router, "/home");
+          }
+        ),
+      )
+    | LoginFailed(errorList) =>
+      ReasonReact.Update({...state, errorList, hasValidationError: true})
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdatePassword(password) => ReasonReact.Update({...state, password})
-    | Login(hasError, errorList) =>
-      ReasonReact.Update({...state, hasValidationError: hasError, errorList})
     | LoginPending => ReasonReact.NoUpdate
     },
   render: ({state, send, handle}) =>
@@ -147,7 +149,7 @@ let make = (~router, _children) => {
                 />
               </fieldset>
               <button
-                onClick={handle(loginUser(router))}
+                onClick={handle(loginUser)}
                 className="btn btn-lg btn-primary pull-xs-right">
                 {ReasonReact.string("Sign in")}
               </button>
