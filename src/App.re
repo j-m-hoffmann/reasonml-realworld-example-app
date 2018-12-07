@@ -14,17 +14,18 @@ let router =
     "/profile": "profile",
   });
 
-let handlers = {
-  "root": () => renderForRoute(Routes.Home, router),
-  "home": () => renderForRoute(Routes.Home, router),
-  "register": () => renderForRoute(Routes.Register, router),
-  "login": () => renderForRoute(Routes.Login, router),
-  "settings": () => renderForRoute(Routes.Settings, router),
-  "article_create": () => renderForRoute(Routes.CreateArticle, router),
-  "article_edit": () => renderForRoute(Routes.EditArticle, router),
-  "article": () => renderForRoute(Routes.Article, router),
-  "profile": () => renderForRoute(Routes.Profile, router),
-};
+let handlers =
+  Routes.{
+    "root": () => renderForRoute(Home, router),
+    "home": () => renderForRoute(Home, router),
+    "register": () => renderForRoute(Register, router),
+    "login": () => renderForRoute(Login, router),
+    "settings": () => renderForRoute(Settings, router),
+    "article_create": () => renderForRoute(CreateArticle, router),
+    "article_edit": () => renderForRoute(EditArticle, router),
+    "article": () => renderForRoute(Article, router),
+    "profile": () => renderForRoute(Profile, router),
+  };
 
 DirectorRe.configure(router, {"html5history": true, "resource": handlers});
 
