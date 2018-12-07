@@ -376,7 +376,7 @@ let make = (~articleCallback, ~router, _children) => {
                 mapi(state.articles, (i, article) =>
                   renderArticle(
                     self,
-                    self.handle,
+                    handle,
                     router,
                     articleCallback,
                     i,
@@ -391,7 +391,7 @@ let make = (~articleCallback, ~router, _children) => {
                 mapi(state.articles, (i, article) =>
                   renderArticle(
                     self,
-                    self.handle,
+                    handle,
                     router,
                     articleCallback,
                     i,
@@ -406,7 +406,7 @@ let make = (~articleCallback, ~router, _children) => {
                 mapi(state.articles, (i, article) =>
                   renderArticle(
                     self,
-                    self.handle,
+                    handle,
                     router,
                     articleCallback,
                     i,
