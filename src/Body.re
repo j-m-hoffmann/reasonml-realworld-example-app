@@ -1,5 +1,3 @@
-open Models;
-
 type state = Article.t;
 
 type action =

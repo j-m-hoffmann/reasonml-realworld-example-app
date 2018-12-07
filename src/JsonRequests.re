@@ -1,5 +1,4 @@
 open Config;
-/*open Models;*/
 
 let make_headers = (token: option(string)) => {
   let content_type = ("content-type", "application/json");
