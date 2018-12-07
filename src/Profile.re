@@ -1,5 +1,3 @@
-open Models;
-
 type state = {
   articles: array(Article.t),
   bio: string,
