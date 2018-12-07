@@ -20,8 +20,8 @@ type action =
   | FavoriteArticles(array(Article.t))
   | MyArticles(array(Article.t))
   | NoData
-  | PendingFavoriteArticles
-  | PendingMyArticles;
+  | PendingFavoriteArticles;
+/*| PendingMyArticles;*/
 
 let reduceMyArticles = (reduceFunc, _status, payload) =>
   payload
@@ -41,8 +41,7 @@ let clickMyArticles = (event, {ReasonReact.state, send}) => {
     LocalStorage.getToken(),
   )
   |> ignore;
-
-  send(_ => PendingMyArticles);
+  /*send(PendingMyArticles);*/
 };
 
 let clickProfileSettings = (router, event, {ReasonReact.state: _state}) => {
@@ -71,8 +70,8 @@ let reduceByAuthArticles = (self, _status, jsonPayload) =>
 
        switch (articleList.articlesCount) {
        | count when count > 0 =>
-         self.ReasonReact.send(_ => MyArticles(articleList.articles))
-       | _ => self.ReasonReact.send(_ => NoData)
+         self.ReasonReact.send(MyArticles(articleList.articles))
+       | _ => self.ReasonReact.send(NoData)
        };
 
        result |> Js.Promise.resolve;
@@ -171,7 +170,7 @@ let make = (~articleCallback, ~router, _children) => {
       ReasonReact.Update({...state, username, bio, image})
     | NoData => ReasonReact.NoUpdate
     | PendingFavoriteArticles => ReasonReact.NoUpdate
-    | PendingMyArticles => ReasonReact.NoUpdate
+    /*| PendingMyArticles => ReasonReact.NoUpdate*/
     },
   didMount: self => {
     let (username, bio, image) = LocalStorage.getUser();
@@ -187,8 +186,8 @@ let make = (~articleCallback, ~router, _children) => {
       token,
     )
     |> ignore;
-    self.send(_ =>
-      CurrentUserFetched((currentUsername, currentBio, currentImage))
+    self.send(
+      CurrentUserFetched((currentUsername, currentBio, currentImage)),
     );
   },
   render: ({state, send, handle}) => {
