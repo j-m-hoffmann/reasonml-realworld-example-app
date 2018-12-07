@@ -172,7 +172,7 @@ let renderArticle =
       router,
       articleCallback,
       index,
-      article,
+      article: Article.t,
     ) =>
   <div key={string_of_int(index)} className="article-preview">
     <div>
