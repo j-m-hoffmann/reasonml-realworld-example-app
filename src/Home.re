@@ -109,7 +109,7 @@ let updateFavoritedCount = (articles, currentSlug) => {
             article.favoritesCount - 1 : article.favoritesCount + 1,
       } :
       article;
-  Array.map(updateCurrentArticle, articles);
+  Belt.Array.map(articles, updateCurrentArticle);
 };
 
 let renderTag = (self, index, tag) =>
