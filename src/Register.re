@@ -46,6 +46,7 @@ let register = (route, {ReasonReact.state, send}, event) => {
                ...state,
                validationFailed: true,
                errorList: newUser->Convert.toErrorListFromResponse,
+               /*errorList: json->convertErrorsToList,*/
              }
            };
          send(Register(newState.validationFailed, newState.errorList))

@@ -22,8 +22,8 @@ let makeInit = (method, token, data: option(Js.Json.t)) => {
   };
 };
 
-let toJson = listedElements =>
-  listedElements |> Js.Dict.fromList |> Js.Json.object_;
+/*let toJson = listedElements =>*/
+/*listedElements |> Js.Dict.fromList |> Js.Json.object_;*/
 
 type newUserResponse =
   | Success(User.registered)
