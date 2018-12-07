@@ -332,7 +332,7 @@ let make = (~articleCallback, ~router, _children) => {
     populateTags(self);
     populateGlobalFeed(self, 0);
   },
-  render: ({state, handle}) => {
+  render: ({state, handle} as self) => {
     let mapi = Belt.Array.mapWithIndex;
     let currentTagName = state.currentTagName;
     <div className="home-page">
