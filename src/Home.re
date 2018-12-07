@@ -370,29 +370,48 @@ let make = (~articleCallback, ~router, _children) => {
                 </li>
               </ul>
             </div>
+            /*TODO this renders 3 times the same thing check again later*/
             <div style={state.myFeedDisplay}>
               {
-                mapi(
-                  renderArticle(self, self.handle, router, articleCallback),
-                  state.articles,
+                mapi(state.articles, (i, article) =>
+                  renderArticle(
+                    self,
+                    self.handle,
+                    router,
+                    articleCallback,
+                    i,
+                    article,
+                  )
                 )
                 ->ReasonReact.array
               }
             </div>
             <div style={state.globalFeedDisplay}>
               {
-                mapi(
-                  renderArticle(self, self.handle, router, articleCallback),
-                  state.articles,
+                mapi(state.articles, (i, article) =>
+                  renderArticle(
+                    self,
+                    self.handle,
+                    router,
+                    articleCallback,
+                    i,
+                    article,
+                  )
                 )
                 ->ReasonReact.array
               }
             </div>
             <div style={state.tagFeedDisplay}>
               {
-                mapi(
-                  renderArticle(self, self.handle, router, articleCallback),
-                  state.articles,
+                mapi(state.articles, (i, article) =>
+                  renderArticle(
+                    self,
+                    self.handle,
+                    router,
+                    articleCallback,
+                    i,
+                    article,
+                  )
                 )
                 ->ReasonReact.array
               }
@@ -409,7 +428,10 @@ let make = (~articleCallback, ~router, _children) => {
             <div className="sidebar">
               <p> {ReasonReact.string("Popular Tags")} </p>
               <div className="tag-list">
-                {mapi(renderTag(self), state.tags)->ReasonReact.array}
+                {
+                  mapi(state.tags, (i, tag) => renderTag(self, i, tag))
+                  ->ReasonReact.array
+                }
               </div>
             </div>
           </div>
