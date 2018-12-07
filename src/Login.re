@@ -52,7 +52,7 @@ let loginUser = (event, {ReasonReact.state, send}) => {
              fun
              | None => send(LoginSuccessful(parseNewUser(json).user))
              | Some(errors) =>
-               send(LoginFailed(convertErrorsToList(errors)))
+               send(LoginFailed(convertToErrorList(errors)))
            )
          ->Js.Promise.resolve
        );

@@ -72,7 +72,7 @@ let checkForErrors = responseText =>
   |> Js.Json.decodeObject
   |> Js.Option.andThen((. prop) => Js.Dict.get(prop, "errors"));
 
-let convertErrorsToList = errorJson => {
+let convertToErrorList = errorJson => {
   let decodedJson = Js.Json.decodeObject(errorJson);
   switch (decodedJson) {
   | Some(errorList) =>
