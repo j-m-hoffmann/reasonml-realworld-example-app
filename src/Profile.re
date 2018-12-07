@@ -191,7 +191,7 @@ let make = (~articleCallback, ~router, _children) => {
       CurrentUserFetched((currentUsername, currentBio, currentImage))
     );
   },
-  render: ({state, send}) => {
+  render: ({state, send, handle}) => {
     let mapi = Belt.Array.mapWithIndex;
     <div className="profile-page">
       <div className="user-info">
@@ -203,7 +203,7 @@ let make = (~articleCallback, ~router, _children) => {
               <p> {ReasonReact.string(state.bio)} </p>
               <button
                 className="btn btn-sm btn-outline-secondary action-btn"
-                onClick={self.handle(clickProfileSettings(router))}>
+                onClick={handle(clickProfileSettings(router))}>
                 <i className="ion-plus-round" />
                 {ReasonReact.string("Edit Profile Settings")}
               </button>
@@ -220,7 +220,7 @@ let make = (~articleCallback, ~router, _children) => {
                   <a
                     className={state.myFeedActiveClass}
                     href="#"
-                    onClick={self.handle(clickMyArticles)}>
+                    onClick={handle(clickMyArticles)}>
                     {ReasonReact.string("My Articles")}
                   </a>
                 </li>
@@ -228,7 +228,7 @@ let make = (~articleCallback, ~router, _children) => {
                   <a
                     className={state.favfeedActiveClass}
                     href="#"
-                    onClick={self.handle(clickMyFavorites)}>
+                    onClick={handle(clickMyFavorites)}>
                     {ReasonReact.string("Favorited Articles")}
                   </a>
                 </li>
