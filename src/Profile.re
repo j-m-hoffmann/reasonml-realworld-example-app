@@ -237,8 +237,8 @@ let make = (~articleCallback, ~router, _children) => {
             <div style={state.isMyArticleDisplay}>
               {
                 mapi(
-                  renderArticle(self.handle, router, articleCallback, false),
                   state.myArticles,
+                  renderArticle(handle, router, articleCallback, false),
                 )
                 ->ReasonReact.array
               }
@@ -246,8 +246,8 @@ let make = (~articleCallback, ~router, _children) => {
             <div style={state.isFavArticleDisplay}>
               {
                 mapi(
-                  renderArticle(self.handle, router, articleCallback, true),
                   state.favoriteArticles,
+                  renderArticle(handle, router, articleCallback, true),
                 )
                 ->ReasonReact.array
               }
