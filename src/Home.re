@@ -333,7 +333,7 @@ let make = (~articleCallback, ~router, _children) => {
     populateGlobalFeed(self, 0);
   },
   render: ({state, handle} as self) => {
-    let mapi = Belt.Array.mapWithIndex;
+    let mapi = Belt.Array.mapWithIndexU;
     let currentTagName = state.currentTagName;
     <div className="home-page">
       <div className="banner">
@@ -373,7 +373,7 @@ let make = (~articleCallback, ~router, _children) => {
             /*TODO this renders 3 times the same thing check again later*/
             <div style={state.myFeedDisplay}>
               {
-                mapi(state.articles, (i, article) =>
+                mapi(state.articles, (. i, article) =>
                   renderArticle(
                     self,
                     handle,
@@ -388,7 +388,7 @@ let make = (~articleCallback, ~router, _children) => {
             </div>
             <div style={state.globalFeedDisplay}>
               {
-                mapi(state.articles, (i, article) =>
+                mapi(state.articles, (. i, article) =>
                   renderArticle(
                     self,
                     handle,
@@ -403,7 +403,7 @@ let make = (~articleCallback, ~router, _children) => {
             </div>
             <div style={state.tagFeedDisplay}>
               {
-                mapi(state.articles, (i, article) =>
+                mapi(state.articles, (. i, article) =>
                   renderArticle(
                     self,
                     handle,
@@ -429,7 +429,7 @@ let make = (~articleCallback, ~router, _children) => {
               <p> {ReasonReact.string("Popular Tags")} </p>
               <div className="tag-list">
                 {
-                  mapi(state.tags, (i, tag) => renderTag(self, i, tag))
+                  mapi(state.tags, (. i, tag) => renderTag(self, i, tag))
                   ->ReasonReact.array
                 }
               </div>
