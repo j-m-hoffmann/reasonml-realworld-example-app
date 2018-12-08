@@ -15,3 +15,22 @@ let fromJson = json =>
 /*switch (email, password, username) {*/
 /*| (None, None, None) => []*/
 /*};*/
+
+let toList = errorJson => {
+  let decodedJson = Js.Json.decodeObject(errorJson);
+  switch (decodedJson) {
+  | Some(errorList) =>
+    let errorKeys = Js.Dict.keys(errorList);
+    let errorValues = Js.Dict.values(errorList);
+    Array.mapi(
+      (acc, errorField) => {
+        let validationError = errorValues[acc];
+        let frontCaps = String.capitalize(errorField);
+        {j|$frontCaps $validationError|j};
+      },
+      errorKeys,
+    )
+    |> Array.to_list;
+  | None => []
+  };
+};

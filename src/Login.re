@@ -51,7 +51,7 @@ let loginUser = (event, {ReasonReact.state, send}) => {
            switch (Response.checkForErrors(result)) {
            | None =>
              send(LoginSuccessful(Response.parseNewUser(result).user))
-           | Some(errors) => send(LoginFailed(convertToErrorList(errors)))
+           | Some(errors) => send(LoginFailed(Errors.toList(errors)))
            }
          )
          ->Js.Promise.resolve

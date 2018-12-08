@@ -43,25 +43,6 @@ let makeInit = (method, token, data: option(Js.Json.t)) => {
 /*| Error(Js.Json.t)*/
 /*| User(Js.Json.t);*/
 
-let convertToErrorList = errorJson => {
-  let decodedJson = Js.Json.decodeObject(errorJson);
-  switch (decodedJson) {
-  | Some(errorList) =>
-    let errorKeys = Js.Dict.keys(errorList);
-    let errorValues = Js.Dict.values(errorList);
-    Array.mapi(
-      (acc, errorField) => {
-        let validationError = errorValues[acc];
-        let frontCaps = String.capitalize(errorField);
-        {j|$frontCaps $validationError|j};
-      },
-      errorKeys,
-    )
-    |> Array.to_list;
-  | None => []
-  };
-};
-
 let registerNewUser = (registerFunc, jsonData) => {
   open Js.Promise;
   let request = makeInit(Post, None, Some(jsonData));
