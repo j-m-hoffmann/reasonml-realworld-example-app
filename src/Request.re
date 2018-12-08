@@ -104,7 +104,7 @@ let registerNewUser = (registerFunc, jsonData) => {
 
 let constructUrl = url => apiUrlBase ++ mapUrl(url);
 
-let sendRequest = (requestMethod, token, jsonData, actionFunc, url) => {
+let send = (requestMethod, token, jsonData, actionFunc, url) => {
   open Js.Promise;
   let request = makeInit(requestMethod, token, jsonData);
   Bs_fetch.(
@@ -117,7 +117,7 @@ let sendRequest = (requestMethod, token, jsonData, actionFunc, url) => {
 };
 
 let authenticateUser = (loginFunc, jsonData) =>
-  sendRequest(
+  send(
     Post,
     None,
     Some(jsonData),
@@ -126,7 +126,7 @@ let authenticateUser = (loginFunc, jsonData) =>
   );
 
 let updateUser = (updateUserFunc, jsonData, token) =>
-  sendRequest(
+  send(
     Put,
     token,
     Some(jsonData),
@@ -135,30 +135,24 @@ let updateUser = (updateUserFunc, jsonData, token) =>
   );
 
 let getCurrentUser = (getUserFunc, token) =>
-  sendRequest(
-    Get,
-    token,
-    None,
-    getUserFunc,
-    constructUrl(Config.CurrentUser),
-  );
+  send(Get, token, None, getUserFunc, constructUrl(Config.CurrentUser));
 
 let getMyArticles = (getArticleFunc, name, token) => {
   let urlAfterBase =
     apiUrlBase ++ mapUrl(Config.Articles) ++ "?author=" ++ name;
-  sendRequest(Get, token, None, getArticleFunc, urlAfterBase);
+  send(Get, token, None, getArticleFunc, urlAfterBase);
 };
 
 let getFavoritedArticles = (articleFunc, name, token) => {
   let urlAfterBase =
     apiUrlBase ++ mapUrl(Config.Articles) ++ "?favorited=" ++ name;
-  sendRequest(Get, token, None, articleFunc, urlAfterBase);
+  send(Get, token, None, articleFunc, urlAfterBase);
 };
 
 let getArticlesByTag = (articleFunc, tagName, token) => {
   let urlAfterBase =
     apiUrlBase ++ mapUrl(Config.Articles) ++ "?tag=" ++ tagName;
-  sendRequest(Get, token, None, articleFunc, urlAfterBase);
+  send(Get, token, None, articleFunc, urlAfterBase);
 };
 
 let getGlobalArticles = (getArticlesFunc, token, limit, offset) => {
@@ -169,14 +163,14 @@ let getGlobalArticles = (getArticlesFunc, token, limit, offset) => {
     ++ string_of_int(limit)
     ++ "&offset="
     ++ string_of_int(offset);
-  sendRequest(Get, token, None, getArticlesFunc, urlAfterBase);
+  send(Get, token, None, getArticlesFunc, urlAfterBase);
 };
 
 let getPoplarTags = getTagsFunc =>
-  sendRequest(Get, None, None, getTagsFunc, constructUrl(Config.Tags));
+  send(Get, None, None, getTagsFunc, constructUrl(Config.Tags));
 
 let submitNewArticle = (submissionResponse, jsonData, token) =>
-  sendRequest(
+  send(
     Post,
     token,
     Some(jsonData),
@@ -185,7 +179,7 @@ let submitNewArticle = (submissionResponse, jsonData, token) =>
   );
 
 let commentsForArticle = (slug, commentsFunc) =>
-  sendRequest(
+  send(
     Get,
     None,
     None,
@@ -196,7 +190,7 @@ let commentsForArticle = (slug, commentsFunc) =>
 let mutedResponse = (_, _) => ();
 
 let deleteCommentForArticle = (slug, commentId, token) =>
-  sendRequest(
+  send(
     Delete,
     token,
     None,
@@ -206,7 +200,7 @@ let deleteCommentForArticle = (slug, commentId, token) =>
 
 let followUser = (username, token) =>
   /* Using a muted response even though it returns a profile. It might be needed later */
-  sendRequest(
+  send(
     Post,
     token,
     None,
@@ -215,7 +209,7 @@ let followUser = (username, token) =>
   );
 
 let unFollowUser = (username, token) =>
-  sendRequest(
+  send(
     Delete,
     token,
     None,
@@ -224,10 +218,10 @@ let unFollowUser = (username, token) =>
   );
 
 let getFeed = (token, articleListFunc) =>
-  sendRequest(Get, token, None, articleListFunc, constructUrl(Config.Feed));
+  send(Get, token, None, articleListFunc, constructUrl(Config.Feed));
 
 let favoriteArticle = (token, slug) =>
-  sendRequest(
+  send(
     Post,
     token,
     None,
@@ -236,7 +230,7 @@ let favoriteArticle = (token, slug) =>
   );
 
 let unfavoriteArticle = (token, slug) =>
-  sendRequest(
+  send(
     Delete,
     token,
     None,
