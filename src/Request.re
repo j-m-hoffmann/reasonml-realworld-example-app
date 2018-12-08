@@ -59,10 +59,6 @@ let getUserGraph = response =>
   ->Js.Option.andThen((. prop) => Js.Dict.get(prop, "user"), _)
   ->Belt.Option.getWithDefault(Js.Json.parseExn({j|{}|j}));
 
-let checkForErrors = response =>
-  Js.Json.parseExn(response)->Js.Json.decodeObject
-  |> Js.Option.andThen((. prop) => Js.Dict.get(prop, "errors"));
-
 let convertToErrorList = errorJson => {
   let decodedJson = Js.Json.decodeObject(errorJson);
   switch (decodedJson) {
@@ -88,7 +84,7 @@ let registerNewUser = (registerFunc, jsonData) => {
   Bs_fetch.(
     fetchWithInit(apiUrlBase ++ mapUrl(Config.Register), request)
     |> then_(response =>
-         registerFunc(Response.status(response), Response.text(response))
+         registerFunc(Validate.status(response), Validate.text(response))
          |> resolve
        )
   );
@@ -102,7 +98,7 @@ let send_ = (requestMethod, token, jsonData, actionFunc, url) => {
   Bs_fetch.(
     fetchWithInit(url, request)
     |> then_(response =>
-         actionFunc(Response.status(response), Response.text(response))
+         actionFunc(Validate.status(response), Validate.text(response))
          |> resolve
        )
   );
