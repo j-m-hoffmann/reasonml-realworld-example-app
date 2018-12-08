@@ -28,75 +28,94 @@ let send_ = (data, ~method_=Fetch.Get, ~url, ~token=None, ~f) =>
        ->Js.Promise.resolve
      );
 
-let registerNewUser = (registerFunc, jsonData) =>
-  send_(Post, None, Some(jsonData), registerFunc, getUrl(Register));
+let registerNewUser = (data, ~f) =>
+  send_(Some(data), ~url=getUrl(Register), ~method_=Post, ~f);
 
-let authenticateUser = (loginFunc, jsonData) =>
-  send_(Post, None, Some(jsonData), loginFunc, getUrl(Authenticate));
+let authenticateUser = (data, ~f) =>
+  send_(Some(data), ~method_=Post, ~url=getUrl(Authenticate), ~f);
 
-let updateUser = (updateUserFunc, jsonData, token) =>
-  send_(Put, token, Some(jsonData), updateUserFunc, getUrl(UpdateUser));
+let updateUser = (data, ~token, ~f) =>
+  send_(Some(data), ~method_=Put, ~url=getUrl(UpdateUser), ~token, ~f);
 
-let getCurrentUser = (getUserFunc, token) =>
-  send_(Get, token, None, getUserFunc, getUrl(CurrentUser));
+let getCurrentUser = (~token, ~f) =>
+  send_(None, ~url=getUrl(CurrentUser), ~token, ~f);
 
-let getMyArticles = (getArticleFunc, name, token) => {
-  let urlAfterBase = getUrl(Articles) ++ "?author=" ++ name;
-  send_(Get, token, None, getArticleFunc, urlAfterBase);
-};
+let getMyArticles = (name, ~token, ~f) =>
+  send_(None, ~url=getUrl(Articles) ++ "?author=" ++ name, ~token, ~f);
 
-let getFavoritedArticles = (articleFunc, name, token) => {
-  let urlAfterBase = getUrl(Articles) ++ "?favorited=" ++ name;
-  send_(Get, token, None, articleFunc, urlAfterBase);
-};
+let getFavoritedArticles = (name, ~token, ~f) =>
+  send_(None, ~url=getUrl(Articles) ++ "?favorited=" ++ name, ~token, ~f);
 
-let getArticlesByTag = (articleFunc, tagName, token) => {
-  let urlAfterBase = getUrl(Articles) ++ "?tag=" ++ tagName;
-  send_(Get, token, None, articleFunc, urlAfterBase);
-};
+let getArticlesByTag = (tagName, ~token, ~f) =>
+  send_(None, ~url=getUrl(Articles) ++ "?tag=" ++ tagName, ~token, ~f);
 
-let getGlobalArticles = (getArticlesFunc, token, limit, offset) => {
-  let urlAfterBase =
-    getUrl(Articles)
-    ++ "?limit="
-    ++ string_of_int(limit)
-    ++ "&offset="
-    ++ string_of_int(offset);
-  send_(Get, token, None, getArticlesFunc, urlAfterBase);
-};
+let getGlobalArticles = (~limit, ~offset, ~token, ~f) =>
+  send_(
+    None,
+    ~url=
+      getUrl(Articles)
+      ++ "?limit="
+      ++ string_of_int(limit)
+      ++ "&offset="
+      ++ string_of_int(offset),
+    ~token,
+    ~f,
+  );
 
-let getPoplarTags = getTagsFunc =>
-  send_(Get, None, None, getTagsFunc, getUrl(Tags));
+let getPoplarTags = (~f) => send_(None, ~url=getUrl(Tags), ~f);
 
-let submitNewArticle = (submissionResponse, jsonData, token) =>
-  send_(Post, token, Some(jsonData), submissionResponse, getUrl(Articles));
+let submitNewArticle = (data, ~token, ~f) =>
+  send_(Some(data), ~method_=Post, ~url=getUrl(Articles), ~token, ~f);
 
-let commentsForArticle = (slug, commentsFunc) =>
-  send_(Get, None, None, commentsFunc, getUrl(ArticleCommentBySlug(slug)));
+let commentsForArticle = (slug, ~f) =>
+  send_(None, ~url=getUrl(ArticleCommentBySlug(slug)), ~f);
 
 let mutedResponse = (_, _) => ();
 
-let deleteCommentForArticle = (slug, commentId, token) =>
+let deleteCommentForArticle = (~slug, ~commentId, ~token) =>
   send_(
-    Delete,
-    token,
     None,
-    mutedResponse,
-    getUrl(DeleteComment(slug, commentId)),
+    ~method_=Delete,
+    ~url=getUrl(DeleteComment(slug, commentId)),
+    ~token,
+    ~f=mutedResponse,
   );
 
-let followUser = (username, token) =>
-  /* Using a muted response even though it returns a profile. It might be needed later */
-  send_(Post, token, None, mutedResponse, getUrl(Follow(username)));
+/* Using a muted response even though it returns a profile. It might be needed later */
+let followUser = (username, ~token) =>
+  send_(
+    None,
+    ~method_=Post,
+    ~url=getUrl(Follow(username)),
+    ~token,
+    ~f=mutedResponse,
+  );
 
-let unFollowUser = (username, token) =>
-  send_(Delete, token, None, mutedResponse, getUrl(Unfollow(username)));
+let unFollowUser = (username, ~token) =>
+  send_(
+    None,
+    ~method_=Delete,
+    ~url=getUrl(Unfollow(username)),
+    ~token,
+    ~f=mutedResponse,
+  );
 
-let getFeed = (token, articleListFunc) =>
-  send_(Get, token, None, articleListFunc, getUrl(Feed));
+let getFeed = (~token, ~f) => send_(None, ~url=getUrl(Feed), ~token, ~f);
 
-let favoriteArticle = (token, slug) =>
-  send_(Post, token, None, mutedResponse, getUrl(ArticleFavorite(slug)));
+let favoriteArticle = (slug, ~token) =>
+  send_(
+    None,
+    ~method_=Post,
+    ~url=getUrl(ArticleFavorite(slug)),
+    ~token,
+    ~f=mutedResponse,
+  );
 
-let unfavoriteArticle = (token, slug) =>
-  send_(Delete, token, None, mutedResponse, getUrl(ArticleFavorite(slug)));
+let unfavoriteArticle = (slug, ~token) =>
+  send_(
+    None,
+    ~method_=Delete,
+    ~url=getUrl(ArticleFavorite(slug)),
+    ~token,
+    ~f=mutedResponse,
+  );
