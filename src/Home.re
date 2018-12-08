@@ -24,21 +24,6 @@ type state = {
   tags: array(string),
 };
 
-let populateTags = self => {
-  let reduceTags = (_status, jsonPayload) =>
-    jsonPayload
-    |> Js.Promise.then_(result => {
-         let parsedPopularTags = Js.Json.parseExn(result);
-         let tags =
-           Json.Decode.(parsedPopularTags |> field("tags", array(string)));
-         self.ReasonReact.send(TagsFetched(tags));
-
-         tags |> Js.Promise.resolve;
-       })
-    |> ignore;
-  Request.getPopularTags(reduceTags) |> ignore;
-};
-
 let reduceFeed = (reduceToAction, _state, jsonPayload) =>
   jsonPayload
   |> Js.Promise.then_(result => {
@@ -321,7 +306,19 @@ let make = (~articleCallback, ~router, _children) => {
       )
     },
   didMount: self => {
-    populateTags(self);
+    Request.getPopularTags(~f=(_status, jsonPayload) =>
+      jsonPayload
+      |> Js.Promise.then_(result => {
+           let parsedPopularTags = Js.Json.parseExn(result);
+           let tags =
+             Json.Decode.(parsedPopularTags |> field("tags", array(string)));
+           self.ReasonReact.send(TagsFetched(tags));
+
+           tags |> Js.Promise.resolve;
+         })
+      |> ignore
+    )
+    |> ignore;
     populateGlobalFeed(self, 0);
   },
   render: ({state, handle} as self) => {
