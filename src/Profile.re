@@ -169,12 +169,12 @@ let make = (~articleCallback, ~router, _children) => {
     let (bio, image, username) = LocalStorage.getUser();
     let currentBio = Belt.Option.getWithDefault(bio, "");
     let currentImage = Belt.Option.getWithDefault(image, "");
-    let token = LocalStorage.getToken();
+    let currentUsername = Belt.Option.getWithDefault(username, "");
 
     JsonRequests.getMyArticles(
       reduceByAuthArticles(self),
       currentUsername,
-      token,
+      LocalStorage.getToken(),
     )
     |> ignore;
     self.send(CurrentUserFetched(currentBio, currentImage, currentUsername));
