@@ -167,17 +167,17 @@ let make = (~articleCallback, ~router, _children) => {
     },
   didMount: self => {
     let (bio, image, username) = LocalStorage.getUser();
-    let currentBio = Belt.Option.getWithDefault(bio, "");
-    let currentImage = Belt.Option.getWithDefault(image, "");
-    let currentUsername = Belt.Option.getWithDefault(username, "");
+    let bio' = Belt.Option.getWithDefault(bio, "");
+    let image' = Belt.Option.getWithDefault(image, "");
+    let username' = Belt.Option.getWithDefault(username, "");
 
     JsonRequests.getMyArticles(
       reduceByAuthArticles(self),
-      currentUsername,
+      username',
       LocalStorage.getToken(),
     )
     |> ignore;
-    self.send(CurrentUserFetched(currentBio, currentImage, currentUsername));
+    self.send(CurrentUserFetched(bio', image', username'));
   },
   render: ({state, send, handle}) => {
     let mapi = Belt.Array.mapWithIndex;
