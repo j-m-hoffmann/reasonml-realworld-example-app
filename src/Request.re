@@ -70,11 +70,11 @@ let submitNewArticle = (data, ~token, ~f) =>
 let commentsForArticle = (slug, ~f) =>
   send_(None, ~url=getUrl(ArticleCommentBySlug(slug)), ~f);
 
-let deleteCommentForArticle = (~slug, ~commentId, ~token) =>
+let deleteCommentForArticle = (~id, ~slug, ~token) =>
   send_(
     None,
     ~method_=Delete,
-    ~url=getUrl(DeleteComment(slug, commentId)),
+    ~url=getUrl(DeleteComment(slug, id)),
     ~token,
     ~f=Response.discard,
   );
