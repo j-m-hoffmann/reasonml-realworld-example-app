@@ -42,7 +42,7 @@ let register = (event, {ReasonReact.state, send}) => {
          (
            newUser.errors->Belt.Option.isNone ?
              send(SignUpSuccessful) :
-             send(SignUpFailed(newUser->Convert.toErrorListFromResponse))
+             send(SignUpFailed(newUser->User.errorList))
          )
          ->Js.Promise.resolve;
        });
