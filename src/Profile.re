@@ -70,8 +70,7 @@ let reduceByAuthArticles = (self, _status, jsonPayload) =>
      });
 
 /* These functions were copied from  */
-let goToArticle =
-    (router, articleCallback, article, event, {ReasonReact.state}) => {
+let goToArticle = (router, articleCallback, article, event, _self) => {
   event->ReactEvent.Mouse.preventDefault;
   articleCallback(article);
   DirectorRe.setRoute(router, "/article");
