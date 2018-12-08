@@ -86,15 +86,15 @@ let make = (~article, _children) => {
   reducer: (action, state) =>
     switch (action) {
     | AddComment => ReasonReact.NoUpdate
-    | DeleteComment(commentId) =>
+    | DeleteComment(id) =>
       let commentsWithout =
-        Belt.List.keep(state.commentList, comment => comment.id != commentId);
+        Belt.List.keep(state.commentList, comment => comment.id != id);
       ReasonReact.UpdateWithSideEffects(
         {...state, commentList: commentsWithout},
-        (_self => deleteCommentRequest(commentId, state.slug)),
+        (_self => deleteCommentRequest(id, state.slug)),
       );
-    | FetchComments(comments) =>
-      ReasonReact.Update({...state, commentList: comments})
+    | FetchComments(commentList) =>
+      ReasonReact.Update({...state, commentList})
     | FollowUser(username) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, isFollowing: true},
