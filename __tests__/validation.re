@@ -61,7 +61,7 @@ let () =
           |> toBe("bryant")
         );
         test("should return an error graph", () => {
-          let result = JsonRequests.checkForErrors(loginErrorResponse);
+          let result = checkForErrors(loginErrorResponse);
           switch (result) {
           | Some(_errorList) => expect(true) |> toBe(true)
           | None => expect(false) |> toBe(true)
