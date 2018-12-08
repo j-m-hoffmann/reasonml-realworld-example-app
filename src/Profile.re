@@ -33,7 +33,7 @@ let reduceMyArticles = (reduceFunc, _status, payload) =>
 let clickMyArticles = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
 
-  JsonRequests.getMyArticles(
+  Request.getMyArticles(
     reduceMyArticles(articles => send(MyArticles(articles))),
     state.username,
     LocalStorage.getToken(),
@@ -45,7 +45,7 @@ let clickMyArticles = (event, {ReasonReact.state, send}) => {
 let clickMyFavorites = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
 
-  JsonRequests.getFavoritedArticles(
+  Request.getFavoritedArticles(
     reduceMyArticles(articles => send(FavoriteArticles(articles))),
     state.username,
     LocalStorage.getToken(),
@@ -170,7 +170,7 @@ let make = (~articleCallback, ~router, _children) => {
     let image' = Belt.Option.getWithDefault(image, "");
     let username' = Belt.Option.getWithDefault(username, "");
 
-    JsonRequests.getMyArticles(
+    Request.getMyArticles(
       reduceByAuthArticles(self),
       username',
       LocalStorage.getToken(),

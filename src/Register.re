@@ -34,7 +34,7 @@ let component = ReasonReact.reducerComponent("Register");
 
 let register = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
-  open JsonRequests;
+  open Request;
   let updateState = (_status, jsonPayload) =>
     jsonPayload
     |> Js.Promise.then_(json => {

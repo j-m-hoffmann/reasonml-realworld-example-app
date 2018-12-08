@@ -36,7 +36,7 @@ let populateTags = self => {
          tags |> Js.Promise.resolve;
        })
     |> ignore;
-  JsonRequests.getPoplarTags(reduceTags) |> ignore;
+  Request.getPoplarTags(reduceTags) |> ignore;
 };
 
 let reduceFeed = (reduceToAction, _state, jsonPayload) =>
@@ -52,7 +52,7 @@ let populateGlobalFeed = (self, pageNumber) => {
     self.ReasonReact.send(ArticlesFetched(articleList));
 
   /* Get the right page if there are more than 10 articles */
-  JsonRequests.getGlobalArticles(
+  Request.getGlobalArticles(
     reduceFeed(reduceFunc),
     LocalStorage.getToken(),
     10,
@@ -64,8 +64,7 @@ let populateGlobalFeed = (self, pageNumber) => {
 let populateMyFeed = self => {
   let reduceFunc = articleList =>
     self.ReasonReact.send(MyArticlesFetched(articleList));
-  JsonRequests.getFeed(LocalStorage.getToken(), reduceFeed(reduceFunc))
-  |> ignore;
+  Request.getFeed(LocalStorage.getToken(), reduceFeed(reduceFunc)) |> ignore;
 };
 
 let showMyFeed = (event, self) => {
@@ -284,7 +283,7 @@ let make = (~articleCallback, ~router, _children) => {
           self => {
             let reduceFunc = articleList =>
               self.send(TagArticlesFetched(articleList));
-            JsonRequests.getArticlesByTag(
+            Request.getArticlesByTag(
               reduceFeed(reduceFunc),
               currentTagName,
               LocalStorage.getToken(),
@@ -299,9 +298,8 @@ let make = (~articleCallback, ~router, _children) => {
         (
           _self =>
             !isCurrentlyFav ?
-              JsonRequests.favoriteArticle(LocalStorage.getToken(), slug)
-              |> ignore :
-              JsonRequests.unfavoriteArticle(LocalStorage.getToken(), slug)
+              Request.favoriteArticle(LocalStorage.getToken(), slug) |> ignore :
+              Request.unfavoriteArticle(LocalStorage.getToken(), slug)
               |> ignore
         ),
       )
@@ -311,7 +309,7 @@ let make = (~articleCallback, ~router, _children) => {
           self => {
             let reduceFunc = articleList =>
               self.send(ArticlesFetched(articleList));
-            JsonRequests.getGlobalArticles(
+            Request.getGlobalArticles(
               reduceFeed(reduceFunc),
               LocalStorage.getToken(),
               10,

@@ -67,7 +67,7 @@ let make = (~router, _children) => {
     /*     (_self => DirectorRe.setRoute(router, "/home")), */
     /*   ); */
     | SubmitArticle =>
-      JsonRequests.submitNewArticle(
+      Request.submitNewArticle(
         submissionResponse,
         Encode.newArticle(state),
         LocalStorage.getToken(),

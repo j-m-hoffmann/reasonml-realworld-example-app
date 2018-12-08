@@ -55,14 +55,13 @@ type action =
   | FetchComments(list(Comment.t));
 
 let deleteCommentRequest = (id, slug) =>
-  JsonRequests.deleteCommentForArticle(slug, id, LocalStorage.getToken())
-  |> ignore;
+  Request.deleteCommentForArticle(slug, id, LocalStorage.getToken()) |> ignore;
 
 let followUserRequest = username =>
-  JsonRequests.followUser(username, LocalStorage.getToken()) |> ignore;
+  Request.followUser(username, LocalStorage.getToken()) |> ignore;
 
 let unFollowUserRequest = username =>
-  JsonRequests.unFollowUser(username, LocalStorage.getToken()) |> ignore;
+  Request.unFollowUser(username, LocalStorage.getToken()) |> ignore;
 
 let followUser = (isFollowing, event) =>
   isFollowing ?
@@ -120,7 +119,7 @@ let make = (~article, _children) => {
            result |> Js.Promise.resolve;
          });
 
-    JsonRequests.commentsForArticle(self.state.slug, reduceComments) |> ignore;
+    Request.commentsForArticle(self.state.slug, reduceComments) |> ignore;
   },
   render: ({state, send}) =>
     <div className="article-page">

@@ -43,7 +43,7 @@ let toJson = credentials =>
 
 let loginUser = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
-  open JsonRequests;
+  open Request;
   let reduceByAuthResult = (_status, jsonPayload) =>
     jsonPayload
     |> Js.Promise.then_(json =>

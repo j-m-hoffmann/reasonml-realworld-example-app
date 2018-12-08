@@ -45,11 +45,7 @@ let updateSettings = (event, {ReasonReact.state, send}) => {
          result |> Js.Promise.resolve;
        })
     |> ignore;
-  JsonRequests.updateUser(
-    responseCatch,
-    toJson(state),
-    LocalStorage.getToken(),
-  )
+  Request.updateUser(responseCatch, toJson(state), LocalStorage.getToken())
   |> ignore;
 };
 
@@ -69,7 +65,7 @@ let make = (~router, _children) => {
     | UpdatePassword(password) => ReasonReact.Update({...state, password})
     },
   didMount: self => {
-    open JsonRequests;
+    open Request;
     let reduceCurrentUser = (_status, jsonPayload) =>
       jsonPayload
       |> Js.Promise.then_(result => {
