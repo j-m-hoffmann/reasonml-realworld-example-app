@@ -17,3 +17,5 @@ let parseNewUser = (response: string): User.registered => {
   | _ => {user: User.empty, errors}
   };
 };
+
+let discard = (_status, _response) => ();

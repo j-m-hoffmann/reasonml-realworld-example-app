@@ -70,15 +70,13 @@ let submitNewArticle = (data, ~token, ~f) =>
 let commentsForArticle = (slug, ~f) =>
   send_(None, ~url=getUrl(ArticleCommentBySlug(slug)), ~f);
 
-let mutedResponse = (_, _) => ();
-
 let deleteCommentForArticle = (~slug, ~commentId, ~token) =>
   send_(
     None,
     ~method_=Delete,
     ~url=getUrl(DeleteComment(slug, commentId)),
     ~token,
-    ~f=mutedResponse,
+    ~f=Response.discard,
   );
 
 /* Using a muted response even though it returns a profile. It might be needed later */
@@ -88,7 +86,7 @@ let followUser = (username, ~token) =>
     ~method_=Post,
     ~url=getUrl(Follow(username)),
     ~token,
-    ~f=mutedResponse,
+    ~f=Response.discard,
   );
 
 let unFollowUser = (username, ~token) =>
@@ -97,7 +95,7 @@ let unFollowUser = (username, ~token) =>
     ~method_=Delete,
     ~url=getUrl(Unfollow(username)),
     ~token,
-    ~f=mutedResponse,
+    ~f=Response.discard,
   );
 
 let getFeed = (~token, ~f) => send_(None, ~url=getUrl(Feed), ~token, ~f);
@@ -108,7 +106,7 @@ let favoriteArticle = (slug, ~token) =>
     ~method_=Post,
     ~url=getUrl(ArticleFavorite(slug)),
     ~token,
-    ~f=mutedResponse,
+    ~f=Response.discard,
   );
 
 let unfavoriteArticle = (slug, ~token) =>
@@ -117,5 +115,5 @@ let unfavoriteArticle = (slug, ~token) =>
     ~method_=Delete,
     ~url=getUrl(ArticleFavorite(slug)),
     ~token,
-    ~f=mutedResponse,
+    ~f=Response.discard,
   );
