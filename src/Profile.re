@@ -14,7 +14,7 @@ type state = {
 };
 
 type action =
-  | CurrentUserFetched((string, string, string))
+  | CurrentUserFetched(string, string, string)
   | FavoriteArticles(array(Article.t))
   | GoToSettings
   | MyArticles(array(Article.t))
@@ -157,7 +157,7 @@ let make = (~articleCallback, ~router, _children) => {
         myFeedActiveClass: "nav-link disabled",
         favfeedActiveClass: "nav-link active",
       })
-    | CurrentUserFetched((username, bio, image)) =>
+    | CurrentUserFetched(username, bio, image) =>
       ReasonReact.Update({...state, username, bio, image})
     | GoToSettings =>
       ReasonReact.SideEffects(
@@ -181,9 +181,7 @@ let make = (~articleCallback, ~router, _children) => {
       token,
     )
     |> ignore;
-    self.send(
-      CurrentUserFetched((currentUsername, currentBio, currentImage)),
-    );
+    self.send(CurrentUserFetched(currentUsername, currentBio, currentImage));
   },
   render: ({state, send, handle}) => {
     let mapi = Belt.Array.mapWithIndex;
