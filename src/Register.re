@@ -38,7 +38,7 @@ let register = (event, {ReasonReact.state, send}) => {
   let updateState = (_status, jsonPayload) =>
     jsonPayload
     |> Js.Promise.then_(json => {
-         let newUser = parseNewUser(json);
+         let newUser = Response.parseNewUser(json);
          (
            newUser.errors->Belt.Option.isNone ?
              send(SignUpSuccessful) :

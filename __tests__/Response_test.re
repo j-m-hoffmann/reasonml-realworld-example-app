@@ -1,6 +1,6 @@
 open Jest;
 
-open Request;
+open Response;
 
 let errorsJson = {j|{"errors":{"email":["is invalid"],"password":["is too short (minimum is 8 characters)"]}}|j};
 

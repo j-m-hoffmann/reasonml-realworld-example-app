@@ -39,16 +39,6 @@ let makeInit = (method, token, data: option(Js.Json.t)) => {
 /*output;*/
 /*};*/
 
-let parseNewUser = (responseText: string): User.registered => {
-  let json = Js.Json.parseExn(responseText);
-  let errors =
-    Json.Decode.(optional(field("errors", Errors.fromJson), json));
-  switch (errors) {
-  | None => {user: User.fromJson(json), errors: None}
-  | _ => {user: User.empty, errors}
-  };
-};
-
 /*type responseType =*/
 /*| Error(Js.Json.t)*/
 /*| User(Js.Json.t);*/

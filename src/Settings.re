@@ -69,7 +69,7 @@ let make = (~router, _children) => {
     let reduceCurrentUser = (_status, jsonPayload) =>
       jsonPayload
       |> Js.Promise.then_(result => {
-           let registered = parseNewUser(result);
+           let registered = Response.parseNewUser(result);
 
            self.send(
              SettingsFetched({

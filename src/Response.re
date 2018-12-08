@@ -7,3 +7,13 @@ let getUserGraph = response =>
   ->Js.Json.decodeObject
   ->Js.Option.andThen((. prop) => Js.Dict.get(prop, "user"), _)
   ->Belt.Option.getWithDefault(Js.Json.parseExn({j|{}|j}));
+
+let parseNewUser = (responseText: string): User.registered => {
+  let json = Js.Json.parseExn(responseText);
+  let errors =
+    Json.Decode.(optional(field("errors", Errors.fromJson), json));
+  switch (errors) {
+  | None => {user: User.fromJson(json), errors: None}
+  | _ => {user: User.empty, errors}
+  };
+};

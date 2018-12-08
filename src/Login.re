@@ -50,7 +50,8 @@ let loginUser = (event, {ReasonReact.state, send}) => {
          Response.checkForErrors(json)
          ->(
              fun
-             | None => send(LoginSuccessful(parseNewUser(json).user))
+             | None =>
+               send(LoginSuccessful(Response.parseNewUser(json).user))
              | Some(errors) =>
                send(LoginFailed(convertToErrorList(errors)))
            )
