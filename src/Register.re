@@ -34,9 +34,8 @@ let component = ReasonReact.reducerComponent("Register");
 
 let register = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
-  open Request;
-  let updateState = (_status, jsonPayload) =>
-    jsonPayload
+  Request.registerNewUser(toJson(state), ~f=(_status, payload) =>
+    payload
     |> Js.Promise.then_(json => {
          let newUser = Response.parseNewUser(json);
          (
@@ -44,9 +43,10 @@ let register = (event, {ReasonReact.state, send}) => {
              send(SignUpSuccessful) :
              send(SignUpFailed(newUser->User.errorList))
          )
-         ->Js.Promise.resolve;
-       });
-  registerNewUser(updateState, toJson(state))->ignore;
+         |> Js.Promise.resolve;
+       })
+  )
+  |> ignore;
   /*send(Register(false, ["Hitting server."]));*/
 };
 
