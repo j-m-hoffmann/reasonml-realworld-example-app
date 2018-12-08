@@ -1,6 +1,6 @@
-let apiUrlBase = "https://conduit.productionready.io/api";
+let urlBase = "https://conduit.productionready.io/api";
 
-type urlMap =
+type service =
   | Authenticate
   | Register
   | CurrentUser
@@ -18,8 +18,8 @@ type urlMap =
   | Tags
   | Feed;
 
-let mapUrl = url =>
-  switch (url) {
+let getUrl = s =>
+  switch (s) {
   | Authenticate => "/users/login"
   | Register => "/users"
   | CurrentUser
