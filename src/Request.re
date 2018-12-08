@@ -21,17 +21,12 @@ let makeInit = (data: option(Js.Json.t), ~method_, ~token) => {
   };
 };
 
-let send_ = (requestMethod, token, jsonData, actionFunc, url) => {
-  open Js.Promise;
-  let request = makeInit(requestMethod, token, jsonData);
-  Bs_fetch.(
-    fetchWithInit(url, request)
-    |> then_(response =>
-         Bs_fetch.Response.(actionFunc(status(response), text(response)))
-         |> resolve
-       )
-  );
-};
+let send_ = (data, ~method_=Fetch.Get, ~url, ~token=None, ~f) =>
+  Bs_fetch.fetchWithInit(url, makeInit(data, ~method_, ~token))
+  |> Js.Promise.then_(response =>
+       Bs_fetch.Response.(f(status(response), text(response)))
+       ->Js.Promise.resolve
+     );
 
 let registerNewUser = (registerFunc, jsonData) =>
   send_(Post, None, Some(jsonData), registerFunc, getUrl(Register));
