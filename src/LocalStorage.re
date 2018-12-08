@@ -3,9 +3,9 @@ open Dom.Storage;
 let getToken = () => getItem("jwt", localStorage);
 
 let getUser = () => (
-  getItem("username", localStorage),
   getItem("bio", localStorage),
   getItem("image", localStorage),
+  getItem("username", localStorage),
 );
 
 let saveToken = value => setItem("jwt", value, localStorage);
