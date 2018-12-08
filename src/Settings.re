@@ -89,7 +89,7 @@ let make = (~router, _children) => {
         DirectorRe.setRoute(router, "/login");
       };
 
-      getUserGraph(result)->User.fromJson(_).token
+      Response.getUserGraph(result)->User.fromJson(_).token
       ->Some
       ->getCurrentUser(reduceCurrentUser, _)
       ->ignore;

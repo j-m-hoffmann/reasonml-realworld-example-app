@@ -53,12 +53,6 @@ let parseNewUser = (responseText: string): User.registered => {
 /*| Error(Js.Json.t)*/
 /*| User(Js.Json.t);*/
 
-let getUserGraph = response =>
-  Js.Json.parseExn(response)
-  ->Js.Json.decodeObject
-  ->Js.Option.andThen((. prop) => Js.Dict.get(prop, "user"), _)
-  ->Belt.Option.getWithDefault(Js.Json.parseExn({j|{}|j}));
-
 let convertToErrorList = errorJson => {
   let decodedJson = Js.Json.decodeObject(errorJson);
   switch (decodedJson) {
