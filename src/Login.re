@@ -43,20 +43,19 @@ let toJson = credentials =>
 
 let loginUser = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
-  open Request;
-  let reduceByAuthResult = (_status, jsonPayload) =>
-    jsonPayload
-    |> Js.Promise.then_(result =>
+  Request.authenticateUser(toJson(state), ~f=(_status, payload) =>
+    payload
+    |> Js.Promise.then_(json =>
          (
-           switch (Response.checkForErrors(result)) {
-           | None =>
-             send(LoginSuccessful(Response.parseNewUser(result).user))
+           switch (Response.checkForErrors(json)) {
+           | None => send(LoginSuccessful(Response.parseNewUser(json).user))
            | Some(errors) => send(LoginFailed(Errors.toList(errors)))
            }
          )
-         ->Js.Promise.resolve
-       );
-  authenticateUser(reduceByAuthResult, toJson(state))->ignore;
+         |> Js.Promise.resolve
+       )
+  )
+  |> ignore;
   /*send(LoginPending);*/
 };
 
