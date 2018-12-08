@@ -106,22 +106,23 @@ let make = (~article, _children) => {
         (_self => unFollowUserRequest(username)),
       )
     },
-  didMount: self => {
-    let reduceComments = (_status, jsonPayload) =>
-      jsonPayload
+  didMount: self =>
+    Request.commentsForArticle(self.state.slug, ~f=(_status, payload) =>
+      payload
       |> Js.Promise.then_(result => {
-           let parsedComments = Js.Json.parseExn(result);
            let commentList =
              Json.Decode.{
                comments:
-                 parsedComments |> field("comments", list(Comment.fromJson)),
+                 Js.Json.parseExn(result)
+                 |> field("comments", list(Comment.fromJson)),
              };
-           self.send(FetchComments(commentList.comments));
-           result |> Js.Promise.resolve;
-         });
-
-    Request.commentsForArticle(self.state.slug, reduceComments) |> ignore;
-  },
+           self.send(FetchComments(commentList.comments))
+           |> Js.Promise.resolve;
+           /*self.send(FetchComments(commentList.comments));*/
+           /*result |> Js.Promise.resolve;*/
+         })
+    )
+    |> ignore,
   render: ({state, send}) =>
     <div className="article-page">
       <div className="banner">
