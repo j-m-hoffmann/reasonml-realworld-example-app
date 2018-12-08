@@ -1,53 +1,44 @@
-let component = ReasonReact.statelessComponent("Header");
+type state = unit;
+
+type action =
+  | GoToCreateArticle
+  | GoToHome
+  | GoToProfile
+  | GoToRegistration
+  | GoToSettings;
 
 let pointer = ReactDOMRe.Style.make(~cursor="pointer", ());
 
-let navigateTo = (router, event, routeName) => {
-  event->ReactEvent.Mouse.preventDefault;
-  DirectorRe.setRoute(router, routeName);
-};
-
-let goToRegistration = (router, routeName, event) =>
-  navigateTo(router, event, routeName);
-let goToHome = (router, routeName, event) =>
-  navigateTo(router, event, routeName);
-let goToSettings = (router, routeName, event) =>
-  navigateTo(router, event, routeName);
-let goToCreateArticle = (router, routeName, event) =>
-  navigateTo(router, event, routeName);
-
 let displayUsername = () => {
   let (_, _, optionalName) = LocalStorage.getUser();
-  switch (optionalName) {
-  | Some(name) => name
-  | None => "Username Missing"
-  };
+  Belt.Option.getWithDefault(optionalName, "Username Missing");
 };
 
-/* This really should be in a reducer component since we are doing a side effect here. */
-let displayByLogin = router =>
-  switch (LocalStorage.getToken()) {
-  | Some(_token) =>
-    <a
-      className="nav-link"
-      style=pointer
-      href="#"
-      onClick={goToRegistration(router, "/profile")}>
-      {ReasonReact.string(displayUsername())}
-    </a>
-  | None =>
-    <a
-      className="nav-link"
-      style=pointer
-      href="#"
-      onClick={goToRegistration(router, "/register")}>
-      {ReasonReact.string("Sign up")}
-    </a>
-  };
+let component = ReasonReact.reducerComponent("Header");
 
 let make = (~router, _children) => {
-  ...component, /* spread the template's other defaults into here  */
-  render: _self =>
+  ...component,
+  initialState: () => (),
+  reducer: (action, _state: unit) =>
+    switch (action) {
+    | GoToCreateArticle =>
+      ReasonReact.SideEffects(
+        (_ => DirectorRe.setRoute(router, "article/create")),
+      )
+    | GoToHome =>
+      ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/home")))
+    | GoToProfile =>
+      ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/profile")))
+    | GoToRegistration =>
+      ReasonReact.SideEffects(
+        (_ => DirectorRe.setRoute(router, "/register")),
+      )
+    | GoToSettings =>
+      ReasonReact.SideEffects(
+        (_ => DirectorRe.setRoute(router, "/settings")),
+      )
+    },
+  render: ({send}) =>
     <div>
       <nav className="navbar navbar-light">
         <div className="container">
@@ -60,7 +51,12 @@ let make = (~router, _children) => {
                 className="nav-link active"
                 style=pointer
                 href="#"
-                onClick={goToHome(router, "/home")}>
+                onClick={
+                  event => {
+                    event->ReactEvent.Mouse.preventDefault;
+                    send(GoToHome);
+                  }
+                }>
                 {ReasonReact.string("Home")}
               </a>
             </li>
@@ -69,7 +65,12 @@ let make = (~router, _children) => {
                 className="nav-link"
                 style=pointer
                 href="#"
-                onClick={goToCreateArticle(router, "/article/create")}>
+                onClick={
+                  event => {
+                    event->ReactEvent.Mouse.preventDefault;
+                    send(GoToCreateArticle);
+                  }
+                }>
                 <i className="ion-compose" />
                 {ReasonReact.string(" New Post")}
               </a>
@@ -79,12 +80,48 @@ let make = (~router, _children) => {
                 className="nav-link"
                 style=pointer
                 href="#"
-                onClick={goToSettings(router, "/settings")}>
+                onClick={
+                  event => {
+                    event->ReactEvent.Mouse.preventDefault;
+                    send(GoToSettings);
+                  }
+                }>
                 <i className="ion-gear-a" />
                 {ReasonReact.string(" Settings")}
               </a>
             </li>
-            <li className="nav-item"> {displayByLogin(router)} </li>
+            <li className="nav-item">
+              {
+                switch (LocalStorage.getToken()) {
+                | Some(_token) =>
+                  <a
+                    className="nav-link"
+                    style=pointer
+                    href="#"
+                    onClick=(
+                      event => {
+                        event->ReactEvent.Mouse.preventDefault;
+                        send(GoToProfile);
+                      }
+                    )>
+                    {ReasonReact.string(displayUsername())}
+                  </a>
+                | None =>
+                  <a
+                    className="nav-link"
+                    style=pointer
+                    href="#"
+                    onClick=(
+                      event => {
+                        event->ReactEvent.Mouse.preventDefault;
+                        send(GoToRegistration);
+                      }
+                    )>
+                    {ReasonReact.string("Sign up")}
+                  </a>
+                }
+              }
+            </li>
           </ul>
         </div>
       </nav>
