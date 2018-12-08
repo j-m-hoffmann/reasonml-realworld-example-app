@@ -21,28 +21,6 @@ let makeInit = (method, token, data: option(Js.Json.t)) => {
   };
 };
 
-/*let toJson = listedElements =>*/
-/*listedElements |> Js.Dict.fromList |> Js.Json.object_;*/
-
-/*type newUserResponse =*/
-/*| Success(User.registered)*/
-/*| Failure(User.registered);*/
-
-/*let hasErrors = checkId =>*/
-/*switch (checkId) {*/
-/*| Some(_resp) => true*/
-/*| None => false*/
-/*};*/
-
-/*let tee = (func, output) => {*/
-/*func(output);*/
-/*output;*/
-/*};*/
-
-/*type responseType =*/
-/*| Error(Js.Json.t)*/
-/*| User(Js.Json.t);*/
-
 let registerNewUser = (registerFunc, jsonData) => {
   open Js.Promise;
   let request = makeInit(Post, None, Some(jsonData));
