@@ -21,18 +21,6 @@ let makeInit = (method, token, data: option(Js.Json.t)) => {
   };
 };
 
-let registerNewUser = (registerFunc, jsonData) => {
-  open Js.Promise;
-  let request = makeInit(Post, None, Some(jsonData));
-  Bs_fetch.(
-    fetchWithInit(apiUrlBase ++ mapUrl(Config.Register), request)
-    |> then_(response =>
-         Bs_fetch.Response.(registerFunc(status(response), text(response)))
-         |> resolve
-       )
-  );
-};
-
 let constructUrl = url => apiUrlBase ++ mapUrl(url);
 
 let send_ = (requestMethod, token, jsonData, actionFunc, url) => {
@@ -46,6 +34,9 @@ let send_ = (requestMethod, token, jsonData, actionFunc, url) => {
        )
   );
 };
+
+let registerNewUser = (registerFunc, jsonData) =>
+  send_(Post, None, Some(jsonData), registerFunc, constructUrl(Register));
 
 let authenticateUser = (loginFunc, jsonData) =>
   send_(
