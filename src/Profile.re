@@ -18,8 +18,8 @@ type action =
   | FavoriteArticles(array(Article.t))
   | GoToSettings
   | MyArticles(array(Article.t))
-  | NoData
-  | PendingFavoriteArticles;
+  | NoData;
+/*| PendingFavoriteArticles;*/
 /*| PendingMyArticles;*/
 
 let reduceMyArticles = (reduceFunc, _status, payload) =>
@@ -52,8 +52,7 @@ let clickMyFavorites = (event, {ReasonReact.state, send}) => {
     LocalStorage.getToken(),
   )
   |> ignore;
-
-  send(_ => PendingFavoriteArticles);
+  /*send(_ => PendingFavoriteArticles);*/
 };
 
 /* side effect */
@@ -164,7 +163,7 @@ let make = (~articleCallback, ~router, _children) => {
         (_ => DirectorRe.setRoute(router, "/settings")),
       )
     | NoData => ReasonReact.NoUpdate
-    | PendingFavoriteArticles => ReasonReact.NoUpdate
+    /*| PendingFavoriteArticles => ReasonReact.NoUpdate*/
     /*| PendingMyArticles => ReasonReact.NoUpdate*/
     },
   didMount: self => {
