@@ -40,7 +40,7 @@ let register = (event, {ReasonReact.state, send}) => {
     |> Js.Promise.then_(json => {
          let newUser = parseNewUser(json);
          (
-           Belt.Option.isNone(newUser.errors) ?
+           newUser.errors->Belt.Option.isNone ?
              send(SignUpSuccessful) :
              send(SignUpFailed(newUser->Convert.toErrorListFromResponse))
          )
