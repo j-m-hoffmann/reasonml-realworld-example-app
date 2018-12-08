@@ -56,11 +56,9 @@ let () =
           };
         });
         test("should have the correct username", () =>
-          Models.(
-            parseNewUser(succesWithJson).user.username
-            |> expect
-            |> toBe("bryant")
-          )
+          parseNewUser(succesWithJson).user.username
+          |> expect
+          |> toBe("bryant")
         );
         test("should return an error graph", () => {
           let result = JsonRequests.checkForErrors(loginErrorResponse);
