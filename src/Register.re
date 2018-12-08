@@ -40,11 +40,9 @@ let register = (event, {ReasonReact.state, send}) => {
     |> Js.Promise.then_(json => {
          let newUser = parseNewUser(json);
          (
-           switch (newUser.errors) {
-           | None => send(SignUpSuccessful)
-           | Some(_errors) =>
+           Belt.Option.isNone(newUser.errors) ?
+             send(SignUpSuccessful) :
              send(SignUpFailed(newUser->Convert.toErrorListFromResponse))
-           }
          )
          ->Js.Promise.resolve;
        });
