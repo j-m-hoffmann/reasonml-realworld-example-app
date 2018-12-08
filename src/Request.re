@@ -49,9 +49,9 @@ let parseNewUser = (responseText: string): User.registered => {
   };
 };
 
-type responseType =
-  | Error(Js.Json.t)
-  | User(Js.Json.t);
+/*type responseType =*/
+/*| Error(Js.Json.t)*/
+/*| User(Js.Json.t);*/
 
 let getUserGraph = response =>
   Js.Json.parseExn(response)
