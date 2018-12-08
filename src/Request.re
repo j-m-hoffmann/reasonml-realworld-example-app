@@ -1,6 +1,6 @@
 open Config;
 
-let make_headers = (token: option(string)) => {
+let makeHeaders = (token: option(string)) => {
   let content_type = ("content-type", "application/json");
   switch (token) {
   | None => [|content_type|]
@@ -12,7 +12,7 @@ let makeInit = (method, token, data: option(Js.Json.t)) => {
   let defaultInit =
     Bs_fetch.RequestInit.make(
       ~method_=method,
-      ~headers=Bs_fetch.HeadersInit.makeWithArray @@ make_headers(token),
+      ~headers=Bs_fetch.HeadersInit.makeWithArray @@ makeHeaders(token),
     );
   switch (data) {
   | None => defaultInit()
