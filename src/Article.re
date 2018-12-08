@@ -54,16 +54,6 @@ type action =
   | UnFollowUser(string)
   | FetchComments(list(Comment.t));
 
-let deleteCommentRequest = (id, slug) =>
-  Request.deleteCommentForArticle(~id, ~slug, ~token=LocalStorage.getToken())
-  |> ignore;
-
-let followUserRequest = username =>
-  Request.followUser(username, ~token=LocalStorage.getToken()) |> ignore;
-
-let unFollowUserRequest = username =>
-  Request.unFollowUser(username, ~token=LocalStorage.getToken()) |> ignore;
-
 let followUser = (isFollowing, event) =>
   isFollowing ?
     UnFollowUser(ReactEvent.Mouse.target(event)##value) :
@@ -91,19 +81,34 @@ let make = (~article, _children) => {
         Belt.List.keep(state.commentList, comment => comment.id != id);
       ReasonReact.UpdateWithSideEffects(
         {...state, commentList: commentsWithout},
-        (_self => deleteCommentRequest(id, state.slug)),
+        (
+          _self =>
+            Request.deleteCommentForArticle(
+              ~id,
+              ~slug=state.slug,
+              ~token=LocalStorage.getToken(),
+            )
+            |> ignore
+        ),
       );
     | FetchComments(commentList) =>
       ReasonReact.Update({...state, commentList})
-    | FollowUser(username) =>
+    | FollowUser(name) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, isFollowing: true},
-        (_self => followUserRequest(username)),
+        (
+          _self =>
+            Request.followUser(name, ~token=LocalStorage.getToken()) |> ignore
+        ),
       )
-    | UnFollowUser(username) =>
+    | UnFollowUser(name) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, isFollowing: false},
-        (_self => unFollowUserRequest(username)),
+        (
+          _self =>
+            Request.unFollowUser(name, ~token=LocalStorage.getToken())
+            |> ignore
+        ),
       )
     },
   didMount: self =>
