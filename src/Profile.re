@@ -32,10 +32,9 @@ let reduceMyArticles = (reduceFunc, _status, payload) =>
 
 let clickMyArticles = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
-  let reduceFunc = articles => send(_ => MyArticles(articles));
 
   JsonRequests.getMyArticles(
-    reduceMyArticles(reduceFunc),
+    reduceMyArticles(articles => send(MyArticles(articles))),
     state.username,
     LocalStorage.getToken(),
   )
@@ -45,9 +44,9 @@ let clickMyArticles = (event, {ReasonReact.state, send}) => {
 
 let clickMyFavorites = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
-  let reduceFunc = articles => send(_ => FavoriteArticles(articles));
+
   JsonRequests.getFavoritedArticles(
-    reduceMyArticles(reduceFunc),
+    reduceMyArticles(articles => send(FavoriteArticles(articles))),
     state.username,
     LocalStorage.getToken(),
   )
