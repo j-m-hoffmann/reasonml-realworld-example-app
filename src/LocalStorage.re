@@ -10,16 +10,14 @@ let getUser = () => (
 
 let saveToken = value => setItem("jwt", value, localStorage);
 
-let saveUser = (username, bio, image) => {
-  setItem("username", username, localStorage);
-
-  switch (image) {
-  | Some(image) => setItem("image", image, localStorage)
-  | None => ()
-  };
-
+let saveUser = (bio, image, username) => {
   switch (bio) {
   | Some(bio) => setItem("bio", bio, localStorage)
   | None => ()
   };
+  switch (image) {
+  | Some(image) => setItem("image", image, localStorage)
+  | None => ()
+  };
+  setItem("username", username, localStorage);
 };

@@ -157,8 +157,8 @@ let make = (~articleCallback, ~router, _children) => {
         myFeedActiveClass: "nav-link disabled",
         favfeedActiveClass: "nav-link active",
       })
-    | CurrentUserFetched(username, bio, image) =>
-      ReasonReact.Update({...state, username, bio, image})
+    | CurrentUserFetched(bio, image, username) =>
+      ReasonReact.Update({...state, bio, image, username})
     | GoToSettings =>
       ReasonReact.SideEffects(
         (_ => DirectorRe.setRoute(router, "/settings")),
@@ -181,7 +181,7 @@ let make = (~articleCallback, ~router, _children) => {
       token,
     )
     |> ignore;
-    self.send(CurrentUserFetched(currentUsername, currentBio, currentImage));
+    self.send(CurrentUserFetched(currentBio, currentImage, currentUsername));
   },
   render: ({state, send, handle}) => {
     let mapi = Belt.Array.mapWithIndex;

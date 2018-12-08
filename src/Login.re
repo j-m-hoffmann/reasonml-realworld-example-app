@@ -81,7 +81,7 @@ let make = (~router, _children) => {
         (
           _ => {
             LocalStorage.saveToken(user.token);
-            LocalStorage.saveUser(user.username, user.bio, user.image);
+            LocalStorage.saveUser(user.bio, user.image, user.username);
             DirectorRe.setRoute(router, "/home");
           }
         ),
