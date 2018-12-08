@@ -84,7 +84,7 @@ let registerNewUser = (registerFunc, jsonData) => {
   Bs_fetch.(
     fetchWithInit(apiUrlBase ++ mapUrl(Config.Register), request)
     |> then_(response =>
-         registerFunc(Validate.status(response), Validate.text(response))
+         Bs_fetch.Response.(registerFunc(status(response), text(response)))
          |> resolve
        )
   );
@@ -98,7 +98,7 @@ let send_ = (requestMethod, token, jsonData, actionFunc, url) => {
   Bs_fetch.(
     fetchWithInit(url, request)
     |> then_(response =>
-         actionFunc(Validate.status(response), Validate.text(response))
+         Bs_fetch.Response.(actionFunc(status(response), text(response)))
          |> resolve
        )
   );
