@@ -62,7 +62,7 @@ let getGlobalArticles = (~limit, ~offset, ~token, ~f) =>
     ~f,
   );
 
-let getPoplarTags = (~f) => send_(None, ~url=getUrl(Tags), ~f);
+let getPopularTags = (~f) => send_(None, ~url=getUrl(Tags), ~f);
 
 let submitNewArticle = (data, ~token, ~f) =>
   send_(Some(data), ~method_=Post, ~url=getUrl(Articles), ~token, ~f);

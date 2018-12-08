@@ -36,7 +36,7 @@ let populateTags = self => {
          tags |> Js.Promise.resolve;
        })
     |> ignore;
-  Request.getPoplarTags(reduceTags) |> ignore;
+  Request.getPopularTags(reduceTags) |> ignore;
 };
 
 let reduceFeed = (reduceToAction, _state, jsonPayload) =>
