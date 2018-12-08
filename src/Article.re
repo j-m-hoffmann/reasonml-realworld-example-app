@@ -54,10 +54,10 @@ type action =
   | UnFollowUser(string)
   | FetchComments(list(Comment.t));
 
-let followUser = (isFollowing, event) =>
-  isFollowing ?
-    UnFollowUser(ReactEvent.Mouse.target(event)##value) :
-    FollowUser(ReactEvent.Mouse.target(event)##value);
+let followUser = (event, {ReasonReact.state, send}) =>
+  state.isFollowing ?
+    send(UnFollowUser(ReactEvent.Mouse.target(event)##value)) :
+    send(FollowUser(ReactEvent.Mouse.target(event)##value));
 
 /* Add markdown parser to display properly */
 let dangerousHtml: string => Js.t('a) = html => {"__html": html};
@@ -128,7 +128,7 @@ let make = (~article, _children) => {
          })
     )
     |> ignore,
-  render: ({state, send}) =>
+  render: ({state, send, handle}) =>
     <div className="article-page">
       <div className="banner">
         <div className="container">
@@ -151,7 +151,7 @@ let make = (~article, _children) => {
             <button
               className="btn btn-sm btn-outline-secondary"
               value={article.author.username}
-              onClick={e => send(followUser(state.isFollowing, e))}>
+              onClick={handle(followUser)}>
               <i className="ion-plus-round" />
               {ReasonReact.string(" ")}
               {
@@ -202,7 +202,7 @@ let make = (~article, _children) => {
             <button
               className="btn btn-sm btn-outline-secondary"
               value={article.author.username}
-              onClick={e => send(followUser(state.isFollowing, e))}>
+              onClick={handle(followUser)}>
               <i className="ion-plus-round" />
               {ReasonReact.string(" ")}
               {
