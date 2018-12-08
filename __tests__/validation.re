@@ -56,8 +56,7 @@ let () =
           };
         });
         test("should have the correct username", () =>
-          parseNewUser(succesWithJson).user.username
-          |> expect
+          expect(parseNewUser(succesWithJson).user.username)
           |> toBe("bryant")
         );
         test("should return an error graph", () => {
