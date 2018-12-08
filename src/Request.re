@@ -8,10 +8,10 @@ let makeHeaders = (token: option(string)) => {
   };
 };
 
-let makeInit = (method, token, data: option(Js.Json.t)) => {
+let makeInit = (data: option(Js.Json.t), ~method_, ~token) => {
   let defaultInit =
     Bs_fetch.RequestInit.make(
-      ~method_=method,
+      ~method_,
       ~headers=Bs_fetch.HeadersInit.makeWithArray @@ makeHeaders(token),
     );
   switch (data) {
