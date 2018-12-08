@@ -7,13 +7,14 @@ type state = {
 };
 
 type action =
+  | GoToProfile
   | SettingsFetched(state)
-  | SettingsUpdated
   | UpdateBio(string)
   | UpdateEmail(string)
   | UpdateImage(string)
   | UpdateName(string)
-  | UpdatePassword(string);
+  | UpdatePassword(string)
+  | UpdateSettings;
 
 let toJson = settings =>
   Json.Encode.(
@@ -31,43 +32,45 @@ let toJson = settings =>
     ])
   );
 
-/*module Encode = {*/
-/*let token = currentUser => Json.Encode.[("token", string(currentUser))];*/
-/*};*/
-
-let updateSettings = (event, {ReasonReact.state, send}) => {
-  event->ReactEvent.Mouse.preventDefault;
-  let responseCatch = (_status, payload) =>
-    payload
-    |> Js.Promise.then_(result => {
-         Js.log(result);
-         send(SettingsUpdated);
-         result |> Js.Promise.resolve;
-       })
-    |> ignore;
-  Request.updateUser(responseCatch, toJson(state), LocalStorage.getToken())
-  |> ignore;
-};
-
 let component = ReasonReact.reducerComponent("Settings");
+
 let make = (~router, _children) => {
   ...component,
   initialState: () => {bio: "", email: "", image: "", name: "", password: ""},
   reducer: (action, state) =>
     switch (action) {
-    | SettingsFetched(newState) => ReasonReact.Update(newState)
-    | SettingsUpdated =>
+    | GoToProfile =>
       ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/profile")))
+    | SettingsFetched(settings) => ReasonReact.Update(settings)
     | UpdateBio(bio) => ReasonReact.Update({...state, bio})
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdateImage(image) => ReasonReact.Update({...state, image})
     | UpdateName(name) => ReasonReact.Update({...state, name})
     | UpdatePassword(password) => ReasonReact.Update({...state, password})
+    | UpdateSettings =>
+      ReasonReact.SideEffects(
+        (
+          self =>
+            Request.updateUser(
+              toJson(state),
+              ~token=LocalStorage.getToken(),
+              ~f=(_status, payload) =>
+              payload
+              |> Js.Promise.then_(result => {
+                   Js.log(result);
+                   self.send(GoToProfile);
+                   result |> Js.Promise.resolve;
+                 })
+              |> ignore
+            )
+            |> ignore
+        ),
+      )
     },
   didMount: self => {
     open Request;
-    let reduceCurrentUser = (_status, jsonPayload) =>
-      jsonPayload
+    let reduceCurrentUser = (_status, payload) =>
+      payload
       |> Js.Promise.then_(result => {
            let registered = Response.parseNewUser(result);
 
@@ -84,6 +87,7 @@ let make = (~router, _children) => {
            registered.user->Js.Promise.resolve;
          });
 
+    /*TODO this seems wrong*/
     let displayResult = result => {
       if (result == "401") {
         DirectorRe.setRoute(router, "/login");
@@ -91,18 +95,18 @@ let make = (~router, _children) => {
 
       Response.getUserGraph(result)->User.fromJson(_).token
       ->Some
-      ->getCurrentUser(reduceCurrentUser, _)
-      ->ignore;
+      ->getCurrentUser(~token=_, ~f=reduceCurrentUser)
+      |> ignore;
 
       result->Js.Promise.resolve;
     };
 
-    let reduceUser = (_status, jsonPayload) =>
-      jsonPayload |> Js.Promise.then_(displayResult);
-
-    getCurrentUser(reduceUser, LocalStorage.getToken())->ignore;
+    getCurrentUser(~token=LocalStorage.getToken(), ~f=(_status, payload) =>
+      payload |> Js.Promise.then_(displayResult)
+    )
+    |> ignore;
   },
-  render: ({state, send, handle}) =>
+  render: ({state, send}) =>
     <div className="settings-page">
       <div className="container page">
         <div className="row">
@@ -186,7 +190,12 @@ let make = (~router, _children) => {
                 </fieldset>
                 <button
                   className="btn btn-lg btn-primary pull-xs-right"
-                  onClick={handle(updateSettings)}>
+                  onClick={
+                    event => {
+                      event->ReactEvent.Mouse.preventDefault;
+                      send(UpdateSettings);
+                    }
+                  }>
                   {ReasonReact.string("Update Settings")}
                 </button>
               </fieldset>
