@@ -24,20 +24,20 @@ let makeInit = (method, token, data: option(Js.Json.t)) => {
 /*let toJson = listedElements =>*/
 /*listedElements |> Js.Dict.fromList |> Js.Json.object_;*/
 
-type newUserResponse =
-  | Success(User.registered)
-  | Failure(User.registered);
+/*type newUserResponse =*/
+/*| Success(User.registered)*/
+/*| Failure(User.registered);*/
 
-let hasErrors = checkId =>
-  switch (checkId) {
-  | Some(_resp) => true
-  | None => false
-  };
+/*let hasErrors = checkId =>*/
+/*switch (checkId) {*/
+/*| Some(_resp) => true*/
+/*| None => false*/
+/*};*/
 
-let tee = (func, output) => {
-  func(output);
-  output;
-};
+/*let tee = (func, output) => {*/
+/*func(output);*/
+/*output;*/
+/*};*/
 
 let parseNewUser = (responseText: string): User.registered => {
   let json = Js.Json.parseExn(responseText);
