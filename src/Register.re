@@ -8,8 +8,7 @@ type state = {
 
 type action =
   | GoToLogin
-  | Login
-  /*| Register(bool, list(string))*/
+  | SignUp
   | SignUpFailed(list(string))
   | SignUpSuccessful
   | UpdateEmail(string)
@@ -32,25 +31,6 @@ let toJson = user =>
 
 let component = ReasonReact.reducerComponent("Register");
 
-let register = (event, {ReasonReact.state, send}) => {
-  event->ReactEvent.Mouse.preventDefault;
-  Request.registerNewUser(toJson(state), ~f=(_status, payload) =>
-    payload
-    |> Js.Promise.then_(json => {
-         let newUser = Response.parseNewUser(json);
-         (
-           newUser.errors->Belt.Option.isNone ?
-             send(SignUpSuccessful) :
-             send(SignUpFailed(newUser->User.errorList))
-         )
-         |> Js.Promise.resolve;
-       })
-  )
-  |> ignore;
-  /*send(Register(false, ["Hitting server."]));*/
-};
-
-/* TODO: use the route to go the next home screen when registered successfully */
 let make = (~router, _children) => {
   ...component,
   initialState: () => {
@@ -64,9 +44,25 @@ let make = (~router, _children) => {
     switch (action) {
     | GoToLogin =>
       ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/login")))
-    | Login => ReasonReact.NoUpdate
-    /*| Register(validationFailed, errorList) =>*/
-    /*ReasonReact.Update({...state, validationFailed, errorList})*/
+    | SignUp =>
+      ReasonReact.SideEffects(
+        (
+          self =>
+            Request.registerNewUser(toJson(state), ~f=(_status, payload) =>
+              payload
+              |> Js.Promise.then_(json => {
+                   let newUser = Response.parseNewUser(json);
+                   (
+                     newUser.errors->Belt.Option.isNone ?
+                       self.send(SignUpSuccessful) :
+                       self.send(SignUpFailed(newUser->User.errorList))
+                   )
+                   |> Js.Promise.resolve;
+                 })
+            )
+            |> ignore
+        ),
+      )
     | SignUpFailed(errorList) =>
       ReasonReact.Update({...state, validationFailed: true, errorList})
     | SignUpSuccessful =>
@@ -76,7 +72,7 @@ let make = (~router, _children) => {
     | UpdatePassword(value) =>
       ReasonReact.Update({...state, password: value})
     },
-  render: ({state, send, handle}) =>
+  render: ({state, send}) =>
     <div className="auth-page">
       <div className="container page">
         <div className="row">
@@ -145,7 +141,12 @@ let make = (~router, _children) => {
                 />
               </fieldset>
               <button
-                onClick={handle(register)}
+                onClick={
+                  event => {
+                    event->ReactEvent.Mouse.preventDefault;
+                    send(SignUp);
+                  }
+                }
                 className="btn btn-lg btn-primary pull-xs-right">
                 {ReasonReact.string("Sign up")}
               </button>
