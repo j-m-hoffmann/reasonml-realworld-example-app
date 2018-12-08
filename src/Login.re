@@ -46,15 +46,14 @@ let loginUser = (event, {ReasonReact.state, send}) => {
   open Request;
   let reduceByAuthResult = (_status, jsonPayload) =>
     jsonPayload
-    |> Js.Promise.then_(json =>
-         Response.checkForErrors(json)
-         ->(
-             fun
-             | None =>
-               send(LoginSuccessful(Response.parseNewUser(json).user))
-             | Some(errors) =>
-               send(LoginFailed(convertToErrorList(errors)))
-           )
+    |> Js.Promise.then_(result =>
+         (
+           switch (Response.checkForErrors(result)) {
+           | None =>
+             send(LoginSuccessful(Response.parseNewUser(result).user))
+           | Some(errors) => send(LoginFailed(convertToErrorList(errors)))
+           }
+         )
          ->Js.Promise.resolve
        );
   authenticateUser(reduceByAuthResult, toJson(state))->ignore;
