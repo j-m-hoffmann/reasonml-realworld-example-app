@@ -1,4 +1,4 @@
-open Config;
+open Api;
 
 let makeHeaders = (token: option(string)) => {
   let content_type = ("content-type", "application/json");
@@ -44,7 +44,7 @@ let authenticateUser = (loginFunc, jsonData) =>
     None,
     Some(jsonData),
     loginFunc,
-    constructUrl(Config.Authenticate),
+    constructUrl(Api.Authenticate),
   );
 
 let updateUser = (updateUserFunc, jsonData, token) =>
@@ -53,34 +53,32 @@ let updateUser = (updateUserFunc, jsonData, token) =>
     token,
     Some(jsonData),
     updateUserFunc,
-    constructUrl(Config.UpdateUser),
+    constructUrl(Api.UpdateUser),
   );
 
 let getCurrentUser = (getUserFunc, token) =>
-  send_(Get, token, None, getUserFunc, constructUrl(Config.CurrentUser));
+  send_(Get, token, None, getUserFunc, constructUrl(Api.CurrentUser));
 
 let getMyArticles = (getArticleFunc, name, token) => {
-  let urlAfterBase =
-    apiUrlBase ++ mapUrl(Config.Articles) ++ "?author=" ++ name;
+  let urlAfterBase = apiUrlBase ++ mapUrl(Api.Articles) ++ "?author=" ++ name;
   send_(Get, token, None, getArticleFunc, urlAfterBase);
 };
 
 let getFavoritedArticles = (articleFunc, name, token) => {
   let urlAfterBase =
-    apiUrlBase ++ mapUrl(Config.Articles) ++ "?favorited=" ++ name;
+    apiUrlBase ++ mapUrl(Api.Articles) ++ "?favorited=" ++ name;
   send_(Get, token, None, articleFunc, urlAfterBase);
 };
 
 let getArticlesByTag = (articleFunc, tagName, token) => {
-  let urlAfterBase =
-    apiUrlBase ++ mapUrl(Config.Articles) ++ "?tag=" ++ tagName;
+  let urlAfterBase = apiUrlBase ++ mapUrl(Api.Articles) ++ "?tag=" ++ tagName;
   send_(Get, token, None, articleFunc, urlAfterBase);
 };
 
 let getGlobalArticles = (getArticlesFunc, token, limit, offset) => {
   let urlAfterBase =
     apiUrlBase
-    ++ mapUrl(Config.Articles)
+    ++ mapUrl(Api.Articles)
     ++ "?limit="
     ++ string_of_int(limit)
     ++ "&offset="
@@ -89,7 +87,7 @@ let getGlobalArticles = (getArticlesFunc, token, limit, offset) => {
 };
 
 let getPoplarTags = getTagsFunc =>
-  send_(Get, None, None, getTagsFunc, constructUrl(Config.Tags));
+  send_(Get, None, None, getTagsFunc, constructUrl(Api.Tags));
 
 let submitNewArticle = (submissionResponse, jsonData, token) =>
   send_(
@@ -97,7 +95,7 @@ let submitNewArticle = (submissionResponse, jsonData, token) =>
     token,
     Some(jsonData),
     submissionResponse,
-    constructUrl(Config.Articles),
+    constructUrl(Api.Articles),
   );
 
 let commentsForArticle = (slug, commentsFunc) =>
@@ -106,7 +104,7 @@ let commentsForArticle = (slug, commentsFunc) =>
     None,
     None,
     commentsFunc,
-    constructUrl(Config.ArticleCommentBySlug(slug)),
+    constructUrl(Api.ArticleCommentBySlug(slug)),
   );
 
 let mutedResponse = (_, _) => ();
@@ -117,7 +115,7 @@ let deleteCommentForArticle = (slug, commentId, token) =>
     token,
     None,
     mutedResponse,
-    constructUrl(Config.DeleteComment(slug, commentId)),
+    constructUrl(Api.DeleteComment(slug, commentId)),
   );
 
 let followUser = (username, token) =>
@@ -127,7 +125,7 @@ let followUser = (username, token) =>
     token,
     None,
     mutedResponse,
-    constructUrl(Config.Follow(username)),
+    constructUrl(Api.Follow(username)),
   );
 
 let unFollowUser = (username, token) =>
@@ -136,11 +134,11 @@ let unFollowUser = (username, token) =>
     token,
     None,
     mutedResponse,
-    constructUrl(Config.Unfollow(username)),
+    constructUrl(Api.Unfollow(username)),
   );
 
 let getFeed = (token, articleListFunc) =>
-  send_(Get, token, None, articleListFunc, constructUrl(Config.Feed));
+  send_(Get, token, None, articleListFunc, constructUrl(Api.Feed));
 
 let favoriteArticle = (token, slug) =>
   send_(
@@ -148,7 +146,7 @@ let favoriteArticle = (token, slug) =>
     token,
     None,
     mutedResponse,
-    constructUrl(Config.ArticleFavorite(slug)),
+    constructUrl(Api.ArticleFavorite(slug)),
   );
 
 let unfavoriteArticle = (token, slug) =>
@@ -157,5 +155,5 @@ let unfavoriteArticle = (token, slug) =>
     token,
     None,
     mutedResponse,
-    constructUrl(Config.ArticleFavorite(slug)),
+    constructUrl(Api.ArticleFavorite(slug)),
   );
