@@ -47,7 +47,7 @@ let loginUser = (event, {ReasonReact.state, send}) => {
   let reduceByAuthResult = (_status, jsonPayload) =>
     jsonPayload
     |> Js.Promise.then_(json =>
-         Validate.checkForErrors(json)
+         Response.checkForErrors(json)
          ->(
              fun
              | None => send(LoginSuccessful(parseNewUser(json).user))
