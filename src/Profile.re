@@ -175,8 +175,7 @@ let make = (~articleCallback, ~router, _children) => {
     |> ignore;
     self.send(CurrentUserFetched(bio', image', username'));
   },
-  render: ({state, send, handle}) => {
-    let mapi = Belt.Array.mapWithIndex;
+  render: ({state, send, handle}) =>
     <div className="profile-page">
       <div className="user-info">
         <div className="container">
@@ -242,6 +241,5 @@ let make = (~articleCallback, ~router, _children) => {
           </div>
         </div>
       </div>
-    </div>;
-  },
+    </div>,
 };
