@@ -1,7 +1,5 @@
-let urlBase = "https://conduit.productionready.io/api";
-
 type service =
-  | Authenticate
+  | LogIn
   | Register
   | CurrentUser
   | UpdateUser
@@ -18,11 +16,11 @@ type service =
   | Tags
   | Feed;
 
-let getUrl = s =>
+let toUrl = s =>
   switch (s) {
-  | Authenticate => "/users/login"
+  | LogIn => "/users/login"
   | Register => "/users"
-  | CurrentUser
+  | CurrentUser => "/user"
   | UpdateUser => "/user"
   | Profile(username) => "/profiles/" ++ username
   | Follow(username)
@@ -38,3 +36,7 @@ let getUrl = s =>
   | ArticleUnfavorite(slug) => "/articles/" ++ slug ++ "/favorite"
   | Tags => "/tags"
   };
+
+let root = "https://conduit.productionready.io/api";
+
+let url = s => root ++ toUrl(s);
