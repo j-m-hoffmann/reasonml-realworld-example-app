@@ -1,3 +1,5 @@
+open Routes;
+
 type state = Article.t;
 
 type action =
@@ -18,15 +20,15 @@ let make = (~route, ~router, _children) => {
       <Header router />
       {
         switch (route) {
-        | Routes.Home =>
+        | Home =>
           <Home articleCallback=(a => send(SetCurrentArticle(a))) router />
-        | Routes.Register => <Register router />
-        | Routes.Login => <Login router />
-        | Routes.Settings => <Settings router />
-        | Routes.Article => <Article article=state />
-        | Routes.CreateArticle => <CreateArticle router />
-        | Routes.EditArticle => <Article article=state />
-        | Routes.Profile =>
+        | Register => <Register router />
+        | Login => <Login router />
+        | Settings => <Settings router />
+        | Article => <Article article=state />
+        | CreateArticle => <CreateArticle router />
+        | EditArticle => <Article article=state />
+        | Profile =>
           <Profile
             articleCallback=(a => send(SetCurrentArticle(a)))
             router
