@@ -69,12 +69,13 @@ let make = (~router, _children) => {
     },
   didMount: self =>
     Request.(
-      getCurrentUser(~token=LocalStorage.getToken(), ~f=(_status, payload) =>
+      getCurrentUser(~token=LocalStorage.getToken(), ~f=(status, payload) =>
         payload
         |> Js.Promise.then_(result => {
-             if (result == "401") {
+             if (status === 401) {
                DirectorRe.setRoute(router, "/login");
              } else {
+               /*TODO  check again*/
                Response.getUserGraph(result)->User.fromJson(_).token
                ->Some
                ->getCurrentUser(~token=_, ~f=(_status, payload) =>
