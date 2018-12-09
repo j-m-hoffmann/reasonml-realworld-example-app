@@ -51,7 +51,7 @@ let make = (~router, _children) => {
       ReasonReact.SideEffects(
         (
           self =>
-            Request.updateUser(
+            Request.User.saveSettings(
               toJson(state),
               ~token=LocalStorage.getToken(),
               ~f=(_status, payload) =>
@@ -68,49 +68,48 @@ let make = (~router, _children) => {
       )
     },
   didMount: self =>
-    Request.(
-      getCurrentUser(~token=LocalStorage.getToken(), ~f=(status, payload) =>
-        payload
-        |> Js.Promise.then_(result => {
-             if (status === 401) {
-               DirectorRe.setRoute(router, "/login");
-             } else {
-               /*TODO  check again*/
-               Response.getUserGraph(result)->User.fromJson(_).token
-               ->Some
-               ->getCurrentUser(~token=_, ~f=(_status, payload) =>
-                   payload
-                   |> Js.Promise.then_(result => {
-                        let registered = Response.parseNewUser(result);
+    Request.User.current(~token=LocalStorage.getToken(), ~f=(status, payload) =>
+      payload
+      |> Js.Promise.then_(result => {
+           if (status === 401) {
+             DirectorRe.setRoute(router, "/login");
+           } else {
+             /*TODO  check again*/
+             Response.getUserGraph(result)->User.fromJson(_).token
+             ->Some
+             ->Request.User.current(~token=_, ~f=(_status, payload) =>
+                 payload
+                 |> Js.Promise.then_(result => {
+                      let registered = Response.parseNewUser(result);
 
-                        self.send(
-                          SettingsFetched({
-                            bio:
-                              Belt.Option.getWithDefault(
-                                registered.user.bio,
-                                "",
-                              ),
-                            email: registered.user.email,
-                            image:
-                              Belt.Option.getWithDefault(
-                                registered.user.image,
-                                "",
-                              ),
-                            name: registered.user.username,
-                            password: "",
-                          }),
-                        );
+                      self.send(
+                        SettingsFetched({
+                          bio:
+                            Belt.Option.getWithDefault(
+                              registered.user.bio,
+                              "",
+                            ),
+                          email: registered.user.email,
+                          image:
+                            Belt.Option.getWithDefault(
+                              registered.user.image,
+                              "",
+                            ),
+                          name: registered.user.username,
+                          password: "",
+                        }),
+                      );
 
-                        registered.user |> Js.Promise.resolve;
-                      })
-                 )
-               |> ignore;
-             };
-             result |> Js.Promise.resolve;
-           })
-      )
-      |> ignore
-    ),
+                      registered.user |> Js.Promise.resolve;
+                    })
+               )
+             |> ignore;
+           };
+           result |> Js.Promise.resolve;
+         })
+    )
+    |> ignore,
+
   render: ({state, send}) =>
     <div className="settings-page">
       <div className="container page">
