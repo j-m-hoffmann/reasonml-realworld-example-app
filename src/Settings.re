@@ -68,7 +68,7 @@ let make = (~router, _children) => {
     Request.User.current(~f=(status, payload) =>
       payload
       |> Js.Promise.then_(result => {
-           if (status === 401) {
+           if (status == 401) {
              DirectorRe.setRoute(router, "/login");
            } else {
              /*TODO  check again*/
