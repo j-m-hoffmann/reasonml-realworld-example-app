@@ -7,26 +7,12 @@ type state = {
 
 type action =
   | GoToRegister
+  | LogIn
   | LoginSuccessful(User.t)
   | LoginFailed(list(string))
   | UpdateEmail(string)
   | UpdatePassword(string);
 /*| LoginPending;*/
-
-/*module Encode = {*/
-/*let encodeUserCredentials = creds => {*/
-/*open! Json.Encode;*/
-/*object_([*/
-/*("email", string(creds.email)),*/
-/*("password", string(creds.password)),*/
-/*]);*/
-/*};*/
-/*let user = topLevelUser =>*/
-/*Json.Encode.(object_([("user", encodeUserCredentials(topLevelUser))]));*/
-
-/*let currentUser = (username, bio) =>*/
-/*Json.Encode.[("username", string(username)), ("bio", string(bio))];*/
-/*};*/
 
 let toJson = credentials =>
   Json.Encode.(
@@ -40,24 +26,6 @@ let toJson = credentials =>
       ),
     ])
   );
-
-let loginUser = (event, {ReasonReact.state, send}) => {
-  event->ReactEvent.Mouse.preventDefault;
-  Request.User.logIn(toJson(state), ~f=(_status, body) =>
-    body
-    |> Js.Promise.then_(json =>
-         (
-           switch (Response.checkForErrors(json)) {
-           | None => send(LoginSuccessful(Response.parseNewUser(json).user))
-           | Some(errors) => send(LoginFailed(Errors.toList(errors)))
-           }
-         )
-         |> Js.Promise.resolve
-       )
-  )
-  |> ignore;
-  /*send(LoginPending);*/
-};
 
 let component = ReasonReact.reducerComponent("Login");
 
@@ -75,6 +43,32 @@ let make = (~router, _children) => {
       ReasonReact.SideEffects(
         (_ => DirectorRe.setRoute(router, "/register")),
       )
+    | LogIn =>
+      ReasonReact.SideEffects(
+        (
+          self =>
+            Request.User.logIn(toJson(state), ~f=(_status, body) =>
+              body
+              |> Js.Promise.then_(response =>
+                   (
+                     switch (Response.checkForErrors(response)) {
+                     | None =>
+                       self.send(
+                         LoginSuccessful(
+                           Response.parseNewUser(response).user,
+                         ),
+                       )
+                     | Some(errors) =>
+                       self.send(LoginFailed(Errors.toList(errors)))
+                     }
+                   )
+                   |> Js.Promise.resolve
+                 )
+            )
+            |> ignore
+        ),
+        /*send(LoginPending);*/
+      )
     | LoginSuccessful(user) =>
       ReasonReact.SideEffects(
         (
@@ -91,7 +85,7 @@ let make = (~router, _children) => {
     | UpdatePassword(password) => ReasonReact.Update({...state, password})
     /*| LoginPending => ReasonReact.NoUpdate*/
     },
-  render: ({state, send, handle}) =>
+  render: ({state, send}) =>
     <div className="auth-page">
       <div className="container page">
         <div className="row">
@@ -148,7 +142,12 @@ let make = (~router, _children) => {
                 />
               </fieldset>
               <button
-                onClick={handle(loginUser)}
+                onClick={
+                  event => {
+                    event->ReactEvent.Mouse.preventDefault;
+                    send(LogIn);
+                  }
+                }
                 className="btn btn-lg btn-primary pull-xs-right">
                 {ReasonReact.string("Sign in")}
               </button>
