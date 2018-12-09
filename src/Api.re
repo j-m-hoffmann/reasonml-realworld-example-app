@@ -1,40 +1,40 @@
 type service =
-  | LogIn
-  | Register
-  | CurrentUser
-  | UpdateUser
-  | Profile(string)
-  | Follow(string)
-  | Unfollow(string)
-  | DeleteComment(string, int)
-  | Articles
   | ArticleBySlug(string)
-  | ArticleCommentBySlug(string)
   | ArticleBySlugId((string, string))
+  | ArticleCommentBySlug(string)
   | ArticleFavorite(string)
   | ArticleUnfavorite(string)
+  | Articles
+  | CurrentUser
+  | DeleteComment(string, int)
+  | Feed
+  | Follow(string)
+  | LogIn
+  | Profile(string)
+  | Register
   | Tags
-  | Feed;
+  | Unfollow(string)
+  | UpdateUser;
 
 let toUrl = s =>
   switch (s) {
-  | LogIn => "/users/login"
-  | Register => "/users"
-  | CurrentUser => "/user"
-  | UpdateUser => "/user"
-  | Profile(username) => "/profiles/" ++ username
-  | Follow(username)
-  | Unfollow(username) => "/profiles/" ++ username ++ "/follow"
-  | Articles => "/articles"
   | ArticleBySlug(slug) => "/articles/" ++ slug
+  | ArticleBySlugId((slug, id)) => "/articles/" ++ slug ++ "/comments/" ++ id
   | ArticleCommentBySlug(slug) => "/articles/" ++ slug ++ "/comments"
+  | ArticleFavorite(slug) => "/articles/" ++ slug ++ "/favorite"
+  | ArticleUnfavorite(slug) => "/articles/" ++ slug ++ "/favorite"
+  | Articles => "/articles"
+  | CurrentUser => "/user"
   | DeleteComment(slug, commentId) =>
     "/articles/" ++ slug ++ "/comments/" ++ string_of_int(commentId)
-  | ArticleBySlugId((slug, id)) => "/articles/" ++ slug ++ "/comments/" ++ id
   | Feed => "/articles/feed"
-  | ArticleFavorite(slug)
-  | ArticleUnfavorite(slug) => "/articles/" ++ slug ++ "/favorite"
+  | Follow(username) => "/profiles/" ++ username ++ "/follow"
+  | LogIn => "/users/login"
+  | Profile(username) => "/profiles/" ++ username
+  | Register => "/users"
   | Tags => "/tags"
+  | Unfollow(username) => "/profiles/" ++ username ++ "/follow"
+  | UpdateUser => "/user"
   };
 
 let root = "https://conduit.productionready.io/api";
