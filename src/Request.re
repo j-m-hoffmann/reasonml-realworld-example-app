@@ -1,5 +1,3 @@
-open Api;
-
 let makeHeaders = (token: option(string)) => {
   let content_type = ("content-type", "application/json");
   switch (token) {
@@ -28,92 +26,83 @@ let send_ = (data, ~method_=Fetch.Get, ~url, ~token=None, ~f) =>
        ->Js.Promise.resolve
      );
 
-let registerNewUser = (data, ~f) =>
-  send_(Some(data), ~url=getUrl(Register), ~method_=Post, ~f);
+let delete = (~url, ~token, ~f) =>
+  send_(None, ~method_=Fetch.Delete, ~token, ~url, ~f);
 
-let authenticateUser = (data, ~f) =>
-  send_(Some(data), ~method_=Post, ~url=getUrl(Authenticate), ~f);
+let get = (~url, ~token, ~f) =>
+  send_(None, ~method_=Fetch.Get, ~token, ~url, ~f);
 
-let updateUser = (data, ~token, ~f) =>
-  send_(Some(data), ~method_=Put, ~url=getUrl(UpdateUser), ~token, ~f);
+let post = (data, ~url, ~token, ~f) =>
+  send_(data, ~method_=Fetch.Post, ~token, ~url, ~f);
 
-let getCurrentUser = (~token, ~f) =>
-  send_(None, ~url=getUrl(CurrentUser), ~token, ~f);
+let put = (data, ~url, ~token, ~f) =>
+  send_(data, ~method_=Fetch.Put, ~token, ~url, ~f);
 
-let getMyArticles = (name, ~token, ~f) =>
-  send_(None, ~url=getUrl(Articles) ++ "?author=" ++ name, ~token, ~f);
+open Api;
 
-let getFavoritedArticles = (name, ~token, ~f) =>
-  send_(None, ~url=getUrl(Articles) ++ "?favorited=" ++ name, ~token, ~f);
+module Article = {
+  let all = (~limit, ~offset, ~token, ~f) =>
+    get(
+      ~url=
+        url(Articles)
+        ++ "?limit="
+        ++ string_of_int(limit)
+        ++ "&offset="
+        ++ string_of_int(offset),
+      ~token,
+      ~f,
+    );
 
-let getArticlesByTag = (tagName, ~token, ~f) =>
-  send_(None, ~url=getUrl(Articles) ++ "?tag=" ++ tagName, ~token, ~f);
+  let byAuthor = (author, ~token, ~f) =>
+    get(~url=url(Articles) ++ "?author=" ++ author, ~token, ~f);
 
-let getGlobalArticles = (~limit, ~offset, ~token, ~f) =>
-  send_(
-    None,
-    ~url=
-      getUrl(Articles)
-      ++ "?limit="
-      ++ string_of_int(limit)
-      ++ "&offset="
-      ++ string_of_int(offset),
-    ~token,
-    ~f,
-  );
+  let byTag = (tagName, ~token, ~f) =>
+    get(~url=url(Articles) ++ "?tag=" ++ tagName, ~token, ~f);
 
-let getPopularTags = (~f) => send_(None, ~url=getUrl(Tags), ~f);
+  let comments = (slug, ~f) =>
+    get(~token=None, ~url=url(ArticleCommentBySlug(slug)), ~f);
 
-let submitNewArticle = (data, ~token, ~f) =>
-  send_(Some(data), ~method_=Post, ~url=getUrl(Articles), ~token, ~f);
+  let deleteComment = (~id, ~slug, ~token) =>
+    delete(~url=url(DeleteComment(slug, id)), ~token, ~f=Response.discard);
 
-let commentsForArticle = (slug, ~f) =>
-  send_(None, ~url=getUrl(ArticleCommentBySlug(slug)), ~f);
+  let favorite = (slug, ~token) =>
+    post(
+      None,
+      ~url=url(ArticleFavorite(slug)),
+      ~token,
+      ~f=Response.discard,
+    );
 
-let deleteCommentForArticle = (~id, ~slug, ~token) =>
-  send_(
-    None,
-    ~method_=Delete,
-    ~url=getUrl(DeleteComment(slug, id)),
-    ~token,
-    ~f=Response.discard,
-  );
+  let favoritedBy = (name, ~token, ~f) =>
+    get(~url=url(Articles) ++ "?favorited=" ++ name, ~token, ~f);
 
-/* Using a muted response even though it returns a profile. It might be needed later */
-let followUser = (username, ~token) =>
-  send_(
-    None,
-    ~method_=Post,
-    ~url=getUrl(Follow(username)),
-    ~token,
-    ~f=Response.discard,
-  );
+  let feed = (~token, ~f) => get(~url=url(Feed), ~token, ~f);
 
-let unFollowUser = (username, ~token) =>
-  send_(
-    None,
-    ~method_=Delete,
-    ~url=getUrl(Unfollow(username)),
-    ~token,
-    ~f=Response.discard,
-  );
+  let submit = (data, ~token, ~f) =>
+    post(Some(data), ~url=url(Articles), ~token, ~f);
 
-let getFeed = (~token, ~f) => send_(None, ~url=getUrl(Feed), ~token, ~f);
+  let unfavorite = (slug, ~token) =>
+    delete(~url=url(ArticleFavorite(slug)), ~token, ~f=Response.discard);
+};
 
-let favoriteArticle = (slug, ~token) =>
-  send_(
-    None,
-    ~method_=Post,
-    ~url=getUrl(ArticleFavorite(slug)),
-    ~token,
-    ~f=Response.discard,
-  );
+module Tags = {
+  let all = (~f) => get(~url=url(Tags), ~f);
+};
 
-let unfavoriteArticle = (slug, ~token) =>
-  send_(
-    None,
-    ~method_=Delete,
-    ~url=getUrl(ArticleFavorite(slug)),
-    ~token,
-    ~f=Response.discard,
-  );
+module User = {
+  let current = (~token, ~f) => get(~url=url(CurrentUser), ~token, ~f);
+
+  let follow = (username, ~token) =>
+    /* Using a discard even though it returns a profile. It might be needed later */
+    post(None, ~url=url(Follow(username)), ~token, ~f=Response.discard);
+
+  let logIn = (data, ~f) => post(Some(data), ~url=url(LogIn), ~f);
+
+  let register = (data, ~f) => post(Some(data), ~url=url(Register), ~f);
+
+  let saveSettings = (data, ~token, ~f) =>
+    put(Some(data), ~url=url(UpdateUser), ~token, ~f);
+
+  let unFollow = (username, ~token) =>
+    delete(~url=url(Unfollow(username)), ~token, ~f=Response.discard);
+};
