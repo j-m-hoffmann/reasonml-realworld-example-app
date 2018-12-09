@@ -112,7 +112,7 @@ let make = (~article, _children) => {
       )
     },
   didMount: self =>
-    Request.commentsForArticle(self.state.slug, ~f=(_status, payload) =>
+    Request.Article.comments(self.state.slug, ~f=(_status, payload) =>
       payload
       |> Js.Promise.then_(result => {
            let commentList =
