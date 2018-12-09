@@ -24,8 +24,8 @@ type state = {
   tags: array(string),
 };
 
-let reduceFeed = (reduceToAction, _state, jsonPayload) =>
-  jsonPayload
+let reduceFeed = (reduceToAction, _state, body) =>
+  body
   |> Js.Promise.then_(result => {
        let articleList = Js.Json.parseExn(result)->ArticleList.fromJson;
        reduceToAction(articleList);
@@ -306,8 +306,8 @@ let make = (~articleCallback, ~router, _children) => {
       )
     },
   didMount: self => {
-    Request.Tags.all(~f=(_status, payload) =>
-      payload
+    Request.Tags.all(~f=(_status, body) =>
+      body
       |> Js.Promise.then_(result => {
            let json = Js.Json.parseExn(result);
            let tags = Json.Decode.(json |> field("tags", array(string)));

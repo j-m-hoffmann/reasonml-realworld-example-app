@@ -51,8 +51,8 @@ let make = (~router, _children) => {
       ReasonReact.SideEffects(
         (
           self =>
-            Request.User.saveSettings(toJson(state), ~f=(_status, payload) =>
-              payload
+            Request.User.saveSettings(toJson(state), ~f=(_status, body) =>
+              body
               |> Js.Promise.then_(result => {
                    Js.log(result);
                    self.send(GoToProfile);
@@ -65,8 +65,8 @@ let make = (~router, _children) => {
       )
     },
   didMount: self =>
-    Request.User.current(~f=(status, payload) =>
-      payload
+    Request.User.current(~f=(status, body) =>
+      body
       |> Js.Promise.then_(result => {
            if (status == 401) {
              DirectorRe.setRoute(router, "/login");
@@ -74,8 +74,8 @@ let make = (~router, _children) => {
              /*TODO  check again*/
              Response.getUserGraph(result)->User.fromJson(_).token
              ->Some
-             ->Request.User.current(~token=_, ~f=(_status, payload) =>
-                 payload
+             ->Request.User.current(~token=_, ~f=(_status, body) =>
+                 body
                  |> Js.Promise.then_(result => {
                       let registered = Response.parseNewUser(result);
 

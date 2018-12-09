@@ -22,8 +22,8 @@ type action =
 /*| PendingFavoriteArticles;*/
 /*| PendingMyArticles;*/
 
-let reduceMyArticles = (reduceFunc, _status, payload) =>
-  payload
+let reduceMyArticles = (reduceFunc, _status, body) =>
+  body
   |> Js.Promise.then_(result => {
        let articleList = Js.Json.parseExn(result)->ArticleList.fromJson;
        reduceFunc(articleList.articles);
@@ -53,8 +53,8 @@ let clickMyFavorites = (event, {ReasonReact.state, send}) => {
 };
 
 /* side effect */
-let reduceByAuthArticles = (self, _status, jsonPayload) =>
-  jsonPayload
+let reduceByAuthArticles = (self, _status, body) =>
+  body
   |> Js.Promise.then_(result => {
        let articleList = Js.Json.parseExn(result)->ArticleList.fromJson;
 
