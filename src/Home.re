@@ -110,11 +110,6 @@ let renderTag = (self, index, tag) =>
     {ReasonReact.string(tag)}
   </a>;
 
-let renderArticleTag = (index, tag) =>
-  <li className="tag-default tag-pill tag-outline" key={string_of_int(index)}>
-    {ReasonReact.string(tag)}
-  </li>;
-
 /*let rec range = (a, b) =>*/
 /*if (a > b) {*/
 /*[];*/
@@ -190,7 +185,16 @@ let renderArticle =
         <p> {ReasonReact.string(article.description)} </p>
         <span> {ReasonReact.string("Read more...")} </span>
         <ul className="tag-list">
-          {Array.mapi(renderArticleTag, article.tagList)->ReasonReact.array}
+          {
+            mapWIU(article.tagList, (. i, tag) =>
+              <li
+                className="tag-default tag-pill tag-outline"
+                key={string_of_int(i)}>
+                {ReasonReact.string(tag)}
+              </li>
+            )
+            ->ReasonReact.array
+          }
         </ul>
       </a>
     </div>
