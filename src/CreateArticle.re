@@ -34,10 +34,7 @@ let make = (~router, _children) => {
       ReasonReact.SideEffects(
         (
           _self => {
-            Request.Article.submit(
-              toJson(state),
-              ~token=LocalStorage.getToken(),
-              ~f=(_status, body) =>
+            Request.Article.submit(toJson(state), ~f=(_status, body) =>
               body
               |> Js.Promise.then_(result =>
                    Js.log(result) |> Js.Promise.resolve

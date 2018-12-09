@@ -83,12 +83,7 @@ let make = (~article, _children) => {
         {...state, commentList: commentsWithout},
         (
           _self =>
-            Request.Article.deleteComment(
-              ~id,
-              ~slug=state.slug,
-              ~token=LocalStorage.getToken(),
-            )
-            |> ignore
+            Request.Article.deleteComment(~id, ~slug=state.slug) |> ignore
         ),
       );
     | FetchComments(commentList) =>
@@ -96,20 +91,12 @@ let make = (~article, _children) => {
     | FollowUser(name) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, isFollowing: true},
-        (
-          _self =>
-            Request.User.follow(name, ~token=LocalStorage.getToken())
-            |> ignore
-        ),
+        (_self => Request.User.follow(name) |> ignore),
       )
     | UnFollowUser(name) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, isFollowing: false},
-        (
-          _self =>
-            Request.User.unFollow(name, ~token=LocalStorage.getToken())
-            |> ignore
-        ),
+        (_self => Request.User.unFollow(name) |> ignore),
       )
     },
   didMount: self =>

@@ -37,17 +37,15 @@ let populateGlobalFeed = (self, pageNumber) =>
   Request.Article.all(
     ~limit=10,
     ~offset=pageNumber * 10,
-    ~token=LocalStorage.getToken(),
     ~f=
       reduceFeed(articleList =>
         self.ReasonReact.send(ArticlesFetched(articleList))
       ),
   )
   |> ignore;
-
+/*TODO into reducer */
 let populateMyFeed = self =>
   Request.Article.feed(
-    ~token=LocalStorage.getToken(),
     ~f=
       reduceFeed(articleList =>
         self.ReasonReact.send(MyArticlesFetched(articleList))
@@ -61,6 +59,7 @@ let showMyFeed = (event, self) => {
   self.ReasonReact.send(ShowMyFeed);
 };
 
+/*TODO into reducer */
 let showGlobalFeed = (event, self) => {
   event->ReactEvent.Mouse.preventDefault;
   populateGlobalFeed(self, 0);
@@ -277,7 +276,6 @@ let make = (~articleCallback, ~router, _children) => {
           self =>
             Request.Article.byTag(
               currentTagName,
-              ~token=LocalStorage.getToken(),
               ~f=
                 reduceFeed(articleList =>
                   self.send(TagArticlesFetched(articleList))
@@ -293,10 +291,8 @@ let make = (~articleCallback, ~router, _children) => {
           _self =>
             /*TODO put into a handle*/
             !isCurrentlyFav ?
-              Request.Article.favorite(slug, ~token=LocalStorage.getToken())
-              |> ignore :
-              Request.Article.unfavorite(slug, ~token=LocalStorage.getToken())
-              |> ignore
+              Request.Article.favorite(slug) |> ignore :
+              Request.Article.unfavorite(slug) |> ignore
         ),
       )
     | ArticlesByPage(currentPage) =>
@@ -306,7 +302,6 @@ let make = (~articleCallback, ~router, _children) => {
             Request.Article.all(
               ~limit=10,
               ~offset=currentPage * 10,
-              ~token=LocalStorage.getToken(),
               ~f=
                 reduceFeed(articleList =>
                   self.send(ArticlesFetched(articleList))

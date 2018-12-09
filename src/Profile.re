@@ -35,7 +35,6 @@ let clickMyArticles = (event, {ReasonReact.state, send}) => {
 
   Request.Article.byAuthor(
     state.username,
-    ~token=LocalStorage.getToken(),
     ~f=reduceMyArticles(articles => send(MyArticles(articles))),
   )
   |> ignore;
@@ -47,7 +46,6 @@ let clickMyFavorites = (event, {ReasonReact.state, send}) => {
 
   Request.Article.favoritedBy(
     state.username,
-    ~token=LocalStorage.getToken(),
     ~f=reduceMyArticles(articles => send(FavoriteArticles(articles))),
   )
   |> ignore;
@@ -170,11 +168,7 @@ let make = (~articleCallback, ~router, _children) => {
     let image' = Belt.Option.getWithDefault(image, "");
     let username' = Belt.Option.getWithDefault(username, "");
 
-    Request.Article.byAuthor(
-      username',
-      ~token=LocalStorage.getToken(),
-      ~f=reduceByAuthArticles(self),
-    )
+    Request.Article.byAuthor(username', ~f=reduceByAuthArticles(self))
     |> ignore;
     self.send(CurrentUserFetched(bio', image', username'));
   },

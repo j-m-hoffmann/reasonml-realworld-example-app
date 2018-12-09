@@ -41,7 +41,7 @@ let put = (data, ~url, ~token, ~f) =>
 open Api;
 
 module Article = {
-  let all = (~limit, ~offset, ~token, ~f) =>
+  let all = (~limit, ~offset, ~f) =>
     get(
       ~url=
         url(Articles)
@@ -49,60 +49,103 @@ module Article = {
         ++ string_of_int(limit)
         ++ "&offset="
         ++ string_of_int(offset),
-      ~token,
+      ~token=LocalStorage.getToken(),
       ~f,
     );
 
-  let byAuthor = (author, ~token, ~f) =>
-    get(~url=url(Articles) ++ "?author=" ++ author, ~token, ~f);
+  let byAuthor = (author, ~f) =>
+    get(
+      ~url=url(Articles) ++ "?author=" ++ author,
+      ~token=LocalStorage.getToken(),
+      ~f,
+    );
 
-  let byTag = (tagName, ~token, ~f) =>
-    get(~url=url(Articles) ++ "?tag=" ++ tagName, ~token, ~f);
+  let byTag = (tagName, ~f) =>
+    get(
+      ~url=url(Articles) ++ "?tag=" ++ tagName,
+      ~token=LocalStorage.getToken(),
+      ~f,
+    );
 
   let comments = (slug, ~f) =>
     get(~token=None, ~url=url(ArticleCommentBySlug(slug)), ~f);
 
-  let deleteComment = (~id, ~slug, ~token) =>
-    delete(~url=url(DeleteComment(slug, id)), ~token, ~f=Response.discard);
-
-  let favorite = (slug, ~token) =>
-    post(
-      None,
-      ~url=url(ArticleFavorite(slug)),
-      ~token,
+  let deleteComment = (~id, ~slug) =>
+    delete(
+      ~url=url(DeleteComment(slug, id)),
+      ~token=LocalStorage.getToken(),
       ~f=Response.discard,
     );
 
-  let favoritedBy = (name, ~token, ~f) =>
-    get(~url=url(Articles) ++ "?favorited=" ++ name, ~token, ~f);
+  let favorite = slug =>
+    post(
+      None,
+      ~url=url(ArticleFavorite(slug)),
+      ~token=LocalStorage.getToken(),
+      ~f=Response.discard,
+    );
 
-  let feed = (~token, ~f) => get(~url=url(Feed), ~token, ~f);
+  let favoritedBy = (name, ~f) =>
+    get(
+      ~url=url(Articles) ++ "?favorited=" ++ name,
+      ~token=LocalStorage.getToken(),
+      ~f,
+    );
 
-  let submit = (data, ~token, ~f) =>
-    post(Some(data), ~url=url(Articles), ~token, ~f);
+  let feed = (~f) =>
+    get(~url=url(Feed), ~token=LocalStorage.getToken(), ~f);
 
-  let unfavorite = (slug, ~token) =>
-    delete(~url=url(ArticleFavorite(slug)), ~token, ~f=Response.discard);
+  let submit = (data, ~f) =>
+    post(
+      Some(data),
+      ~url=url(Articles),
+      ~token=LocalStorage.getToken(),
+      ~f,
+    );
+
+  let unfavorite = slug =>
+    delete(
+      ~url=url(ArticleFavorite(slug)),
+      ~token=LocalStorage.getToken(),
+      ~f=Response.discard,
+    );
 };
 
 module Tags = {
-  let all = (~f) => get(~url=url(Tags), ~f);
+  let all = (~f) => get(~url=url(Tags), ~token=None, ~f);
 };
 
 module User = {
-  let current = (~token, ~f) => get(~url=url(CurrentUser), ~token, ~f);
+  let current = (~token=LocalStorage.getToken(), ~f) =>
+    get(~url=url(CurrentUser), ~token, ~f);
 
-  let follow = (username, ~token) =>
+  let follow = username =>
     /* Using a discard even though it returns a profile. It might be needed later */
-    post(None, ~url=url(Follow(username)), ~token, ~f=Response.discard);
+    post(
+      None,
+      ~url=url(Follow(username)),
+      ~token=LocalStorage.getToken(),
+      ~f=Response.discard,
+    );
 
-  let logIn = (data, ~f) => post(Some(data), ~url=url(LogIn), ~f);
+  let logIn = (data, ~f) =>
+    post(Some(data), ~token=None, ~url=url(LogIn), ~f);
 
-  let register = (data, ~f) => post(Some(data), ~url=url(Register), ~f);
+  let register = (data, ~f) =>
+    post(Some(data), ~token=None, ~url=url(Register), ~f);
 
-  let saveSettings = (data, ~token, ~f) =>
-    put(Some(data), ~url=url(UpdateUser), ~token, ~f);
+  let saveSettings = (data, ~f) =>
+    put(
+      Some(data),
+      ~token=LocalStorage.getToken(),
+      ~url=url(UpdateUser),
+      ~f,
+    );
 
-  let unFollow = (username, ~token) =>
-    delete(~url=url(Unfollow(username)), ~token, ~f=Response.discard);
+  let unFollow = username =>
+    delete(
+      ~url=url(Unfollow(username)),
+      ~token=LocalStorage.getToken(),
+      ~f=Response.discard,
+    );
 };
