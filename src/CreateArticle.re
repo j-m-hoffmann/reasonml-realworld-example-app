@@ -1,86 +1,58 @@
 type state = {
   title: string,
   description: string,
-  articleBody: string,
-  rawTags: string,
+  body: string,
+  tags: string,
 };
 
 type action =
-  /* | ArticleSubmitted(DirectorRe.t) */
   | SubmitArticle
   | UpdateTitle(string)
   | UpdateDescription(string)
   | UpdateBody(string)
   | UpdateTags(string);
 
-let parseTags = enteredTags => Js.String.split(",", enteredTags);
-
-module Encode = {
-  let newArticle = (articleDetails: state) =>
-    Json.Encode.(
-      object_([
-        ("title", string(articleDetails.title)),
-        ("description", string(articleDetails.description)),
-        ("body", string(articleDetails.articleBody)),
-        (
-          "tagList",
-          parseTags(articleDetails.rawTags) |> Json.Encode.stringArray,
-        ),
-      ])
-    );
-};
-
-let submissionResponse = (_status, payload) =>
-  payload |> Js.Promise.then_(result => Js.log(result) |> Js.Promise.resolve);
-
-/* let submitNewArticle = (router, event, {ReasonReact.state, send}) => { */
-/*   event->ReactEvent.Mouse.preventDefault; */
-/*   JsonRequests.submitNewArticle( */
-/*     submissionResponse, */
-/*     Encode.newArticle(state), */
-/*     Effects.getTokenFromStorage(), */
-/*   ) */
-/*   |> ignore; */
-/*   send(_ => ArticleSubmitted(router)); */
-/* }; */
-
-/*let updateTitle = event => UpdateTitle(ReactEvent.Form.target(event)##value);*/
-/*let updateDescription = event => UpdateDescription(ReactEvent.Form.target(event)##value);*/
-/*let updateBody = event => UpdateBody(ReactEvent.Form.target(event)##value);*/
-/*let updateTags = event => UpdateTags(ReactEvent.Form.target(event)##value);*/
+let toJson = newArticle =>
+  Json.Encode.(
+    object_([
+      ("title", string(newArticle.title)),
+      ("description", string(newArticle.description)),
+      ("body", string(newArticle.body)),
+      ("tagList", newArticle.tags |> Js.String.split(",") |> stringArray),
+    ])
+  );
 
 /* TODO: Add validation for body and title to be required */
 
 let component = ReasonReact.reducerComponent("CreateArticle");
 let make = (~router, _children) => {
   ...component,
-  initialState: () => {
-    title: "",
-    description: "",
-    articleBody: "",
-    rawTags: "",
-  },
+  initialState: () => {title: "", description: "", body: "", tags: ""},
   reducer: (action, state) =>
     switch (action) {
-    /* | ArticleSubmitted(router) => */
-    /*   ReasonReact.SideEffects( */
-    /*     (_self => DirectorRe.setRoute(router, "/home")), */
-    /*   ); */
     | SubmitArticle =>
-      Request.submitNewArticle(
-        submissionResponse,
-        Encode.newArticle(state),
-        LocalStorage.getToken(),
-      )
-      |> ignore;
       ReasonReact.SideEffects(
-        (_self => DirectorRe.setRoute(router, "/home")),
-      );
+        (
+          _self => {
+            Request.submitNewArticle(
+              toJson(state),
+              ~token=LocalStorage.getToken(),
+              ~f=(_status, body) =>
+              body
+              |> Js.Promise.then_(result =>
+                   Js.log(result) |> Js.Promise.resolve
+                 )
+            )
+            |> ignore;
+            DirectorRe.setRoute(router, "/home");
+          }
+        ),
+      )
     | UpdateTitle(title) => ReasonReact.Update({...state, title})
     | UpdateDescription(description) =>
       ReasonReact.Update({...state, description})
-    | UpdateBody(body) => ReasonReact.Update({...state, articleBody: body})
-    | UpdateTags(tags) => ReasonReact.Update({...state, rawTags: tags})
+    | UpdateBody(body) => ReasonReact.Update({...state, body})
+    | UpdateTags(tags) => ReasonReact.Update({...state, tags})
     },
   render: ({state, send}) =>
     <div className="editor-page">
@@ -124,7 +96,7 @@ let make = (~router, _children) => {
                     className="form-control"
                     rows=8
                     placeholder="Write your article (in markdown)"
-                    value={state.articleBody}
+                    value={state.body}
                     onChange={
                       event =>
                         send(
@@ -138,7 +110,7 @@ let make = (~router, _children) => {
                     type_="text"
                     className="form-control"
                     placeholder="Enter tags"
-                    value={state.rawTags}
+                    value={state.tags}
                     onChange={
                       event =>
                         send(
