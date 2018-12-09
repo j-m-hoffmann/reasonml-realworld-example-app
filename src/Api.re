@@ -25,8 +25,8 @@ let toUrl = s =>
   | ArticleUnfavorite(slug) => "/articles/" ++ slug ++ "/favorite"
   | Articles => "/articles"
   | CurrentUser => "/user"
-  | DeleteComment(slug, commentId) =>
-    "/articles/" ++ slug ++ "/comments/" ++ string_of_int(commentId)
+  | DeleteComment(slug, id) =>
+    "/articles/" ++ slug ++ "/comments/" ++ string_of_int(id)
   | Feed => "/articles/feed"
   | Follow(username) => "/profiles/" ++ username ++ "/follow"
   | LogIn => "/users/login"
