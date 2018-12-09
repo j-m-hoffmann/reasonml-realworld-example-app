@@ -32,25 +32,28 @@ let reduceFeed = (reduceToAction, _state, jsonPayload) =>
        articleList |> Js.Promise.resolve;
      });
 
-let populateGlobalFeed = (self, pageNumber) => {
-  let reduceFunc = articleList =>
-    self.ReasonReact.send(ArticlesFetched(articleList));
-
+let populateGlobalFeed = (self, pageNumber) =>
   /* Get the right page if there are more than 10 articles */
-  Request.getGlobalArticles(
-    reduceFeed(reduceFunc),
-    LocalStorage.getToken(),
-    10,
-    pageNumber * 10,
+  Request.Article.all(
+    ~limit=10,
+    ~offset=pageNumber * 10,
+    ~token=LocalStorage.getToken(),
+    ~f=
+      reduceFeed(articleList =>
+        self.ReasonReact.send(ArticlesFetched(articleList))
+      ),
   )
   |> ignore;
-};
 
-let populateMyFeed = self => {
-  let reduceFunc = articleList =>
-    self.ReasonReact.send(MyArticlesFetched(articleList));
-  Request.getFeed(LocalStorage.getToken(), reduceFeed(reduceFunc)) |> ignore;
-};
+let populateMyFeed = self =>
+  Request.Article.feed(
+    ~token=LocalStorage.getToken(),
+    ~f=
+      reduceFeed(articleList =>
+        self.ReasonReact.send(MyArticlesFetched(articleList))
+      ),
+  )
+  |> ignore;
 
 let showMyFeed = (event, self) => {
   event->ReactEvent.Mouse.preventDefault;
@@ -271,16 +274,16 @@ let make = (~articleCallback, ~router, _children) => {
           tagFeedActiveClass: "nav-link active",
         },
         (
-          self => {
-            let reduceFunc = articleList =>
-              self.send(TagArticlesFetched(articleList));
-            Request.getArticlesByTag(
-              reduceFeed(reduceFunc),
+          self =>
+            Request.Article.byTag(
               currentTagName,
-              LocalStorage.getToken(),
+              ~token=LocalStorage.getToken(),
+              ~f=
+                reduceFeed(articleList =>
+                  self.send(TagArticlesFetched(articleList))
+                ),
             )
-            |> ignore;
-          }
+            |> ignore
         ),
       )
     | FavoriteArticle(slug, isCurrentlyFav) =>
@@ -288,37 +291,38 @@ let make = (~articleCallback, ~router, _children) => {
         {...state, articles: updateFavoritedCount(state.articles, slug)},
         (
           _self =>
+            /*TODO put into a handle*/
             !isCurrentlyFav ?
-              Request.favoriteArticle(LocalStorage.getToken(), slug) |> ignore :
-              Request.unfavoriteArticle(LocalStorage.getToken(), slug)
+              Request.Article.favorite(slug, ~token=LocalStorage.getToken())
+              |> ignore :
+              Request.Article.unfavorite(slug, ~token=LocalStorage.getToken())
               |> ignore
         ),
       )
     | ArticlesByPage(currentPage) =>
       ReasonReact.SideEffects(
         (
-          self => {
-            let reduceFunc = articleList =>
-              self.send(ArticlesFetched(articleList));
-            Request.getGlobalArticles(
-              reduceFeed(reduceFunc),
-              LocalStorage.getToken(),
-              10,
-              currentPage * 10,
+          self =>
+            Request.Article.all(
+              ~limit=10,
+              ~offset=currentPage * 10,
+              ~token=LocalStorage.getToken(),
+              ~f=
+                reduceFeed(articleList =>
+                  self.send(ArticlesFetched(articleList))
+                ),
             )
-            |> ignore;
-          }
+            |> ignore
         ),
       )
     },
   didMount: self => {
-    Request.getPopularTags(~f=(_status, jsonPayload) =>
-      jsonPayload
+    Request.Tags.all(~f=(_status, payload) =>
+      payload
       |> Js.Promise.then_(result => {
-           let parsedPopularTags = Js.Json.parseExn(result);
-           let tags =
-             Json.Decode.(parsedPopularTags |> field("tags", array(string)));
-           self.ReasonReact.send(TagsFetched(tags));
+           let json = Js.Json.parseExn(result);
+           let tags = Json.Decode.(json |> field("tags", array(string)));
+           self.send(TagsFetched(tags));
 
            tags |> Js.Promise.resolve;
          })
@@ -327,7 +331,7 @@ let make = (~articleCallback, ~router, _children) => {
     |> ignore;
     populateGlobalFeed(self, 0);
   },
-  render: ({state, handle} as self) => {
+  render: ({state, send, handle} as self) => {
     let currentTagName = state.currentTagName;
     <div className="home-page">
       <div className="banner">
@@ -423,7 +427,7 @@ let make = (~articleCallback, ~router, _children) => {
               <p> {ReasonReact.string("Popular Tags")} </p>
               <div className="tag-list">
                 {
-                  mapi(state.tags, (. i, tag) => renderTag(self, i, tag))
+                  mapWIU(state.tags, (. i, tag) => renderTag(self, i, tag))
                   ->ReasonReact.array
                 }
               </div>
