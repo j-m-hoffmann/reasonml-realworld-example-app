@@ -115,7 +115,10 @@ let renderArticle =
     </div>
   </div>;
 
+let mapWIU = Belt.Array.mapWithIndexU;
+
 let component = ReasonReact.reducerComponent("Profile");
+
 let make = (~articleCallback, ~router, _children) => {
   ...component,
   initialState: () => {
@@ -222,18 +225,16 @@ let make = (~articleCallback, ~router, _children) => {
             </div>
             <div style={state.isMyArticleDisplay}>
               {
-                mapi(
-                  state.myArticles,
-                  renderArticle(handle, router, articleCallback, false),
+                mapWIU(state.myArticles, (. i, a) =>
+                  renderArticle(handle, router, articleCallback, false, i, a)
                 )
                 ->ReasonReact.array
               }
             </div>
             <div style={state.isFavArticleDisplay}>
               {
-                mapi(
-                  state.favoriteArticles,
-                  renderArticle(handle, router, articleCallback, true),
+                mapWIU(state.favoriteArticles, (. i, a) =>
+                  renderArticle(handle, router, articleCallback, true, i, a)
                 )
                 ->ReasonReact.array
               }
