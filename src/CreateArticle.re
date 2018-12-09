@@ -34,7 +34,7 @@ let make = (~router, _children) => {
       ReasonReact.SideEffects(
         (
           _self => {
-            Request.submitNewArticle(
+            Request.Article.submit(
               toJson(state),
               ~token=LocalStorage.getToken(),
               ~f=(_status, body) =>
@@ -123,7 +123,6 @@ let make = (~router, _children) => {
                 <button
                   className="btn btn-lg pull-xs-right btn-primary"
                   type_="button"
-                  /* onClick={self.handle(submitNewArticle(router))}> */
                   onClick={
                     event => {
                       event->ReactEvent.Mouse.preventDefault;
