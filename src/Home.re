@@ -367,7 +367,7 @@ let make = (~articleCallback, ~router, _children) => {
             /*TODO this renders 3 times the same thing check again later*/
             <div style={state.myFeedDisplay}>
               {
-                mapi(state.articles, (. i, article) =>
+                mapWIU(state.articles, (. i, article) =>
                   renderArticle(
                     self,
                     handle,
@@ -382,7 +382,7 @@ let make = (~articleCallback, ~router, _children) => {
             </div>
             <div style={state.globalFeedDisplay}>
               {
-                mapi(state.articles, (. i, article) =>
+                mapWIU(state.articles, (. i, article) =>
                   renderArticle(
                     self,
                     handle,
@@ -397,7 +397,7 @@ let make = (~articleCallback, ~router, _children) => {
             </div>
             <div style={state.tagFeedDisplay}>
               {
-                mapi(state.articles, (. i, article) =>
+                mapWIU(state.articles, (. i, article) =>
                   renderArticle(
                     self,
                     handle,
