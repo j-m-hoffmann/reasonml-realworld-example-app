@@ -1,6 +1,6 @@
 type service =
   | ArticleBySlug(string)
-  | ArticleBySlugId((string, string))
+  | ArticleBySlugId(string, string)
   | ArticleCommentBySlug(string)
   | ArticleFavorite(string)
   | ArticleUnfavorite(string)
@@ -19,7 +19,7 @@ type service =
 let toUrl = s =>
   switch (s) {
   | ArticleBySlug(slug) => "/articles/" ++ slug
-  | ArticleBySlugId((slug, id)) => "/articles/" ++ slug ++ "/comments/" ++ id
+  | ArticleBySlugId(slug, id) => "/articles/" ++ slug ++ "/comments/" ++ id
   | ArticleCommentBySlug(slug) => "/articles/" ++ slug ++ "/comments"
   | ArticleFavorite(slug) => "/articles/" ++ slug ++ "/favorite"
   | ArticleUnfavorite(slug) => "/articles/" ++ slug ++ "/favorite"
