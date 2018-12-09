@@ -34,9 +34,9 @@ let clickMyArticles = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
 
   Request.getMyArticles(
-    reduceMyArticles(articles => send(MyArticles(articles))),
     state.username,
-    LocalStorage.getToken(),
+    ~token=LocalStorage.getToken(),
+    ~f=reduceMyArticles(articles => send(MyArticles(articles))),
   )
   |> ignore;
   /*send(PendingMyArticles);*/
@@ -46,9 +46,9 @@ let clickMyFavorites = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
 
   Request.getFavoritedArticles(
-    reduceMyArticles(articles => send(FavoriteArticles(articles))),
     state.username,
-    LocalStorage.getToken(),
+    ~token=LocalStorage.getToken(),
+    ~f=reduceMyArticles(articles => send(FavoriteArticles(articles))),
   )
   |> ignore;
   /*send(_ => PendingFavoriteArticles);*/
@@ -171,9 +171,9 @@ let make = (~articleCallback, ~router, _children) => {
     let username' = Belt.Option.getWithDefault(username, "");
 
     Request.getMyArticles(
-      reduceByAuthArticles(self),
       username',
-      LocalStorage.getToken(),
+      ~token=LocalStorage.getToken(),
+      ~f=reduceByAuthArticles(self),
     )
     |> ignore;
     self.send(CurrentUserFetched(bio', image', username'));
