@@ -78,12 +78,8 @@ let goToProfile = (router, event, {ReasonReact.state: _state}) => {
   DirectorRe.setRoute(router, "/profile");
 };
 
-let updateFavoritedCount = (articles, currentSlug) => {
-  let updateCurrentArticle = (article: Article.t) =>
-    /*let incDecFavCount =*/
-    /*fun*/
-    /*| true => article.favoritesCount + 1*/
-    /*| false => article.favoritesCount - 1;*/
+let updateFavoritedCount = (articles, currentSlug) =>
+  Belt.Array.map(articles, (article: Article.t) =>
     article.slug == currentSlug ?
       {
         ...article,
@@ -92,9 +88,8 @@ let updateFavoritedCount = (articles, currentSlug) => {
           article.favorited ?
             article.favoritesCount - 1 : article.favoritesCount + 1,
       } :
-      article;
-  Belt.Array.map(articles, updateCurrentArticle);
-};
+      article
+  );
 
 let mapWIU = Belt.Array.mapWithIndexU;
 
