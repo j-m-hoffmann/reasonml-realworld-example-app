@@ -48,10 +48,10 @@ let make = (~router, _children) => {
       ReasonReact.SideEffects(
         (
           self =>
-            Request.registerNewUser(toJson(state), ~f=(_status, payload) =>
-              payload
-              |> Js.Promise.then_(json => {
-                   let newUser = Response.parseNewUser(json);
+            Request.User.register(toJson(state), ~f=(_status, body) =>
+              body
+              |> Js.Promise.then_(text => {
+                   let newUser = Response.parseNewUser(text);
                    (
                      newUser.errors->Belt.Option.isNone ?
                        self.send(SignUpSuccessful) :

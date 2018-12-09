@@ -29,11 +29,11 @@ let reduceMyArticles = (reduceFunc, _status, payload) =>
        reduceFunc(articleList.articles);
        articleList |> Js.Promise.resolve;
      });
-
+/*TODO move into reducer*/
 let clickMyArticles = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
 
-  Request.getMyArticles(
+  Request.Article.byAuthor(
     state.username,
     ~token=LocalStorage.getToken(),
     ~f=reduceMyArticles(articles => send(MyArticles(articles))),
@@ -45,7 +45,7 @@ let clickMyArticles = (event, {ReasonReact.state, send}) => {
 let clickMyFavorites = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
 
-  Request.getFavoritedArticles(
+  Request.Article.favoritedBy(
     state.username,
     ~token=LocalStorage.getToken(),
     ~f=reduceMyArticles(articles => send(FavoriteArticles(articles))),
@@ -170,7 +170,7 @@ let make = (~articleCallback, ~router, _children) => {
     let image' = Belt.Option.getWithDefault(image, "");
     let username' = Belt.Option.getWithDefault(username, "");
 
-    Request.getMyArticles(
+    Request.Article.byAuthor(
       username',
       ~token=LocalStorage.getToken(),
       ~f=reduceByAuthArticles(self),

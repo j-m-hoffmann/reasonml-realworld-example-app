@@ -43,8 +43,8 @@ let toJson = credentials =>
 
 let loginUser = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
-  Request.authenticateUser(toJson(state), ~f=(_status, payload) =>
-    payload
+  Request.User.logIn(toJson(state), ~f=(_status, body) =>
+    body
     |> Js.Promise.then_(json =>
          (
            switch (Response.checkForErrors(json)) {

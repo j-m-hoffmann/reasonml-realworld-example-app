@@ -83,7 +83,7 @@ let make = (~article, _children) => {
         {...state, commentList: commentsWithout},
         (
           _self =>
-            Request.deleteCommentForArticle(
+            Request.Article.deleteComment(
               ~id,
               ~slug=state.slug,
               ~token=LocalStorage.getToken(),
@@ -98,7 +98,8 @@ let make = (~article, _children) => {
         {...state, isFollowing: true},
         (
           _self =>
-            Request.followUser(name, ~token=LocalStorage.getToken()) |> ignore
+            Request.User.follow(name, ~token=LocalStorage.getToken())
+            |> ignore
         ),
       )
     | UnFollowUser(name) =>
@@ -106,7 +107,7 @@ let make = (~article, _children) => {
         {...state, isFollowing: false},
         (
           _self =>
-            Request.unFollowUser(name, ~token=LocalStorage.getToken())
+            Request.User.unFollow(name, ~token=LocalStorage.getToken())
             |> ignore
         ),
       )
