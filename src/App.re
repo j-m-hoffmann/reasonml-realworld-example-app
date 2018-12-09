@@ -6,26 +6,26 @@ let renderForRoute = (route, router) =>
 let router =
   DirectorRe.makeRouter({
     "/": "root",
-    "/home": "home",
-    "/register": "register",
-    "/login": "login",
-    "/settings": "settings",
+    "/article": "article",
     "/article/create": "article_create",
     "/article/edit": "article_edit",
-    "/article": "article",
+    "/home": "home",
+    "/login": "login",
     "/profile": "profile",
+    "/register": "register",
+    "/settings": "settings",
   });
 
 let handlers = {
-  "root": () => renderForRoute(Home, router),
-  "home": () => renderForRoute(Home, router),
-  "register": () => renderForRoute(Register, router),
-  "login": () => renderForRoute(Login, router),
-  "settings": () => renderForRoute(Settings, router),
+  "article": () => renderForRoute(Article, router),
   "article_create": () => renderForRoute(CreateArticle, router),
   "article_edit": () => renderForRoute(EditArticle, router),
-  "article": () => renderForRoute(Article, router),
+  "home": () => renderForRoute(Home, router),
+  "login": () => renderForRoute(Login, router),
   "profile": () => renderForRoute(Profile, router),
+  "register": () => renderForRoute(Register, router),
+  "root": () => renderForRoute(Home, router),
+  "settings": () => renderForRoute(Settings, router),
 };
 
 DirectorRe.configure(router, {"html5history": true, "resource": handlers});

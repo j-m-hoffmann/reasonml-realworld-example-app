@@ -20,19 +20,19 @@ let make = (~route, ~router, _children) => {
       <Header router />
       {
         switch (route) {
-        | Home =>
-          <Home articleCallback=(a => send(SetCurrentArticle(a))) router />
-        | Register => <Register router />
-        | Login => <Login router />
-        | Settings => <Settings router />
         | Article => <Article article=state />
         | CreateArticle => <CreateArticle router />
         | EditArticle => <Article article=state />
+        | Home =>
+          <Home articleCallback=(a => send(SetCurrentArticle(a))) router />
+        | Login => <Login router />
         | Profile =>
           <Profile
             articleCallback=(a => send(SetCurrentArticle(a)))
             router
           />
+        | Register => <Register router />
+        | Settings => <Settings router />
         }
       }
       <Footer />
