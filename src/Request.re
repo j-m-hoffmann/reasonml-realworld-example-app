@@ -19,11 +19,11 @@ let makeInit = (data: option(Js.Json.t), ~method_, ~token) => {
   };
 };
 
-let send_ = (data, ~method_=Fetch.Get, ~url, ~token=None, ~f) =>
+let send_ = (data, ~method_, ~url, ~token, ~f) =>
   Bs_fetch.fetchWithInit(url, makeInit(data, ~method_, ~token))
   |> Js.Promise.then_(response =>
        Bs_fetch.Response.(f(status(response), text(response)))
-       ->Js.Promise.resolve
+       |> Js.Promise.resolve
      );
 
 let delete = (~url, ~token, ~f) =>
