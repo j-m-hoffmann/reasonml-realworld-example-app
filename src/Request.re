@@ -8,23 +8,27 @@ let makeHeaders = (token: option(string)) => {
 
 let makeInit = (data: option(Js.Json.t), ~method_, ~token) => {
   let defaultInit =
-    Bs_fetch.RequestInit.make(
+    Fetch.RequestInit.make(
       ~method_,
-      ~headers=Bs_fetch.HeadersInit.makeWithArray @@ makeHeaders(token),
+      ~headers=Fetch.HeadersInit.makeWithArray @@ makeHeaders(token),
     );
   switch (data) {
   | None => defaultInit()
   | Some(d) =>
-    defaultInit(~body=Bs_fetch.BodyInit.make @@ Js.Json.stringify(d), ())
+    defaultInit(~body=Fetch.BodyInit.make @@ Js.Json.stringify(d), ())
   };
 };
 
-let send_ = (data, ~method_, ~url, ~token, ~f) =>
-  Bs_fetch.fetchWithInit(url, makeInit(data, ~method_, ~token))
-  |> Js.Promise.then_(response =>
-       Bs_fetch.Response.(f(status(response), text(response)))
-       |> Js.Promise.resolve
-     );
+let send_ = (data, ~method_, ~url, ~token, ~f) => {
+  let request = makeInit(data, ~token, ~method_);
+  Js.Promise.(
+    Fetch.fetchWithInit(url, request)
+    |> then_(response =>
+         f(Fetch.Response.status(response), Fetch.Response.text(response))
+         |> resolve
+       )
+  );
+};
 
 let delete = (~url, ~token, ~f) =>
   send_(None, ~method_=Fetch.Delete, ~token, ~url, ~f);
