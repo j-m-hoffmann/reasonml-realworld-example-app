@@ -284,10 +284,9 @@ let make = (~articleCallback, ~router, _children) => {
         {...state, articles: updateFavoritedCount(state.articles, slug)},
         (
           _self =>
-            /*TODO put into a handle*/
-            !isCurrentlyFav ?
-              Request.Article.favorite(slug) |> ignore :
-              Request.Article.unfavorite(slug) |> ignore
+            isCurrentlyFav ?
+              Request.Article.unfavorite(slug) |> ignore :
+              Request.Article.favorite(slug) |> ignore
         ),
       )
     | ArticlesByPage(currentPage) =>
