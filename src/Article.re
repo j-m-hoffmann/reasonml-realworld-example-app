@@ -52,7 +52,7 @@ type action =
   | DeleteComment(int)
   | FollowUser(string)
   | UnFollowUser(string)
-  | FetchComments(list(Comment.t));
+  | CommentsFetched(list(Comment.t));
 
 let followUser = (event, {ReasonReact.state, send}) =>
   state.isFollowing ?
@@ -86,7 +86,7 @@ let make = (~article, _children) => {
             Request.Article.deleteComment(~id, ~slug=state.slug) |> ignore
         ),
       );
-    | FetchComments(commentList) =>
+    | CommentsFetched(commentList) =>
       ReasonReact.Update({...state, commentList})
     | FollowUser(name) =>
       ReasonReact.UpdateWithSideEffects(
@@ -100,19 +100,17 @@ let make = (~article, _children) => {
       )
     },
   didMount: self =>
-    Request.Article.comments(self.state.slug, ~f=(_status, payload) =>
-      payload
-      |> Js.Promise.then_(result => {
+    Request.Article.comments(self.state.slug, ~f=(_status, body) =>
+      body
+      |> Js.Promise.then_(response => {
            let commentList =
              Json.Decode.{
                comments:
-                 Js.Json.parseExn(result)
+                 Js.Json.parseExn(response)
                  |> field("comments", list(Comment.fromJson)),
              };
-           self.send(FetchComments(commentList.comments))
+           self.send(CommentsFetched(commentList.comments))
            |> Js.Promise.resolve;
-           /*self.send(FetchComments(commentList.comments));*/
-           /*result |> Js.Promise.resolve;*/
          })
     )
     |> ignore,
