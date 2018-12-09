@@ -94,6 +94,8 @@ let updateFavoritedCount = (articles, currentSlug) => {
   Belt.Array.map(articles, updateCurrentArticle);
 };
 
+let mapWIU = Belt.Array.mapWithIndexU;
+
 let renderTag = (self, index, tag) =>
   <a
     onClick={
@@ -322,7 +324,6 @@ let make = (~articleCallback, ~router, _children) => {
     populateGlobalFeed(self, 0);
   },
   render: ({state, handle} as self) => {
-    let mapi = Belt.Array.mapWithIndexU;
     let currentTagName = state.currentTagName;
     <div className="home-page">
       <div className="banner">
