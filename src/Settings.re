@@ -67,45 +67,49 @@ let make = (~router, _children) => {
         ),
       )
     },
-  didMount: self => {
-    open Request;
-    let reduceCurrentUser = (_status, payload) =>
-      payload
-      |> Js.Promise.then_(result => {
-           let registered = Response.parseNewUser(result);
+  didMount: self =>
+    Request.(
+      getCurrentUser(~token=LocalStorage.getToken(), ~f=(_status, payload) =>
+        payload
+        |> Js.Promise.then_(result => {
+             if (result == "401") {
+               DirectorRe.setRoute(router, "/login");
+             } else {
+               Response.getUserGraph(result)->User.fromJson(_).token
+               ->Some
+               ->getCurrentUser(~token=_, ~f=(_status, payload) =>
+                   payload
+                   |> Js.Promise.then_(result => {
+                        let registered = Response.parseNewUser(result);
 
-           self.send(
-             SettingsFetched({
-               bio: Belt.Option.getWithDefault(registered.user.bio, ""),
-               email: registered.user.email,
-               image: Belt.Option.getWithDefault(registered.user.image, ""),
-               name: registered.user.username,
-               password: "",
-             }),
-           );
+                        self.send(
+                          SettingsFetched({
+                            bio:
+                              Belt.Option.getWithDefault(
+                                registered.user.bio,
+                                "",
+                              ),
+                            email: registered.user.email,
+                            image:
+                              Belt.Option.getWithDefault(
+                                registered.user.image,
+                                "",
+                              ),
+                            name: registered.user.username,
+                            password: "",
+                          }),
+                        );
 
-           registered.user->Js.Promise.resolve;
-         });
-
-    /*TODO this seems wrong*/
-    let displayResult = result => {
-      if (result == "401") {
-        DirectorRe.setRoute(router, "/login");
-      };
-
-      Response.getUserGraph(result)->User.fromJson(_).token
-      ->Some
-      ->getCurrentUser(~token=_, ~f=reduceCurrentUser)
-      |> ignore;
-
-      result->Js.Promise.resolve;
-    };
-
-    getCurrentUser(~token=LocalStorage.getToken(), ~f=(_status, payload) =>
-      payload |> Js.Promise.then_(displayResult)
-    )
-    |> ignore;
-  },
+                        registered.user |> Js.Promise.resolve;
+                      })
+                 )
+               |> ignore;
+             };
+             result |> Js.Promise.resolve;
+           })
+      )
+      |> ignore
+    ),
   render: ({state, send}) =>
     <div className="settings-page">
       <div className="container page">
