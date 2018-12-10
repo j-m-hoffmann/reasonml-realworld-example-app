@@ -204,7 +204,7 @@ let make = (~articleCallback, ~router, _children) => {
   },
   reducer: (action, state) =>
     switch (action) {
-    | TagsFetched(tagList) => ReasonReact.Update({...state, tags: tagList})
+    | TagsFetched(tags) => ReasonReact.Update({...state, tags})
     | ShowMyFeed =>
       ReasonReact.Update({
         ...state,
