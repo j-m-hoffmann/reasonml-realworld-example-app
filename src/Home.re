@@ -297,11 +297,8 @@ let make = (~articleCallback, ~router, _children) => {
       |> Js.Promise.then_(result => {
            let json = Js.Json.parseExn(result);
            let tags = Json.Decode.(json |> field("tags", array(string)));
-           self.send(TagsFetched(tags));
-
-           tags |> Js.Promise.resolve;
+           self.send(TagsFetched(tags)) |> Js.Promise.resolve;
          })
-      |> ignore
     )
     |> ignore;
     populateGlobalFeed(self, 0);
