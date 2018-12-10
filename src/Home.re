@@ -107,17 +107,8 @@ let renderTag = (self, index, tag) =>
     {ReasonReact.string(tag)}
   </a>;
 
-/*let rec range = (a, b) =>*/
-/*if (a > b) {*/
-/*[];*/
-/*} else {*/
-/*[a, ...range(a + 1, b)];*/
-/*};*/
-
 let renderPager = ({send, ReasonReact.handle}, articlesCount) => {
-  /*let pageRanges = Belt.List.makeBy(articlesCount / 10, i => i + 1);*/
   let pageRanges = Belt.Array.makeBy(articlesCount / 10, i => i + 1);
-  /*let pageRanges = range(1, articlesCount / 10);*/
   let reduceArticles = (currentPageNumber, event, _self) => {
     event->ReactEvent.Mouse.preventDefault;
     send(ArticlesByPage(currentPageNumber));
@@ -134,7 +125,6 @@ let renderPager = ({send, ReasonReact.handle}, articlesCount) => {
       </a>
     </li>
   )
-  /*->Array.of_list*/
   ->ReasonReact.array;
 };
 
