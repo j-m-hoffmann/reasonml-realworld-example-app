@@ -32,11 +32,10 @@ let reduceFeed = (reduceToAction, _state, body) =>
        articleList |> Js.Promise.resolve;
      });
 
-let populateGlobalFeed = (self, pageNumber) =>
+let populateGlobalFeed = (self, page) =>
   /* Get the right page if there are more than 10 articles */
   Request.Article.all(
-    ~limit=10,
-    ~offset=pageNumber * 10,
+    ~page,
     ~f=
       reduceFeed(articleList =>
         self.ReasonReact.send(ArticlesFetched(articleList))
@@ -277,13 +276,12 @@ let make = (~articleCallback, ~router, _children) => {
               Request.Article.favorite(slug) |> ignore
         ),
       )
-    | ArticlesByPage(currentPage) =>
+    | ArticlesByPage(page) =>
       ReasonReact.SideEffects(
         (
           self =>
             Request.Article.all(
-              ~limit=10,
-              ~offset=currentPage * 10,
+              ~page,
               ~f=
                 reduceFeed(articleList =>
                   self.send(ArticlesFetched(articleList))

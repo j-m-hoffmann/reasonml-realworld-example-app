@@ -45,14 +45,15 @@ let put = (data, ~url, ~token, ~f) =>
 open Api;
 
 module Article = {
-  let all = (~limit, ~offset, ~f) =>
+  let limit = (count, page) =>
+    "?limit="
+    ++ string_of_int(count)
+    ++ "&offset="
+    ++ string_of_int(page * count);
+
+  let all = (~page, ~f) =>
     get(
-      ~url=
-        url(Articles)
-        ++ "?limit="
-        ++ string_of_int(limit)
-        ++ "&offset="
-        ++ string_of_int(offset),
+      ~url=url(Articles) ++ limit(10, page),
       ~token=LocalStorage.getToken(),
       ~f,
     );
@@ -97,7 +98,7 @@ module Article = {
     );
 
   let feed = (~f) =>
-    get(~url=url(Feed), ~token=LocalStorage.getToken(), ~f);
+    get(~url=url(Feed) ++ limit(10, 0), ~token=LocalStorage.getToken(), ~f);
 
   let submit = (data, ~f) =>
     post(
