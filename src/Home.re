@@ -111,7 +111,7 @@ let renderPager = ({send, ReasonReact.handle}, articlesCount) => {
     send(ArticlesByPage(currentPageNumber));
   };
 
-  /* Add the logic to highlight the current page */
+  /* TODO Add the logic to highlight the current page */
   Belt.Array.map(pageRanges, currentPageNumber =>
     <li className="page-item ng-scope" key={string_of_int(currentPageNumber)}>
       <a
