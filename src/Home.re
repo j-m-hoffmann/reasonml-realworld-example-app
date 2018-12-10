@@ -24,20 +24,20 @@ type state = {
   tags: array(string),
 };
 
-let reduceFeed = (reduceToAction, _state, body) =>
-  body
-  |> Js.Promise.then_(result => {
-       let articleList = Js.Json.parseExn(result)->ArticleList.fromJson;
-       reduceToAction(articleList);
-       articleList |> Js.Promise.resolve;
-     });
+let applyAsync = (action_, _state, body) =>
+  Js.Promise.(
+    body
+    |> then_(result =>
+         Js.Json.parseExn(result)->ArticleList.fromJson->action_->resolve
+       )
+  );
 
 let populateGlobalFeed = (self, page) =>
   /* Get the right page if there are more than 10 articles */
   Request.Article.all(
     ~page,
     ~f=
-      reduceFeed(articleList =>
+      applyAsync(articleList =>
         self.ReasonReact.send(ArticlesFetched(articleList))
       ),
   )
@@ -48,7 +48,7 @@ let showMyFeed = (event, self) => {
   event->ReactEvent.Mouse.preventDefault;
   Request.Article.feed(
     ~f=
-      reduceFeed(articleList =>
+      applyAsync(articleList =>
         self.ReasonReact.send(MyArticlesFetched(articleList))
       ),
   )
@@ -259,7 +259,7 @@ let make = (~articleCallback, ~router, _children) => {
             Request.Article.byTag(
               currentTagName,
               ~f=
-                reduceFeed(articleList =>
+                applyAsync(articleList =>
                   self.send(TagArticlesFetched(articleList))
                 ),
             )
@@ -283,7 +283,7 @@ let make = (~articleCallback, ~router, _children) => {
             Request.Article.all(
               ~page,
               ~f=
-                reduceFeed(articleList =>
+                applyAsync(articleList =>
                   self.send(ArticlesFetched(articleList))
                 ),
             )
