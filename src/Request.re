@@ -65,9 +65,9 @@ module Article = {
       ~f,
     );
 
-  let byTag = (tagName, ~f) =>
+  let byTag = (name, ~f) =>
     get(
-      ~url=url(Articles) ++ "?tag=" ++ tagName,
+      ~url=url(Articles) ++ "?tag=" ++ name,
       ~token=LocalStorage.getToken(),
       ~f,
     );
