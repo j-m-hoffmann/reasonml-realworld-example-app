@@ -43,8 +43,10 @@ let populateGlobalFeed = (self, pageNumber) =>
       ),
   )
   |> ignore;
+
 /*TODO into reducer */
-let populateMyFeed = self =>
+let showMyFeed = (event, self) => {
+  event->ReactEvent.Mouse.preventDefault;
   Request.Article.feed(
     ~f=
       reduceFeed(articleList =>
@@ -52,10 +54,6 @@ let populateMyFeed = self =>
       ),
   )
   |> ignore;
-
-let showMyFeed = (event, self) => {
-  event->ReactEvent.Mouse.preventDefault;
-  populateMyFeed(self);
   self.ReasonReact.send(ShowMyFeed);
 };
 
