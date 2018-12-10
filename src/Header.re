@@ -3,6 +3,7 @@ type state = unit;
 type action =
   | GoToCreateArticle
   | GoToHome
+  | GoToLogin
   | GoToProfile
   | GoToRegistration
   | GoToSettings;
@@ -16,7 +17,7 @@ let displayUsername = () => {
 
 let component = ReasonReact.reducerComponent("Header");
 
-let make = (~router, _children) => {
+let make = (~router, ~token, _children) => {
   ...component,
   initialState: () => (),
   reducer: (action, _state: unit) =>
@@ -27,6 +28,8 @@ let make = (~router, _children) => {
       )
     | GoToHome =>
       ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/home")))
+    | GoToLogin =>
+      ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/login")))
     | GoToProfile =>
       ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/profile")))
     | GoToRegistration =>
@@ -45,55 +48,55 @@ let make = (~router, _children) => {
           <a className="navbar-brand" href="index.html">
             {ReasonReact.string("conduit")}
           </a>
-          <ul className="nav navbar-nav pull-xs-right">
-            <li className="nav-item">
-              <a
-                className="nav-link active"
-                style=pointer
-                href="#"
-                onClick={
-                  event => {
-                    event->ReactEvent.Mouse.preventDefault;
-                    send(GoToHome);
-                  }
-                }>
-                {ReasonReact.string("Home")}
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                className="nav-link"
-                style=pointer
-                href="#"
-                onClick={
-                  event => {
-                    event->ReactEvent.Mouse.preventDefault;
-                    send(GoToCreateArticle);
-                  }
-                }>
-                <i className="ion-compose" />
-                {ReasonReact.string(" New Post")}
-              </a>
-            </li>
-            <li className="nav-item">
-              <a
-                className="nav-link"
-                style=pointer
-                href="#"
-                onClick={
-                  event => {
-                    event->ReactEvent.Mouse.preventDefault;
-                    send(GoToSettings);
-                  }
-                }>
-                <i className="ion-gear-a" />
-                {ReasonReact.string(" Settings")}
-              </a>
-            </li>
-            <li className="nav-item">
-              {
-                switch (LocalStorage.getToken()) {
-                | Some(_token) =>
+          {
+            switch (token) {
+            | Some(_) =>
+              <ul className="nav navbar-nav pull-xs-right">
+                <li className="nav-item">
+                  <a
+                    className="nav-link active"
+                    style=pointer
+                    href="#"
+                    onClick=(
+                      event => {
+                        event->ReactEvent.Mouse.preventDefault;
+                        send(GoToHome);
+                      }
+                    )>
+                    {ReasonReact.string("Home")}
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    className="nav-link"
+                    style=pointer
+                    href="#"
+                    onClick=(
+                      event => {
+                        event->ReactEvent.Mouse.preventDefault;
+                        send(GoToCreateArticle);
+                      }
+                    )>
+                    <i className="ion-compose" />
+                    {ReasonReact.string(" New Post")}
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    className="nav-link"
+                    style=pointer
+                    href="#"
+                    onClick=(
+                      event => {
+                        event->ReactEvent.Mouse.preventDefault;
+                        send(GoToSettings);
+                      }
+                    )>
+                    <i className="ion-gear-a" />
+                    {ReasonReact.string(" Settings")}
+                  </a>
+                </li>
+                <li className="nav-item">
                   <a
                     className="nav-link"
                     style=pointer
@@ -106,7 +109,39 @@ let make = (~router, _children) => {
                     )>
                     {ReasonReact.string(displayUsername())}
                   </a>
-                | None =>
+                </li>
+              </ul>
+            | None =>
+              <ul className="nav navbar-nav pull-xs-right">
+                <li className="nav-item">
+                  <a
+                    className="nav-link active"
+                    style=pointer
+                    href="#"
+                    onClick=(
+                      event => {
+                        event->ReactEvent.Mouse.preventDefault;
+                        send(GoToHome);
+                      }
+                    )>
+                    {ReasonReact.string("Home")}
+                  </a>
+                </li>
+                <li className="nav-item">
+                  <a
+                    className="nav-link"
+                    style=pointer
+                    href="#"
+                    onClick=(
+                      event => {
+                        event->ReactEvent.Mouse.preventDefault;
+                        send(GoToLogin);
+                      }
+                    )>
+                    {ReasonReact.string("Log in")}
+                  </a>
+                </li>
+                <li className="nav-item">
                   <a
                     className="nav-link"
                     style=pointer
@@ -119,10 +154,10 @@ let make = (~router, _children) => {
                     )>
                     {ReasonReact.string("Sign up")}
                   </a>
-                }
-              }
-            </li>
-          </ul>
+                </li>
+              </ul>
+            }
+          }
         </div>
       </nav>
     </div>,

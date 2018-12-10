@@ -1,28 +1,35 @@
 open Routes;
 
-type state = Article.t;
+type state = {
+  currentArticle: Article.t,
+  token: option(string),
+};
 
 type action =
-  | SetCurrentArticle(Article.t);
+  | SetCurrentArticle(Article.t)
+  | SetToken(option(string));
 
 let component = ReasonReact.reducerComponent("Body");
 
 /* Just like any other variant data can be carried around with variants with the routes */
 let make = (~route, ~router, _children) => {
   ...component,
-  initialState: () => Article.empty,
-  reducer: (action, _state) =>
+  initialState: () => {currentArticle: Article.empty, token: None},
+  reducer: (action, state) =>
     switch (action) {
-    | SetCurrentArticle(current) => ReasonReact.Update(current)
+    | SetCurrentArticle(currentArticle) =>
+      ReasonReact.Update({...state, currentArticle})
+    | SetToken(token) => ReasonReact.Update({...state, token})
     },
+  didMount: self => self.send(SetToken(LocalStorage.getToken())),
   render: ({send, state}) =>
     <div>
-      <Header router />
+      <Header router token={state.token} />
       {
         switch (route) {
-        | Article => <Article article=state />
+        | Article => <Article article={state.currentArticle} />
         | CreateArticle => <CreateArticle router />
-        | EditArticle => <Article article=state />
+        | EditArticle => <Article article={state.currentArticle} />
         | Home =>
           <Home articleCallback=(a => send(SetCurrentArticle(a))) router />
         | Login => <Login router />
