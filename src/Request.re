@@ -10,12 +10,12 @@ let makeInit = (data: option(Js.Json.t), ~method_, ~token) => {
   let defaultInit =
     Fetch.RequestInit.make(
       ~method_,
-      ~headers=Fetch.HeadersInit.makeWithArray @@ makeHeaders(token),
+      ~headers=makeHeaders(token)->Fetch.HeadersInit.makeWithArray,
     );
   switch (data) {
   | None => defaultInit()
   | Some(d) =>
-    defaultInit(~body=Fetch.BodyInit.make @@ Js.Json.stringify(d), ())
+    defaultInit(~body=Js.Json.stringify(d)->Fetch.BodyInit.make, ())
   };
 };
 
