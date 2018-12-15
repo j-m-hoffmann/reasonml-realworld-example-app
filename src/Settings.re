@@ -63,7 +63,7 @@ let make = (~router, _children) => {
       Request.User.current(
         ~token,
         ~f=json => {
-          let registered = Response.parseNewUser(json);
+          let registered = AuthResponse.parseNewUser(json);
 
           self.send(
             SettingsFetched({

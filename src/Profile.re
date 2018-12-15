@@ -22,20 +22,12 @@ type action =
 /*| PendingFavoriteArticles;*/
 /*| PendingMyArticles;*/
 
-let reduceMyArticles = (reduceFunc, _status, body) =>
-  body
-  |> Js.Promise.then_(result => {
-       let articleList = Js.Json.parseExn(result)->ArticleList.fromJson;
-       reduceFunc(articleList.articles);
-       articleList |> Js.Promise.resolve;
-     });
 /*TODO move into reducer*/
 let clickMyArticles = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
 
-  Request.Article.byAuthor(
-    state.username,
-    ~f=reduceMyArticles(articles => send(MyArticles(articles))),
+  Request.Article.byAuthor(state.username, ~f=json =>
+    send(MyArticles(ArticleList.fromJson(json).articles))
   )
   |> ignore;
   /*send(PendingMyArticles);*/
@@ -44,28 +36,12 @@ let clickMyArticles = (event, {ReasonReact.state, send}) => {
 let clickMyFavorites = (event, {ReasonReact.state, send}) => {
   event->ReactEvent.Mouse.preventDefault;
 
-  Request.Article.favoritedBy(
-    state.username,
-    ~f=reduceMyArticles(articles => send(FavoriteArticles(articles))),
+  Request.Article.favoritedBy(state.username, ~f=json =>
+    send(FavoriteArticles(ArticleList.fromJson(json).articles))
   )
   |> ignore;
   /*send(_ => PendingFavoriteArticles);*/
 };
-
-/* side effect */
-let reduceByAuthArticles = (self, _status, body) =>
-  body
-  |> Js.Promise.then_(result => {
-       let articleList = Js.Json.parseExn(result)->ArticleList.fromJson;
-
-       switch (articleList.articlesCount) {
-       | count when count > 0 =>
-         self.ReasonReact.send(MyArticles(articleList.articles))
-       | _ => self.ReasonReact.send(NoData)
-       };
-
-       result |> Js.Promise.resolve;
-     });
 
 /* These functions were copied from  */
 let goToArticle = (router, articleCallback, article, event, _self) => {
@@ -79,17 +55,15 @@ let renderArticle =
   <div key={string_of_int(index)} className="article-preview">
     <div>
       <div className="article-meta">
-        {
-          if (isFavorites) {
-            <a href="profile.html">
-              <img
-                src={Belt.Option.getWithDefault(article.author.image, "")}
-              />
-            </a>;
-          } else {
-            <a href="#" />;
-          }
-        }
+        {if (isFavorites) {
+           <a href="profile.html">
+             <img
+               src={Belt.Option.getWithDefault(article.author.image, "")}
+             />
+           </a>;
+         } else {
+           <a href="#" />;
+         }}
         <div className="info">
           <a href="" className="author">
             {ReasonReact.string(article.author.username)}
@@ -158,9 +132,7 @@ let make = (~articleCallback, ~router, _children) => {
     | CurrentUserFetched(bio, image, username) =>
       ReasonReact.Update({...state, bio, image, username})
     | GoToSettings =>
-      ReasonReact.SideEffects(
-        (_ => DirectorRe.setRoute(router, "/settings")),
-      )
+      ReasonReact.SideEffects(_ => DirectorRe.setRoute(router, "/settings"))
     | NoData => ReasonReact.NoUpdate
     /*| PendingFavoriteArticles => ReasonReact.NoUpdate*/
     /*| PendingMyArticles => ReasonReact.NoUpdate*/
@@ -171,7 +143,17 @@ let make = (~articleCallback, ~router, _children) => {
     let image' = Belt.Option.getWithDefault(image, "");
     let username' = Belt.Option.getWithDefault(username, "");
 
-    Request.Article.byAuthor(username', ~f=reduceByAuthArticles(self))
+    Request.Article.byAuthor(
+      username',
+      ~f=json => {
+        let articleList = ArticleList.fromJson(json);
+        switch (articleList.articlesCount) {
+        | count when count > 0 =>
+          self.ReasonReact.send(MyArticles(articleList.articles))
+        | _ => self.ReasonReact.send(NoData)
+        };
+      },
+    )
     |> ignore;
     self.send(CurrentUserFetched(bio', image', username'));
   },
@@ -186,12 +168,10 @@ let make = (~articleCallback, ~router, _children) => {
               <p> {ReasonReact.string(state.bio)} </p>
               <button
                 className="btn btn-sm btn-outline-secondary action-btn"
-                onClick={
-                  event => {
-                    event->ReactEvent.Mouse.preventDefault;
-                    send(GoToSettings);
-                  }
-                }>
+                onClick={event => {
+                  event->ReactEvent.Mouse.preventDefault;
+                  send(GoToSettings);
+                }}>
                 <i className="ion-plus-round" />
                 {ReasonReact.string("Edit Profile Settings")}
               </button>
@@ -223,20 +203,16 @@ let make = (~articleCallback, ~router, _children) => {
               </ul>
             </div>
             <div style={state.isMyArticleDisplay}>
-              {
-                mapWIU(state.myArticles, (. i, a) =>
-                  renderArticle(handle, router, articleCallback, false, i, a)
-                )
-                ->ReasonReact.array
-              }
+              {mapWIU(state.myArticles, (. i, a) =>
+                 renderArticle(handle, router, articleCallback, false, i, a)
+               )
+               ->ReasonReact.array}
             </div>
             <div style={state.isFavArticleDisplay}>
-              {
-                mapWIU(state.favoriteArticles, (. i, a) =>
-                  renderArticle(handle, router, articleCallback, true, i, a)
-                )
-                ->ReasonReact.array
-              }
+              {mapWIU(state.favoriteArticles, (. i, a) =>
+                 renderArticle(handle, router, articleCallback, true, i, a)
+               )
+               ->ReasonReact.array}
             </div>
           </div>
         </div>
