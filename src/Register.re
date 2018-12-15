@@ -10,7 +10,7 @@ type action =
   | GoToLogin
   | SignUp
   | SignUpFailed(list(string))
-  | SignUpSuccessful
+  | SignUpSuccessful(User.t)
   | UpdateEmail(string)
   | UpdateName(string)
   | UpdatePassword(string);
@@ -65,8 +65,14 @@ let make = (~router, _children) => {
       )
     | SignUpFailed(errorList) =>
       ReasonReact.Update({...state, registrationFailed: true, errorList})
-    | SignUpSuccessful =>
-      ReasonReact.SideEffects(_ => DirectorRe.setRoute(router, "/home"))
+    | SignUpSuccessful(user) =>
+      ReasonReact.SideEffects(
+        _ => {
+          LocalStorage.saveToken(user.token);
+          LocalStorage.saveUser(user.bio, user.image, user.username);
+          DirectorRe.setRoute(router, "/home");
+        },
+      )
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdateName(username) => ReasonReact.Update({...state, username})
     | UpdatePassword(value) =>
