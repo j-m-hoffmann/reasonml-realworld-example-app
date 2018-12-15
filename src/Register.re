@@ -43,7 +43,7 @@ let make = (~router, _children) => {
   reducer: (action, state) =>
     switch (action) {
     | GoToLogin =>
-      ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/login")))
+      ReasonReact.SideEffects(_ => DirectorRe.setRoute(router, "/login"))
     | SignUp =>
       ReasonReact.SideEffects(
         (
@@ -66,7 +66,7 @@ let make = (~router, _children) => {
     | SignUpFailed(errorList) =>
       ReasonReact.Update({...state, registrationFailed: true, errorList})
     | SignUpSuccessful =>
-      ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/home")))
+      ReasonReact.SideEffects(_ => DirectorRe.setRoute(router, "/home"))
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdateName(username) => ReasonReact.Update({...state, username})
     | UpdatePassword(value) =>
