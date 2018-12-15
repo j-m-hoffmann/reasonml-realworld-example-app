@@ -25,23 +25,18 @@ let make = (~route, ~router, _children) => {
   render: ({send, state}) =>
     <div>
       <Header router token={state.token} />
-      {
-        switch (route) {
-        | Article => <Article article={state.currentArticle} />
-        | CreateArticle => <CreateArticle router />
-        | EditArticle => <Article article={state.currentArticle} />
-        | Home =>
-          <Home articleCallback=(a => send(SetCurrentArticle(a))) router />
-        | Login => <Login router />
-        | Profile =>
-          <Profile
-            articleCallback=(a => send(SetCurrentArticle(a)))
-            router
-          />
-        | Register => <Register router />
-        | Settings => <Settings router />
-        }
-      }
+      {switch (route) {
+       | Article => <Article article={state.currentArticle} />
+       | CreateArticle => <CreateArticle router />
+       | EditArticle => <Article article={state.currentArticle} />
+       | Home =>
+         <Home articleCallback={a => send(SetCurrentArticle(a))} router />
+       | Login => <Login router />
+       | Profile =>
+         <Profile articleCallback={a => send(SetCurrentArticle(a))} router />
+       | Register => <Register router />
+       | Settings => <Settings router />
+       }}
       <Footer />
     </div>,
 };
