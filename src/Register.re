@@ -62,8 +62,7 @@ let make = (~router, _children) => {
     | SignUpSuccessful(user) =>
       ReasonReact.SideEffects(
         _ => {
-          LocalStorage.saveToken(user.token);
-          LocalStorage.saveUser(user.bio, user.image, user.username);
+          LocalStorage.save(user);
           DirectorRe.setRoute(router, "/home");
         },
       )

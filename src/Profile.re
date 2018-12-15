@@ -148,14 +148,9 @@ let make = (~articleCallback, ~router, _children) => {
     /*| PendingMyArticles => ReasonReact.NoUpdate*/
     },
   didMount: self => {
-    let (bio, image, username) = LocalStorage.getUser();
-    let bio' = Belt.Option.getWithDefault(bio, "");
-    let image' = Belt.Option.getWithDefault(image, "");
-    let username' = Belt.Option.getWithDefault(username, "");
-
-    Request.Article.byAuthor(username', ~f=reduceByAuthArticles(self))
-    |> ignore;
-    self.send(CurrentUserFetched(bio', image', username'));
+    let name = LocalStorage.username();
+    Request.Article.byAuthor(name, ~f=reduceByAuthArticles(self)) |> ignore;
+    LocalStorage.(self.send(CurrentUserFetched(bio(), image(), name)));
   },
   render: ({state, send, handle}) =>
     <div className="profile-page">

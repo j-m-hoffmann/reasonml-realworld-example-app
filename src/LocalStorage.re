@@ -1,23 +1,24 @@
 open Dom.Storage;
 
+let bio = () => getItem("bio", localStorage)->Belt.Option.getWithDefault("");
+
+let image = () =>
+  getItem("image", localStorage)->Belt.Option.getWithDefault("");
+
 let token = () => getItem("jwt", localStorage);
 
-let getUser = () => (
-  getItem("bio", localStorage),
-  getItem("image", localStorage),
-  getItem("username", localStorage),
-);
+let username = () =>
+  getItem("username", localStorage)->Belt.Option.getWithDefault("anonymous");
 
-let saveToken = value => setItem("jwt", value, localStorage);
-
-let saveUser = (bio, image, username) => {
-  switch (bio) {
+let save = (user: AuthResponse.User.t) => {
+  switch (user.bio) {
   | Some(bio) => setItem("bio", bio, localStorage)
   | None => ()
   };
-  switch (image) {
+  switch (user.image) {
   | Some(image) => setItem("image", image, localStorage)
   | None => ()
   };
-  setItem("username", username, localStorage);
+  setItem("jwt", user.token, localStorage);
+  setItem("username", user.username, localStorage);
 };
