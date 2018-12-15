@@ -83,12 +83,10 @@ let make = (~router, _children) => {
             <p className="text-xs-center">
               <a
                 href="#"
-                onClick={
-                  event => {
-                    event->ReactEvent.Mouse.preventDefault;
-                    send(GoToLogin);
-                  }
-                }>
+                onClick={event => {
+                  event->ReactEvent.Mouse.preventDefault;
+                  send(GoToLogin);
+                }}>
                 {ReasonReact.string("Have an account?")}
               </a>
             </p>
@@ -104,9 +102,8 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Your Name"
                   value={state.username}
-                  onChange={
-                    event =>
-                      send(UpdateName(ReactEvent.Form.target(event)##value))
+                  onChange={event =>
+                    send(UpdateName(ReactEvent.Form.target(event)##value))
                   }
                 />
               </fieldset>
@@ -116,11 +113,8 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Email"
                   value={state.email}
-                  onChange={
-                    event =>
-                      send(
-                        UpdateEmail(ReactEvent.Form.target(event)##value),
-                      )
+                  onChange={event =>
+                    send(UpdateEmail(ReactEvent.Form.target(event)##value))
                   }
                 />
               </fieldset>
@@ -130,21 +124,18 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Password"
                   value={state.password}
-                  onChange={
-                    event =>
-                      send(
-                        UpdatePassword(ReactEvent.Form.target(event)##value),
-                      )
+                  onChange={event =>
+                    send(
+                      UpdatePassword(ReactEvent.Form.target(event)##value),
+                    )
                   }
                 />
               </fieldset>
               <button
-                onClick={
-                  event => {
-                    event->ReactEvent.Mouse.preventDefault;
-                    send(SignUp);
-                  }
-                }
+                onClick={event => {
+                  event->ReactEvent.Mouse.preventDefault;
+                  send(SignUp);
+                }}
                 className="btn btn-lg btn-primary pull-xs-right">
                 {ReasonReact.string("Sign up")}
               </button>
