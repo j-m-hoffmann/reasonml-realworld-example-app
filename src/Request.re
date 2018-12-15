@@ -19,7 +19,7 @@ let makeInit = (data: option(Js.Json.t), ~method_, ~token) => {
   };
 };
 
-let send_ = (data, ~method_, ~url, ~token, ~f) => {
+let handle = (data, ~method_, ~url, ~token, ~f) => {
   let request = makeInit(data, ~token, ~method_);
   Js.Promise.(
     Fetch.fetchWithInit(url, request)
@@ -31,16 +31,16 @@ let send_ = (data, ~method_, ~url, ~token, ~f) => {
 };
 
 let delete = (~url, ~token, ~f) =>
-  send_(None, ~method_=Fetch.Delete, ~token, ~url, ~f);
+  handle(None, ~method_=Fetch.Delete, ~token, ~url, ~f);
 
 let get = (~url, ~token, ~f) =>
-  send_(None, ~method_=Fetch.Get, ~token, ~url, ~f);
+  handle(None, ~method_=Fetch.Get, ~token, ~url, ~f);
 
 let post = (data, ~url, ~token, ~f) =>
-  send_(data, ~method_=Fetch.Post, ~token, ~url, ~f);
+  handle(data, ~method_=Fetch.Post, ~token, ~url, ~f);
 
 let put = (data, ~url, ~token, ~f) =>
-  send_(data, ~method_=Fetch.Put, ~token, ~url, ~f);
+  handle(data, ~method_=Fetch.Put, ~token, ~url, ~f);
 
 open Api;
 
