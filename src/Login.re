@@ -40,9 +40,7 @@ let make = (~router, _children) => {
   reducer: (action, state) =>
     switch (action) {
     | GoToRegister =>
-      ReasonReact.SideEffects(
-        (_ => DirectorRe.setRoute(router, "/register")),
-      )
+      ReasonReact.SideEffects(_ => DirectorRe.setRoute(router, "/register"))
     | LogIn =>
       ReasonReact.SideEffects(
         self =>
@@ -60,13 +58,11 @@ let make = (~router, _children) => {
       )
     | LoginSuccessful(user) =>
       ReasonReact.SideEffects(
-        (
-          _ => {
-            LocalStorage.saveToken(user.token);
-            LocalStorage.saveUser(user.bio, user.image, user.username);
-            DirectorRe.setRoute(router, "/home");
-          }
-        ),
+        _ => {
+          LocalStorage.saveToken(user.token);
+          LocalStorage.saveUser(user.bio, user.image, user.username);
+          DirectorRe.setRoute(router, "/home");
+        },
       )
     | LoginFailed(errorList) =>
       ReasonReact.Update({...state, errorList, loginFailed: true})
@@ -85,22 +81,18 @@ let make = (~router, _children) => {
             <p className="text-xs-center">
               <a
                 href="#"
-                onClick={
-                  event => {
-                    event->ReactEvent.Mouse.preventDefault;
-                    send(GoToRegister);
-                  }
-                }>
+                onClick={event => {
+                  event->ReactEvent.Mouse.preventDefault;
+                  send(GoToRegister);
+                }}>
                 {ReasonReact.string("Need an account?")}
               </a>
             </p>
-            {
-              if (state.loginFailed) {
-                <ErrorMessages errors={state.errorList} />;
-              } else {
-                ReasonReact.null;
-              }
-            }
+            {if (state.loginFailed) {
+               <ErrorMessages errors={state.errorList} />;
+             } else {
+               ReasonReact.null;
+             }}
             <form>
               <fieldset className="form-group">
                 <input
@@ -108,11 +100,8 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Email"
                   value={state.email}
-                  onChange={
-                    event =>
-                      send(
-                        UpdateEmail(ReactEvent.Form.target(event)##value),
-                      )
+                  onChange={event =>
+                    send(UpdateEmail(ReactEvent.Form.target(event)##value))
                   }
                 />
               </fieldset>
@@ -122,21 +111,18 @@ let make = (~router, _children) => {
                   className="form-control form-control-lg"
                   placeholder="Password"
                   value={state.password}
-                  onChange={
-                    event =>
-                      send(
-                        UpdatePassword(ReactEvent.Form.target(event)##value),
-                      )
+                  onChange={event =>
+                    send(
+                      UpdatePassword(ReactEvent.Form.target(event)##value),
+                    )
                   }
                 />
               </fieldset>
               <button
-                onClick={
-                  event => {
-                    event->ReactEvent.Mouse.preventDefault;
-                    send(LogIn);
-                  }
-                }
+                onClick={event => {
+                  event->ReactEvent.Mouse.preventDefault;
+                  send(LogIn);
+                }}
                 className="btn btn-lg btn-primary pull-xs-right">
                 {ReasonReact.string("Sign in")}
               </button>
