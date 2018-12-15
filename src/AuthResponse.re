@@ -76,12 +76,12 @@ type t = {
   user: User.t,
 };
 
-let checkForErrors = response =>
-  Js.Json.decodeObject(response)
+let checkForErrors = json =>
+  Js.Json.decodeObject(json)
   |> Js.Option.andThen((. prop) => Js.Dict.get(prop, "errors"));
 
-let getUserGraph = response =>
-  Js.Json.decodeObject(response)
+let getUserGraph = json =>
+  Js.Json.decodeObject(json)
   ->Js.Option.andThen((. prop) => Js.Dict.get(prop, "user"), _)
   ->Belt.Option.getWithDefault(Js.Json.parseExn({j|{}|j}));
 
