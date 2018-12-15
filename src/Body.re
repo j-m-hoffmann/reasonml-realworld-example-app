@@ -21,7 +21,7 @@ let make = (~route, ~router, _children) => {
       ReasonReact.Update({...state, currentArticle})
     | SetToken(token) => ReasonReact.Update({...state, token})
     },
-  didMount: self => self.send(SetToken(LocalStorage.getToken())),
+  didMount: self => self.send(SetToken(LocalStorage.token())),
   render: ({send, state}) =>
     <div>
       <Header router token={state.token} />

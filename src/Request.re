@@ -62,21 +62,21 @@ module Article = {
   let all = (~page, ~f) =>
     get(
       ~url=url(Articles) ++ limit(10, page),
-      ~token=LocalStorage.getToken(),
+      ~token=LocalStorage.token(),
       ~f,
     );
 
   let byAuthor = (author, ~f) =>
     get(
       ~url=url(Articles) ++ "?author=" ++ author,
-      ~token=LocalStorage.getToken(),
+      ~token=LocalStorage.token(),
       ~f,
     );
 
   let byTag = (name, ~f) =>
     get(
       ~url=url(Articles) ++ "?tag=" ++ name,
-      ~token=LocalStorage.getToken(),
+      ~token=LocalStorage.token(),
       ~f,
     );
 
@@ -86,7 +86,7 @@ module Article = {
   let deleteComment = (~id, ~slug) =>
     delete(
       ~url=url(DeleteComment(slug, id)),
-      ~token=LocalStorage.getToken(),
+      ~token=LocalStorage.token(),
       ~f=discard,
     );
 
@@ -94,32 +94,27 @@ module Article = {
     post(
       None,
       ~url=url(ArticleFavorite(slug)),
-      ~token=LocalStorage.getToken(),
+      ~token=LocalStorage.token(),
       ~f=discard,
     );
 
   let favoritedBy = (name, ~f) =>
     get(
       ~url=url(Articles) ++ "?favorited=" ++ name,
-      ~token=LocalStorage.getToken(),
+      ~token=LocalStorage.token(),
       ~f,
     );
 
   let feed = (~f) =>
-    get(~url=url(Feed) ++ limit(10, 0), ~token=LocalStorage.getToken(), ~f);
+    get(~url=url(Feed) ++ limit(10, 0), ~token=LocalStorage.token(), ~f);
 
   let submit = (data, ~f) =>
-    post(
-      Some(data),
-      ~url=url(Articles),
-      ~token=LocalStorage.getToken(),
-      ~f,
-    );
+    post(Some(data), ~url=url(Articles), ~token=LocalStorage.token(), ~f);
 
   let unfavorite = slug =>
     delete(
       ~url=url(ArticleFavorite(slug)),
-      ~token=LocalStorage.getToken(),
+      ~token=LocalStorage.token(),
       ~f=discard,
     );
 };
@@ -129,7 +124,7 @@ module Tags = {
 };
 
 module User = {
-  let current = (~token=LocalStorage.getToken(), ~f) =>
+  let current = (~token=LocalStorage.token(), ~f) =>
     get(~url=url(CurrentUser), ~token, ~f);
 
   let follow = username =>
@@ -137,7 +132,7 @@ module User = {
     post(
       None,
       ~url=url(Follow(username)),
-      ~token=LocalStorage.getToken(),
+      ~token=LocalStorage.token(),
       ~f=discard,
     );
 
@@ -148,17 +143,12 @@ module User = {
     post(Some(data), ~token=None, ~url=url(Register), ~f);
 
   let saveSettings = (data, ~f) =>
-    put(
-      Some(data),
-      ~token=LocalStorage.getToken(),
-      ~url=url(UpdateUser),
-      ~f,
-    );
+    put(Some(data), ~token=LocalStorage.token(), ~url=url(UpdateUser), ~f);
 
   let unFollow = username =>
     delete(
       ~url=url(Unfollow(username)),
-      ~token=LocalStorage.getToken(),
+      ~token=LocalStorage.token(),
       ~f=discard,
     );
 };

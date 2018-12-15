@@ -1,6 +1,6 @@
 open Dom.Storage;
 
-let getToken = () => getItem("jwt", localStorage);
+let token = () => getItem("jwt", localStorage);
 
 let getUser = () => (
   getItem("bio", localStorage),

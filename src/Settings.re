@@ -58,7 +58,7 @@ let make = (~router, _children) => {
       )
     },
   didMount: self =>
-    switch (LocalStorage.getToken()) {
+    switch (LocalStorage.token()) {
     | Some(_) as token =>
       Request.User.current(
         ~token,
