@@ -23,8 +23,14 @@ let handle = (data, ~method_, ~url, ~token, ~f) => {
   let request = makeInit(data, ~token, ~method_);
   Js.Promise.(
     Fetch.fetchWithInit(url, request)
-    |> then_(response =>
-         f(Fetch.Response.status(response), Fetch.Response.text(response))
+    |> then_(Fetch.Response.text)
+    |> then_(body =>
+         (
+           switch (Json.parse(body)) {
+           | Some(json) => f(json)
+           | None => Js.Console.error("Error parsing JSON")
+           }
+         )
          |> resolve
        )
   );
