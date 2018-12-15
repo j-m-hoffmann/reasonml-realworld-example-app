@@ -45,28 +45,17 @@ let make = (~router, _children) => {
       )
     | LogIn =>
       ReasonReact.SideEffects(
-        (
-          self =>
-            Request.User.logIn(toJson(state), ~f=(_status, body) =>
-              body
-              |> Js.Promise.then_(response =>
-                   (
-                     switch (Response.checkForErrors(response)) {
-                     | None =>
-                       self.send(
-                         LoginSuccessful(
-                           Response.parseNewUser(response).user,
-                         ),
-                       )
-                     | Some(errors) =>
-                       self.send(LoginFailed(Errors.toList(errors)))
-                     }
-                   )
-                   |> Js.Promise.resolve
-                 )
+        self =>
+          Request.User.logIn(toJson(state), ~f=json =>
+            AuthResponse.(
+              switch (checkForErrors(json)) {
+              | None => self.send(LoginSuccessful(User.fromJson(json)))
+              | Some(errors) =>
+                self.send(LoginFailed(Errors.toList(errors)))
+              }
             )
-            |> ignore
-        ),
+          )
+          |> ignore,
         /*send(LoginPending);*/
       )
     | LoginSuccessful(user) =>

@@ -46,22 +46,17 @@ let make = (~router, _children) => {
       ReasonReact.SideEffects(_ => DirectorRe.setRoute(router, "/login"))
     | SignUp =>
       ReasonReact.SideEffects(
-        (
-          self =>
-            Request.User.register(toJson(state), ~f=(_status, body) =>
-              body
-              |> Js.Promise.then_(text => {
-                   let newUser = Response.parseNewUser(text);
-                   (
-                     newUser.errors->Belt.Option.isNone ?
-                       self.send(SignUpSuccessful) :
-                       self.send(SignUpFailed(newUser->User.errorList))
-                   )
-                   |> Js.Promise.resolve;
-                 })
+        self =>
+          Request.User.register(toJson(state), ~f=json =>
+            AuthResponse.(
+              switch (checkForErrors(json)) {
+              | None => self.send(SignUpSuccessful(User.fromJson(json)))
+              | Some(errors) =>
+                self.send(SignUpFailed(Errors.toList(errors)))
+              }
             )
-            |> ignore
-        ),
+          )
+          |> ignore,
       )
     | SignUpFailed(errorList) =>
       ReasonReact.Update({...state, registrationFailed: true, errorList})
