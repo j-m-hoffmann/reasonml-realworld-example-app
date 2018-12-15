@@ -50,6 +50,8 @@ let put = (data, ~url, ~token, ~f) =>
 
 open Api;
 
+let discard = _response => ();
+
 module Article = {
   let limit = (count, page) =>
     "?limit="
@@ -85,7 +87,7 @@ module Article = {
     delete(
       ~url=url(DeleteComment(slug, id)),
       ~token=LocalStorage.getToken(),
-      ~f=Response.discard,
+      ~f=discard,
     );
 
   let favorite = slug =>
@@ -93,7 +95,7 @@ module Article = {
       None,
       ~url=url(ArticleFavorite(slug)),
       ~token=LocalStorage.getToken(),
-      ~f=Response.discard,
+      ~f=discard,
     );
 
   let favoritedBy = (name, ~f) =>
@@ -118,7 +120,7 @@ module Article = {
     delete(
       ~url=url(ArticleFavorite(slug)),
       ~token=LocalStorage.getToken(),
-      ~f=Response.discard,
+      ~f=discard,
     );
 };
 
@@ -136,7 +138,7 @@ module User = {
       None,
       ~url=url(Follow(username)),
       ~token=LocalStorage.getToken(),
-      ~f=Response.discard,
+      ~f=discard,
     );
 
   let logIn = (data, ~f) =>
@@ -157,6 +159,6 @@ module User = {
     delete(
       ~url=url(Unfollow(username)),
       ~token=LocalStorage.getToken(),
-      ~f=Response.discard,
+      ~f=discard,
     );
 };

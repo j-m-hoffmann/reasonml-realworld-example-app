@@ -14,5 +14,3 @@ let parseNewUser = (json): User.registered => {
   | _ => {user: User.empty, errors}
   };
 };
-
-let discard = _response => ();
