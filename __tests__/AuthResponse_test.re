@@ -1,10 +1,15 @@
 open Jest;
 
-open Response;
+open AuthResponse;
 
-let errorsJson = {j|{"errors":{"email":["is invalid"],"password":["is too short (minimum is 8 characters)"]}}|j};
+let errorsJson =
+  Json.parseOrRaise(
+    {j|{"errors":{"email":["is invalid"],"password":["is too short (minimum is 8 characters)"]}}|j},
+  );
 
-let succesWithJson = {j|{
+let succesWithJson =
+  Json.parseOrRaise(
+    {j|{
   "user":{
     "id":12123,
     "email":"bryant@bryant.com",
@@ -15,9 +20,11 @@ let succesWithJson = {j|{
     "image":null,
     "token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MTIxMjMsInVzZXJuYW1lIjoiYnJ5YW50IiwiZXhwIjoxNTExMzQzMzE2fQ.WpeiSLOW2UUYrgeC0cgPkLY5v7aUC7yNKcIVMClgfCw"
   }
-}|j};
+}|j},
+  );
 
-let loginErrorResponse = {j|{"errors":{"email or password":["is invalid"]}}|j};
+let loginErrorResponse =
+  Json.parseOrRaise({j|{"errors":{"email or password":["is invalid"]}}|j});
 
 let () =
   describe(
