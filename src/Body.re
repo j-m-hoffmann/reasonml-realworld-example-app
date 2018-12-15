@@ -31,10 +31,10 @@ let make = (~route, ~router, _children) => {
        | EditArticle => <Article article={state.currentArticle} />
        | Home =>
          <Home articleCallback={a => send(SetCurrentArticle(a))} router />
-       | Login => <Login router />
+       | Login => <Login logIn={t => send(SetToken(t))} router />
        | Profile =>
          <Profile articleCallback={a => send(SetCurrentArticle(a))} router />
-       | Register => <Register router />
+       | Register => <Register logIn={t => send(SetToken(t))} router />
        | Settings => <Settings router />
        }}
       <Footer />

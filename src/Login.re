@@ -29,7 +29,7 @@ let toJson = credentials =>
 
 let component = ReasonReact.reducerComponent("Login");
 
-let make = (~router, _children) => {
+let make = (~logIn, ~router, _children) => {
   ...component,
   initialState: () => {
     email: "",
@@ -59,6 +59,7 @@ let make = (~router, _children) => {
       ReasonReact.SideEffects(
         _ => {
           LocalStorage.save(user);
+          logIn(Some(user.token));
           DirectorRe.setRoute(router, "/home");
         },
       )
