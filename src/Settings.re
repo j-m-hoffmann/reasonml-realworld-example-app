@@ -7,7 +7,6 @@ type state = {
 };
 
 type action =
-  | GoToProfile
   | SettingsFetched(state)
   | UpdateBio(string)
   | UpdateEmail(string)
@@ -39,8 +38,6 @@ let make = (~router, _children) => {
   initialState: () => {bio: "", email: "", image: "", name: "", password: ""},
   reducer: (action, state) =>
     switch (action) {
-    | GoToProfile =>
-      ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/profile")))
     | SettingsFetched(settings) => ReasonReact.Update(settings)
     | UpdateBio(bio) => ReasonReact.Update({...state, bio})
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
@@ -49,64 +46,39 @@ let make = (~router, _children) => {
     | UpdatePassword(password) => ReasonReact.Update({...state, password})
     | UpdateSettings =>
       ReasonReact.SideEffects(
-        (
-          self =>
-            Request.User.saveSettings(toJson(state), ~f=(_status, body) =>
-              body
-              |> Js.Promise.then_(result => {
-                   Js.log(result);
-                   self.send(GoToProfile);
-                   result |> Js.Promise.resolve;
-                 })
-              |> ignore
-            )
-            |> ignore
-        ),
+        _ =>
+          Request.User.saveSettings(
+            toJson(state),
+            ~f=json => {
+              Json.stringify(json)->Js.log;
+              DirectorRe.setRoute(router, "/profile");
+            },
+          )
+          |> ignore,
       )
     },
   didMount: self =>
-    Request.User.current(~f=(status, body) =>
-      body
-      |> Js.Promise.then_(result => {
-           if (status == 401) {
-             DirectorRe.setRoute(router, "/login");
-           } else {
-             /*TODO  check again*/
-             Response.getUserGraph(result)->User.fromJson(_).token
-             ->Some
-             ->Request.User.current(~token=_, ~f=(_status, body) =>
-                 body
-                 |> Js.Promise.then_(result => {
-                      let registered = Response.parseNewUser(result);
+    switch (LocalStorage.getToken()) {
+    | Some(_) as token =>
+      Request.User.current(
+        ~token,
+        ~f=json => {
+          let registered = Response.parseNewUser(json);
 
-                      self.send(
-                        SettingsFetched({
-                          bio:
-                            Belt.Option.getWithDefault(
-                              registered.user.bio,
-                              "",
-                            ),
-                          email: registered.user.email,
-                          image:
-                            Belt.Option.getWithDefault(
-                              registered.user.image,
-                              "",
-                            ),
-                          name: registered.user.username,
-                          password: "",
-                        }),
-                      );
-
-                      registered.user |> Js.Promise.resolve;
-                    })
-               )
-             |> ignore;
-           };
-           result |> Js.Promise.resolve;
-         })
-    )
-    |> ignore,
-
+          self.send(
+            SettingsFetched({
+              bio: Belt.Option.getWithDefault(registered.user.bio, ""),
+              email: registered.user.email,
+              image: Belt.Option.getWithDefault(registered.user.image, ""),
+              name: registered.user.username,
+              password: "",
+            }),
+          );
+        },
+      )
+      |> ignore
+    | None => DirectorRe.setRoute(router, "/login")
+    },
   render: ({state, send}) =>
     <div className="settings-page">
       <div className="container page">
@@ -123,11 +95,10 @@ let make = (~router, _children) => {
                     type_="text"
                     placeholder="URL of profile picture"
                     value={state.image}
-                    onChange={
-                      event =>
-                        send(
-                          UpdateImage(ReactEvent.Form.target(event)##value),
-                        )
+                    onChange={event =>
+                      send(
+                        UpdateImage(ReactEvent.Form.target(event)##value),
+                      )
                     }
                   />
                 </fieldset>
@@ -137,11 +108,8 @@ let make = (~router, _children) => {
                     type_="text"
                     placeholder="Your Name"
                     value={state.name}
-                    onChange={
-                      event =>
-                        send(
-                          UpdateName(ReactEvent.Form.target(event)##value),
-                        )
+                    onChange={event =>
+                      send(UpdateName(ReactEvent.Form.target(event)##value))
                     }
                   />
                 </fieldset>
@@ -151,11 +119,8 @@ let make = (~router, _children) => {
                     rows=8
                     placeholder="Short bio about you"
                     value={state.bio}
-                    onChange={
-                      event =>
-                        send(
-                          UpdateBio(ReactEvent.Form.target(event)##value),
-                        )
+                    onChange={event =>
+                      send(UpdateBio(ReactEvent.Form.target(event)##value))
                     }
                   />
                 </fieldset>
@@ -165,11 +130,10 @@ let make = (~router, _children) => {
                     type_="text"
                     placeholder="Email"
                     value={state.email}
-                    onChange={
-                      event =>
-                        send(
-                          UpdateEmail(ReactEvent.Form.target(event)##value),
-                        )
+                    onChange={event =>
+                      send(
+                        UpdateEmail(ReactEvent.Form.target(event)##value),
+                      )
                     }
                   />
                 </fieldset>
@@ -179,24 +143,19 @@ let make = (~router, _children) => {
                     type_="password"
                     placeholder="Password"
                     value={state.password}
-                    onChange={
-                      event =>
-                        send(
-                          UpdatePassword(
-                            ReactEvent.Form.target(event)##value,
-                          ),
-                        )
+                    onChange={event =>
+                      send(
+                        UpdatePassword(ReactEvent.Form.target(event)##value),
+                      )
                     }
                   />
                 </fieldset>
                 <button
                   className="btn btn-lg btn-primary pull-xs-right"
-                  onClick={
-                    event => {
-                      event->ReactEvent.Mouse.preventDefault;
-                      send(UpdateSettings);
-                    }
-                  }>
+                  onClick={event => {
+                    event->ReactEvent.Mouse.preventDefault;
+                    send(UpdateSettings);
+                  }}>
                   {ReasonReact.string("Update Settings")}
                 </button>
               </fieldset>
