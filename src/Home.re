@@ -24,18 +24,33 @@ type state = {
   tags: array(string),
 };
 
+let applyAsync = (action_, _state, body) =>
+  Js.Promise.(
+    body
+    |> then_(result =>
+         Js.Json.parseExn(result)->ArticleList.fromJson->action_->resolve
+       )
+  );
+
 let populateGlobalFeed = (self, page) =>
   /* Get the right page if there are more than 10 articles */
-  Request.Article.all(~page, ~f=json =>
-    self.ReasonReact.send(ArticlesFetched(ArticleList.fromJson(json)))
+  Request.Article.all(
+    ~page,
+    ~f=
+      applyAsync(articleList =>
+        self.ReasonReact.send(ArticlesFetched(articleList))
+      ),
   )
   |> ignore;
 
 /*TODO into reducer */
 let showMyFeed = (event, self) => {
   event->ReactEvent.Mouse.preventDefault;
-  Request.Article.feed(~f=json =>
-    self.ReasonReact.send(MyArticlesFetched(ArticleList.fromJson(json)))
+  Request.Article.feed(
+    ~f=
+      applyAsync(articleList =>
+        self.ReasonReact.send(MyArticlesFetched(articleList))
+      ),
   )
   |> ignore;
   self.ReasonReact.send(ShowMyFeed);
@@ -77,10 +92,11 @@ let mapWIU = Belt.Array.mapWithIndexU;
 
 let renderTag = (self, index, tag) =>
   <a
-    onClick={event =>
-      self.ReasonReact.send(
-        ShowTagList(ReactEvent.Mouse.target(event)##innerText),
-      )
+    onClick={
+      event =>
+        self.ReasonReact.send(
+          ShowTagList(ReactEvent.Mouse.target(event)##innerText),
+        )
     }
     href="#"
     key={string_of_int(index)}
@@ -138,8 +154,8 @@ let renderArticle =
         </div>
         <button
           className="btn btn-outline-primary btn-sm pull-xs-right"
-          onClick={_event =>
-            send(FavoriteArticle(article.slug, article.favorited))
+          onClick={
+            _event => send(FavoriteArticle(article.slug, article.favorited))
           }>
           <i className="ion-heart" />
           {ReasonReact.string(string_of_int(article.favoritesCount))}
@@ -153,14 +169,16 @@ let renderArticle =
         <p> {ReasonReact.string(article.description)} </p>
         <span> {ReasonReact.string("Read more...")} </span>
         <ul className="tag-list">
-          {mapWIU(article.tagList, (. i, tag) =>
-             <li
-               className="tag-default tag-pill tag-outline"
-               key={string_of_int(i)}>
-               {ReasonReact.string(tag)}
-             </li>
-           )
-           ->ReasonReact.array}
+          {
+            mapWIU(article.tagList, (. i, tag) =>
+              <li
+                className="tag-default tag-pill tag-outline"
+                key={string_of_int(i)}>
+                {ReasonReact.string(tag)}
+              </li>
+            )
+            ->ReasonReact.array
+          }
         </ul>
       </a>
     </div>
@@ -236,31 +254,52 @@ let make = (~articleCallback, ~router, _children) => {
           globalfeedActiveClass: "nav-link disabled",
           tagFeedActiveClass: "nav-link active",
         },
-        self =>
-          Request.Article.byTag(currentTagName, ~f=json =>
-            self.send(TagArticlesFetched(ArticleList.fromJson(json)))
-          )
-          |> ignore,
+        (
+          self =>
+            Request.Article.byTag(
+              currentTagName,
+              ~f=
+                applyAsync(articleList =>
+                  self.send(TagArticlesFetched(articleList))
+                ),
+            )
+            |> ignore
+        ),
       )
     | FavoriteArticle(slug, isCurrentlyFav) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, articles: updateFavoritedCount(state.articles, slug)},
-        _self =>
-          isCurrentlyFav ?
-            Request.Article.unfavorite(slug) |> ignore :
-            Request.Article.favorite(slug) |> ignore,
+        (
+          _self =>
+            isCurrentlyFav ?
+              Request.Article.unfavorite(slug) |> ignore :
+              Request.Article.favorite(slug) |> ignore
+        ),
       )
     | ArticlesByPage(page) =>
       ReasonReact.SideEffects(
-        self =>
-          Request.Article.all(~page, ~f=json =>
-            self.send(ArticlesFetched(ArticleList.fromJson(json)))
-          )
-          |> ignore,
+        (
+          self =>
+            Request.Article.all(
+              ~page,
+              ~f=
+                applyAsync(articleList =>
+                  self.send(ArticlesFetched(articleList))
+                ),
+            )
+            |> ignore
+        ),
       )
     },
   didMount: self => {
-    Request.Tags.all(~f=json => self.send(TagsFetched(Tags.fromJson(json))))
+    Request.Tags.all(~f=(_status, body) =>
+      body
+      |> Js.Promise.then_(result => {
+           let json = Js.Json.parseExn(result);
+           let tags = Json.Decode.(json |> field("tags", array(string)));
+           self.send(TagsFetched(tags)) |> Js.Promise.resolve;
+         })
+    )
     |> ignore;
     populateGlobalFeed(self, 0);
   },
@@ -303,43 +342,49 @@ let make = (~articleCallback, ~router, _children) => {
             </div>
             /*TODO this renders 3 times the same thing check again later*/
             <div style={state.myFeedDisplay}>
-              {mapWIU(state.articles, (. i, article) =>
-                 renderArticle(
-                   self,
-                   handle,
-                   router,
-                   articleCallback,
-                   i,
-                   article,
-                 )
-               )
-               ->ReasonReact.array}
+              {
+                mapWIU(state.articles, (. i, article) =>
+                  renderArticle(
+                    self,
+                    handle,
+                    router,
+                    articleCallback,
+                    i,
+                    article,
+                  )
+                )
+                ->ReasonReact.array
+              }
             </div>
             <div style={state.globalFeedDisplay}>
-              {mapWIU(state.articles, (. i, article) =>
-                 renderArticle(
-                   self,
-                   handle,
-                   router,
-                   articleCallback,
-                   i,
-                   article,
-                 )
-               )
-               ->ReasonReact.array}
+              {
+                mapWIU(state.articles, (. i, article) =>
+                  renderArticle(
+                    self,
+                    handle,
+                    router,
+                    articleCallback,
+                    i,
+                    article,
+                  )
+                )
+                ->ReasonReact.array
+              }
             </div>
             <div style={state.tagFeedDisplay}>
-              {mapWIU(state.articles, (. i, article) =>
-                 renderArticle(
-                   self,
-                   handle,
-                   router,
-                   articleCallback,
-                   i,
-                   article,
-                 )
-               )
-               ->ReasonReact.array}
+              {
+                mapWIU(state.articles, (. i, article) =>
+                  renderArticle(
+                    self,
+                    handle,
+                    router,
+                    articleCallback,
+                    i,
+                    article,
+                  )
+                )
+                ->ReasonReact.array
+              }
             </div>
             <div>
               <nav>
@@ -353,8 +398,10 @@ let make = (~articleCallback, ~router, _children) => {
             <div className="sidebar">
               <p> {ReasonReact.string("Popular Tags")} </p>
               <div className="tag-list">
-                {mapWIU(state.tags, (. i, tag) => renderTag(self, i, tag))
-                 ->ReasonReact.array}
+                {
+                  mapWIU(state.tags, (. i, tag) => renderTag(self, i, tag))
+                  ->ReasonReact.array
+                }
               </div>
             </div>
           </div>
