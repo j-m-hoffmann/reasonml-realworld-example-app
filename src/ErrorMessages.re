@@ -16,8 +16,7 @@ let make = (~errors, _children) => {
   render: _self =>
     <ul className="error-messages">
       Belt.(
-        List.keep(errors, errorMessage => String.length(errorMessage) > 0)
-        ->List.toArray
+        Array.keep(errors, errorMessage => String.length(errorMessage) > 0)
         ->Array.mapWithIndex((i, errorMessage) =>
             <li key={string_of_int(i)}>
               {ReasonReact.string(errorMessage)}

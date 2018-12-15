@@ -17,22 +17,20 @@ module Errors = {
   /*| (None, None, None) => []*/
   /*};*/
 
-  let toList = errorJson => {
-    let decodedJson = Js.Json.decodeObject(errorJson);
-    switch (decodedJson) {
-    | Some(errorList) =>
-      let errorKeys = Js.Dict.keys(errorList);
-      let errorValues = Js.Dict.values(errorList);
-      Array.mapi(
-        (acc, errorField) => {
-          let validationError = errorValues[acc];
+  let toArray = json => {
+    switch (Js.Json.decodeObject(json)) {
+    | Some(errors) =>
+      let errorKeys = Js.Dict.keys(errors);
+      let errorValues = Js.Dict.values(errors);
+      Belt.Array.mapWithIndex(
+        errorKeys,
+        (i, errorField) => {
+          let validationError = errorValues[i];
           let frontCaps = String.capitalize(errorField);
           {j|$frontCaps $validationError|j};
         },
-        errorKeys,
-      )
-      |> Array.to_list;
-    | None => []
+      );
+    | None => [||]
     };
   };
 };

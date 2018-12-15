@@ -1,6 +1,6 @@
 type state = {
   email: string,
-  errorList: list(string),
+  errors: array(string),
   registrationFailed: bool,
   password: string,
   username: string,
@@ -9,7 +9,7 @@ type state = {
 type action =
   | GoToLogin
   | SignUp
-  | SignUpFailed(list(string))
+  | SignUpFailed(array(string))
   | SignUpSuccessful(AuthResponse.User.t)
   | UpdateEmail(string)
   | UpdateName(string)
@@ -35,7 +35,7 @@ let make = (~router, _children) => {
   ...component,
   initialState: () => {
     email: "",
-    errorList: [],
+    errors: [||],
     registrationFailed: false,
     password: "",
     username: "",
@@ -51,15 +51,14 @@ let make = (~router, _children) => {
             AuthResponse.(
               switch (checkForErrors(json)) {
               | None => self.send(SignUpSuccessful(User.fromJson(json)))
-              | Some(errors) =>
-                self.send(SignUpFailed(Errors.toList(errors)))
+              | Some(e) => self.send(SignUpFailed(Errors.toArray(e)))
               }
             )
           )
           |> ignore,
       )
-    | SignUpFailed(errorList) =>
-      ReasonReact.Update({...state, registrationFailed: true, errorList})
+    | SignUpFailed(errors) =>
+      ReasonReact.Update({...state, registrationFailed: true, errors})
     | SignUpSuccessful(user) =>
       ReasonReact.SideEffects(
         _ => {
@@ -92,7 +91,7 @@ let make = (~router, _children) => {
               </a>
             </p>
             {if (state.registrationFailed) {
-               <ErrorMessages errors={state.errorList} />;
+               <ErrorMessages errors={state.errors} />;
              } else {
                ReasonReact.null;
              }}

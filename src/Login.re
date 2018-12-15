@@ -2,14 +2,14 @@ type state = {
   email: string,
   password: string,
   loginFailed: bool,
-  errorList: list(string),
+  errors: array(string),
 };
 
 type action =
   | GoToRegister
   | LogIn
   | LoginSuccessful(AuthResponse.User.t)
-  | LoginFailed(list(string))
+  | LoginFailed(array(string))
   | UpdateEmail(string)
   | UpdatePassword(string);
 /*| LoginPending;*/
@@ -35,7 +35,7 @@ let make = (~router, _children) => {
     email: "",
     password: "",
     loginFailed: false,
-    errorList: [],
+    errors: [||],
   },
   reducer: (action, state) =>
     switch (action) {
@@ -48,8 +48,7 @@ let make = (~router, _children) => {
             AuthResponse.(
               switch (checkForErrors(json)) {
               | None => self.send(LoginSuccessful(User.fromJson(json)))
-              | Some(errors) =>
-                self.send(LoginFailed(Errors.toList(errors)))
+              | Some(e) => self.send(LoginFailed(Errors.toArray(e)))
               }
             )
           )
@@ -64,8 +63,8 @@ let make = (~router, _children) => {
           DirectorRe.setRoute(router, "/home");
         },
       )
-    | LoginFailed(errorList) =>
-      ReasonReact.Update({...state, errorList, loginFailed: true})
+    | LoginFailed(errors) =>
+      ReasonReact.Update({...state, errors, loginFailed: true})
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
     | UpdatePassword(password) => ReasonReact.Update({...state, password})
     /*| LoginPending => ReasonReact.NoUpdate*/
@@ -89,7 +88,7 @@ let make = (~router, _children) => {
               </a>
             </p>
             {if (state.loginFailed) {
-               <ErrorMessages errors={state.errorList} />;
+               <ErrorMessages errors={state.errors} />;
              } else {
                ReasonReact.null;
              }}
