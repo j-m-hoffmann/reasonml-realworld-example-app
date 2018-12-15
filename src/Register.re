@@ -1,7 +1,7 @@
 type state = {
   email: string,
   errorList: list(string),
-  validationFailed: bool,
+  registrationFailed: bool,
   password: string,
   username: string,
 };
@@ -36,7 +36,7 @@ let make = (~router, _children) => {
   initialState: () => {
     email: "",
     errorList: [],
-    validationFailed: false,
+    registrationFailed: false,
     password: "",
     username: "",
   },
@@ -64,7 +64,7 @@ let make = (~router, _children) => {
         ),
       )
     | SignUpFailed(errorList) =>
-      ReasonReact.Update({...state, validationFailed: true, errorList})
+      ReasonReact.Update({...state, registrationFailed: true, errorList})
     | SignUpSuccessful =>
       ReasonReact.SideEffects((_ => DirectorRe.setRoute(router, "/home")))
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
@@ -92,13 +92,11 @@ let make = (~router, _children) => {
                 {ReasonReact.string("Have an account?")}
               </a>
             </p>
-            {
-              if (state.validationFailed) {
-                <ErrorMessages errors={state.errorList} />;
-              } else {
-                ReasonReact.null;
-              }
-            }
+            {if (state.registrationFailed) {
+               <ErrorMessages errors={state.errorList} />;
+             } else {
+               ReasonReact.null;
+             }}
             <form>
               <fieldset className="form-group">
                 <input
