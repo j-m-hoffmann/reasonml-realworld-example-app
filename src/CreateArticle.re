@@ -32,18 +32,13 @@ let make = (~router, _children) => {
     switch (action) {
     | SubmitArticle =>
       ReasonReact.SideEffects(
-        (
-          _self => {
-            Request.Article.submit(toJson(state), ~f=(_status, body) =>
-              body
-              |> Js.Promise.then_(result =>
-                   Js.log(result) |> Js.Promise.resolve
-                 )
-            )
-            |> ignore;
-            DirectorRe.setRoute(router, "/home");
-          }
-        ),
+        _self => {
+          Request.Article.submit(toJson(state), ~f=json =>
+            Json.stringify(json)->Js.log
+          )
+          |> ignore;
+          DirectorRe.setRoute(router, "/home");
+        },
       )
     | UpdateTitle(title) => ReasonReact.Update({...state, title})
     | UpdateDescription(description) =>
@@ -64,11 +59,10 @@ let make = (~router, _children) => {
                     className="form-control form-control-lg"
                     placeholder="Article Title"
                     value={state.title}
-                    onChange={
-                      event =>
-                        send(
-                          UpdateTitle(ReactEvent.Form.target(event)##value),
-                        )
+                    onChange={event =>
+                      send(
+                        UpdateTitle(ReactEvent.Form.target(event)##value),
+                      )
                     }
                   />
                 </fieldset>
@@ -78,13 +72,12 @@ let make = (~router, _children) => {
                     className="form-control"
                     placeholder="What's this article about?"
                     value={state.description}
-                    onChange={
-                      event =>
-                        send(
-                          UpdateDescription(
-                            ReactEvent.Form.target(event)##value,
-                          ),
-                        )
+                    onChange={event =>
+                      send(
+                        UpdateDescription(
+                          ReactEvent.Form.target(event)##value,
+                        ),
+                      )
                     }
                   />
                 </fieldset>
@@ -94,11 +87,8 @@ let make = (~router, _children) => {
                     rows=8
                     placeholder="Write your article (in markdown)"
                     value={state.body}
-                    onChange={
-                      event =>
-                        send(
-                          UpdateBody(ReactEvent.Form.target(event)##value),
-                        )
+                    onChange={event =>
+                      send(UpdateBody(ReactEvent.Form.target(event)##value))
                     }
                   />
                 </fieldset>
@@ -108,11 +98,8 @@ let make = (~router, _children) => {
                     className="form-control"
                     placeholder="Enter tags"
                     value={state.tags}
-                    onChange={
-                      event =>
-                        send(
-                          UpdateTags(ReactEvent.Form.target(event)##value),
-                        )
+                    onChange={event =>
+                      send(UpdateTags(ReactEvent.Form.target(event)##value))
                     }
                   />
                   <div className="tag-list" />
@@ -120,12 +107,10 @@ let make = (~router, _children) => {
                 <button
                   className="btn btn-lg pull-xs-right btn-primary"
                   type_="button"
-                  onClick={
-                    event => {
-                      event->ReactEvent.Mouse.preventDefault;
-                      send(SubmitArticle);
-                    }
-                  }>
+                  onClick={event => {
+                    event->ReactEvent.Mouse.preventDefault;
+                    send(SubmitArticle);
+                  }}>
                   {ReasonReact.string("Publish Article")}
                 </button>
               </fieldset>
