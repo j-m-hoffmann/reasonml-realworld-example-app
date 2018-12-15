@@ -10,7 +10,7 @@ type action =
   | GoToLogin
   | SignUp
   | SignUpFailed(list(string))
-  | SignUpSuccessful(User.t)
+  | SignUpSuccessful(AuthResponse.User.t)
   | UpdateEmail(string)
   | UpdateName(string)
   | UpdatePassword(string);

@@ -8,7 +8,7 @@ type state = {
 type action =
   | GoToRegister
   | LogIn
-  | LoginSuccessful(User.t)
+  | LoginSuccessful(AuthResponse.User.t)
   | LoginFailed(list(string))
   | UpdateEmail(string)
   | UpdatePassword(string);
