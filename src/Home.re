@@ -24,14 +24,6 @@ type state = {
   tags: array(string),
 };
 
-let applyAsync = (action_, _state, body) =>
-  Js.Promise.(
-    body
-    |> then_(result =>
-         Js.Json.parseExn(result)->ArticleList.fromJson->action_->resolve
-       )
-  );
-
 let populateGlobalFeed = (self, page) =>
   /* Get the right page if there are more than 10 articles */
   Request.Article.all(
