@@ -44,19 +44,14 @@ let clickMyFavorites = (event, {ReasonReact.state, send}) => {
 };
 
 /* side effect */
-let reduceByAuthArticles = (self, _status, body) =>
-  body
-  |> Js.Promise.then_(result => {
-       let articleList = Js.Json.parseExn(result)->ArticleList.fromJson;
-
-       switch (articleList.articlesCount) {
-       | count when count > 0 =>
-         self.ReasonReact.send(MyArticles(articleList.articles))
-       | _ => self.ReasonReact.send(NoData)
-       };
-
-       result |> Js.Promise.resolve;
-     });
+let reduceByAuthArticles = (self, json) => {
+  let articleList = ArticleList.fromJson(json);
+  switch (articleList.articlesCount) {
+  | count when count > 0 =>
+    self.ReasonReact.send(MyArticles(articleList.articles))
+  | _ => self.ReasonReact.send(NoData)
+  };
+};
 
 /* These functions were copied from  */
 let goToArticle = (router, articleCallback, article, event, _self) => {
