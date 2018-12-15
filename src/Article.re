@@ -25,6 +25,15 @@ let fromJson = json =>
     author: json |> field("author", Author.fromJson),
   };
 
+module CommentList = {
+  type t = {comments: list(Comment.t)};
+
+  let fromJson = json =>
+    Json.Decode.{
+      comments: json |> field("comments", list(Comment.fromJson)),
+    };
+};
+
 let empty = {
   slug: "",
   title: "",
@@ -37,8 +46,6 @@ let empty = {
   favoritesCount: 0,
   author: Author.none,
 };
-
-type commentList = {comments: list(Comment.t)};
 
 type state = {
   slug: string,
@@ -100,18 +107,8 @@ let make = (~article, _children) => {
       )
     },
   didMount: self =>
-    Request.Article.comments(self.state.slug, ~f=(_status, body) =>
-      body
-      |> Js.Promise.then_(response => {
-           let commentList =
-             Json.Decode.{
-               comments:
-                 Js.Json.parseExn(response)
-                 |> field("comments", list(Comment.fromJson)),
-             };
-           self.send(CommentsFetched(commentList.comments))
-           |> Js.Promise.resolve;
-         })
+    Request.Article.comments(self.state.slug, ~f=json =>
+      self.send(CommentsFetched(CommentList.fromJson(json).comments))
     )
     |> ignore,
   render: ({state, send, handle}) =>
