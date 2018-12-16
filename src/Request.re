@@ -28,7 +28,7 @@ let handle = (data, ~method_, ~url, ~token, ~f) => {
          (
            switch (Json.parse(body)) {
            | Some(json) => f(json)
-           | None => Js.Console.error("Error parsing JSON")
+           | None => Js.Console.error("Error parsing JSON in Request.handle")
            }
          )
          |> resolve
