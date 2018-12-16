@@ -25,9 +25,9 @@ module Errors = {
       Belt.Array.mapWithIndex(
         errorKeys,
         (i, errorField) => {
-          let validationError = errorValues[i];
+          let validationError = errorValues[i]->Json.stringify;
           let frontCaps = String.capitalize(errorField);
-          {j|$frontCaps $validationError|j};
+          frontCaps ++ " " ++ validationError;
         },
       );
     | None => [||]
