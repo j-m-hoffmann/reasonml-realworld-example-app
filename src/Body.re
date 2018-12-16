@@ -6,6 +6,7 @@ type state = {
 };
 
 type action =
+  | LogOut
   | SetCurrentArticle(Article.t)
   | SetToken(option(string));
 
@@ -17,6 +18,14 @@ let make = (~route, ~router, _children) => {
   initialState: () => {currentArticle: Article.empty, token: None},
   reducer: (action, state) =>
     switch (action) {
+    | LogOut =>
+      ReasonReact.UpdateWithSideEffects(
+        {...state, token: None},
+        _ => {
+          LocalStorage.clear();
+          DirectorRe.setRoute(router, "/home");
+        },
+      )
     | SetCurrentArticle(currentArticle) =>
       ReasonReact.Update({...state, currentArticle})
     | SetToken(token) => ReasonReact.Update({...state, token})
@@ -35,7 +44,7 @@ let make = (~route, ~router, _children) => {
        | Profile =>
          <Profile articleCallback={a => send(SetCurrentArticle(a))} router />
        | Register => <Register logIn={t => send(SetToken(t))} router />
-       | Settings => <Settings router />
+       | Settings => <Settings logOut={_ => send(LogOut)} router />
        }}
       <Footer />
     </div>,

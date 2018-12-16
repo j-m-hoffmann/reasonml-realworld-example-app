@@ -1,5 +1,7 @@
 open Dom.Storage;
 
+let clear = () => clear(localStorage);
+
 let bio = () => getItem("bio", localStorage)->Belt.Option.getWithDefault("");
 
 let image = () =>

@@ -7,6 +7,7 @@ type state = {
 };
 
 type action =
+  | LogOut
   | SettingsFetched(state)
   | UpdateBio(string)
   | UpdateEmail(string)
@@ -33,11 +34,12 @@ let toJson = settings =>
 
 let component = ReasonReact.reducerComponent("Settings");
 
-let make = (~router, _children) => {
+let make = (~logOut, ~router, _children) => {
   ...component,
   initialState: () => {bio: "", email: "", image: "", name: "", password: ""},
   reducer: (action, state) =>
     switch (action) {
+    | LogOut => ReasonReact.SideEffects(_ => logOut())
     | SettingsFetched(settings) => ReasonReact.Update(settings)
     | UpdateBio(bio) => ReasonReact.Update({...state, bio})
     | UpdateEmail(email) => ReasonReact.Update({...state, email})
@@ -157,6 +159,14 @@ let make = (~router, _children) => {
                     send(UpdateSettings);
                   }}>
                   {ReasonReact.string("Update Settings")}
+                </button>
+                <button
+                  className="btn btn-lg btn-secondary pull-xs-left"
+                  onClick={event => {
+                    event->ReactEvent.Mouse.preventDefault;
+                    send(LogOut);
+                  }}>
+                  {ReasonReact.string("Log Out")}
                 </button>
               </fieldset>
             </form>
