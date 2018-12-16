@@ -80,7 +80,7 @@ let checkForErrors = json =>
   Js.Json.decodeObject(json)
   |> Js.Option.andThen((. prop) => Js.Dict.get(prop, "errors"));
 
-let getUserGraph = json =>
+let user = json =>
   Js.Json.decodeObject(json)
   ->Js.Option.andThen((. prop) => Js.Dict.get(prop, "user"), _)
   ->Belt.Option.getWithDefault(Js.Json.parseExn({j|{}|j}));
