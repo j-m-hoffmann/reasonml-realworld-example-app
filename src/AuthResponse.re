@@ -93,3 +93,10 @@ let fromJson = json => {
   | _ => {user: User.empty, errors}
   };
 };
+
+let toResult = json => {
+  switch (checkForErrors(json)) {
+  | None => Belt.Result.Ok(user(json)->User.fromJson)
+  | Some(e) => Belt.Result.Error(Errors.toArray(e))
+  };
+};
