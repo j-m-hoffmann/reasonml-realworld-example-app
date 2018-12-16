@@ -32,15 +32,15 @@ let () =
     ExpectJs.(
       () => {
         test("should respond with an error", () => {
-          let newUser = parseNewUser(signUpErrors);
-          switch (newUser.errors) {
+          let authResponse = fromJson(signUpErrors);
+          switch (authResponse.errors) {
           | Some(_response) => pass
           | None => fail("Failed to find errors")
           };
         });
         test("should have an invalid email", () => {
-          let newUser = parseNewUser(signUpErrors);
-          switch (newUser.errors) {
+          let authResponse = fromJson(signUpErrors);
+          switch (authResponse.errors) {
           | Some(errorList) =>
             switch (errorList.email) {
             | Some(error) => expect(error[0]) |> toBe("is invalid")
@@ -50,8 +50,8 @@ let () =
           };
         });
         test("should have an error where the password is too short", () => {
-          let newUser = parseNewUser(signUpErrors);
-          switch (newUser.errors) {
+          let authResponse = fromJson(signUpErrors);
+          switch (authResponse.errors) {
           | Some(errorList) =>
             switch (errorList.password) {
             | Some(password) =>
@@ -63,12 +63,12 @@ let () =
           };
         });
         test("should have the correct username", () =>
-          expect(parseNewUser(authSuccess).user.username) |> toBe("bryant")
+          expect(fromJson(authSuccess).user.username) |> toBe("bryant")
         );
         test("should find and return errors", () =>
-          switch (checkForErrors(loginErrors)) {
-          | Some(_errors) => pass
-          | None => fail("Failed to find errors")
+          switch (toResult(loginErrors)) {
+          | Error(_) => pass
+          | Ok(_) => fail("Failed to find errors")
           }
         );
       }

@@ -63,14 +63,14 @@ let make = (~router, _children) => {
       Request.User.current(
         ~token,
         ~f=json => {
-          let registered = AuthResponse.parseNewUser(json);
+          let authResponse = AuthResponse.fromJson(json);
 
           self.send(
             SettingsFetched({
-              bio: Belt.Option.getWithDefault(registered.user.bio, ""),
-              email: registered.user.email,
-              image: Belt.Option.getWithDefault(registered.user.image, ""),
-              name: registered.user.username,
+              bio: Belt.Option.getWithDefault(authResponse.user.bio, ""),
+              email: authResponse.user.email,
+              image: Belt.Option.getWithDefault(authResponse.user.image, ""),
+              name: authResponse.user.username,
               password: "",
             }),
           );
