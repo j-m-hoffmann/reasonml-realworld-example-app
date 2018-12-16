@@ -89,7 +89,7 @@ let parseNewUser = json => {
   let errors =
     Json.Decode.(optional(field("errors", Errors.fromJson), json));
   switch (errors) {
-  | None => {user: User.fromJson(json), errors: None}
+  | None => {user: user(json)->User.fromJson, errors: None}
   | _ => {user: User.empty, errors}
   };
 };
