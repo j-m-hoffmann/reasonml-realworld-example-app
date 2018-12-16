@@ -2,12 +2,12 @@ open Jest;
 
 open AuthResponse;
 
-let errorsJson =
+let signUpErrors =
   Json.parseOrRaise(
     {j|{"errors":{"email":["is invalid"],"password":["is too short (minimum is 8 characters)"]}}|j},
   );
 
-let succesWithJson =
+let authSuccess =
   Json.parseOrRaise(
     {j|{
   "user":{
@@ -23,7 +23,7 @@ let succesWithJson =
 }|j},
   );
 
-let loginErrorResponse =
+let loginErrors =
   Json.parseOrRaise({j|{"errors":{"email or password":["is invalid"]}}|j});
 
 let () =
@@ -31,15 +31,15 @@ let () =
     "New user request",
     ExpectJs.(
       () => {
-        test("should respond with a decoded error", () => {
-          let newUser = parseNewUser(errorsJson);
+        test("should respond with an error", () => {
+          let newUser = parseNewUser(signUpErrors);
           switch (newUser.errors) {
-          | Some(_response) => expect(true) |> toBeTruthy
-          | None => expect(false) |> toBeTruthy
+          | Some(_response) => pass
+          | None => fail("Failed to find errors")
           };
         });
         test("should have an invalid email", () => {
-          let newUser = parseNewUser(errorsJson);
+          let newUser = parseNewUser(signUpErrors);
           switch (newUser.errors) {
           | Some(errorList) =>
             switch (errorList.email) {
@@ -50,7 +50,7 @@ let () =
           };
         });
         test("should have an error where the password is too short", () => {
-          let newUser = parseNewUser(errorsJson);
+          let newUser = parseNewUser(signUpErrors);
           switch (newUser.errors) {
           | Some(errorList) =>
             switch (errorList.password) {
@@ -63,16 +63,14 @@ let () =
           };
         });
         test("should have the correct username", () =>
-          expect(parseNewUser(succesWithJson).user.username)
-          |> toBe("bryant")
+          expect(parseNewUser(authSuccess).user.username) |> toBe("bryant")
         );
-        test("should return an error graph", () => {
-          let result = checkForErrors(loginErrorResponse);
-          switch (result) {
-          | Some(_errorList) => expect(true) |> toBe(true)
-          | None => expect(false) |> toBe(true)
-          };
-        });
+        test("should find and return errors", () =>
+          switch (checkForErrors(loginErrors)) {
+          | Some(_errors) => pass
+          | None => fail("Failed to find errors")
+          }
+        );
       }
     ),
   );
