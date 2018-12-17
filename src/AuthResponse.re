@@ -25,9 +25,9 @@ module Errors = {
       Belt.Array.mapWithIndex(
         errorKeys,
         (i, errorField) => {
-          let validationError = errorValues[i]->Json.stringify;
+          let validationError = errorValues[i];
           let frontCaps = String.capitalize(errorField);
-          frontCaps ++ " " ++ validationError;
+          {j|$frontCaps $validationError|j};
         },
       );
     | None => [||]
@@ -69,6 +69,11 @@ module Data = {
       updatedAt: json |> field("updatedAt", string),
       username: json |> field("username", string),
     };
+
+  let get = json =>
+    Js.Json.decodeObject(json)
+    ->Js.Option.andThen((. prop) => Js.Dict.get(prop, "user"), _)
+    ->Belt.Option.getWithDefault(Js.Json.parseExn({j|{}|j}));
 };
 
 type t = {
@@ -80,23 +85,18 @@ let checkForErrors = json =>
   Js.Json.decodeObject(json)
   |> Js.Option.andThen((. prop) => Js.Dict.get(prop, "errors"));
 
-let user = json =>
-  Js.Json.decodeObject(json)
-  ->Js.Option.andThen((. prop) => Js.Dict.get(prop, "user"), _)
-  ->Belt.Option.getWithDefault(Js.Json.parseExn({j|{}|j}));
-
 let fromJson = json => {
   let errors =
     Json.Decode.(optional(field("errors", Errors.fromJson), json));
   switch (errors) {
-  | None => {user: user(json)->Data.fromJson, errors: None}
+  | None => {user: Data.(get(json)->fromJson), errors: None}
   | _ => {user: Data.empty, errors}
   };
 };
 
 let toResult = json => {
   switch (checkForErrors(json)) {
-  | None => Belt.Result.Ok(user(json)->Data.fromJson)
+  | None => Belt.Result.Ok(Data.get(json)->Data.fromJson)
   | Some(e) => Belt.Result.Error(Errors.toArray(e))
   };
 };
