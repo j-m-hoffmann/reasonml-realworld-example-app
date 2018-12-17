@@ -62,21 +62,29 @@ let make = (~logOut, ~router, _children) => {
   didMount: self =>
     switch (LocalStorage.token()) {
     | Some(_) as token =>
-      Request.User.current(
-        ~token,
-        ~f=json => {
-          let authResponse = AuthResponse.fromJson(json);
-
+      Request.User.current(~token, ~f=json =>
+        switch (AuthResponse.fromJson(json)) {
+        | User(user) =>
           self.send(
             SettingsFetched({
-              bio: Belt.Option.getWithDefault(authResponse.user.bio, ""),
-              email: authResponse.user.email,
-              image: Belt.Option.getWithDefault(authResponse.user.image, ""),
-              name: authResponse.user.username,
+              bio: Belt.Option.getWithDefault(user.bio, ""),
+              email: user.email,
+              image: Belt.Option.getWithDefault(user.image, ""),
+              name: user.username,
               password: "",
             }),
-          );
-        },
+          )
+        | Errors(_) =>
+          self.send(
+            SettingsFetched({
+              bio: "Fetching settings failed",
+              email: "",
+              image: "",
+              name: "",
+              password: "",
+            }),
+          )
+        }
       )
       |> ignore
     | None => DirectorRe.setRoute(router, "/login")

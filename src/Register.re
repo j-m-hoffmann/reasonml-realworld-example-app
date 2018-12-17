@@ -48,10 +48,12 @@ let make = (~logIn, ~router, _children) => {
       ReasonReact.SideEffects(
         self =>
           Request.User.register(toJson(state), ~f=json =>
-            switch (AuthResponse.toResult(json)) {
-            | Ok(user) => self.send(SignUpSuccessful(user))
-            | Error(errors) => self.send(SignUpFailed(errors))
-            }
+            AuthResponse.(
+              switch (fromJson(json)) {
+              | User(user) => self.send(SignUpSuccessful(user))
+              | Errors(e) => self.send(SignUpFailed(Errors.toArray(e)))
+              }
+            )
           )
           |> ignore,
       )

@@ -16,11 +16,6 @@ module Errors = {
     Js.Json.decodeObject(json)
     |> Js.Option.andThen((. prop) => Js.Dict.get(prop, "errors"));
 
-  /*let toList = ({email, password, username}) =>*/
-  /*switch (email, password, username) {*/
-  /*| (None, None, None) => []*/
-  /*};*/
-
   let toArray = json => {
     switch (Js.Json.decodeObject(json)) {
     | Some(errors) =>
@@ -80,23 +75,13 @@ module Data = {
     ->Belt.Option.getWithDefault(Js.Json.parseExn({j|{}|j}));
 };
 
-type t = {
-  errors: option(Errors.t),
-  user: Data.t,
-};
+type t =
+  | User(Data.t)
+  | Errors(Js.Json.t);
 
 let fromJson = json => {
-  let errors =
-    Json.Decode.(optional(field("errors", Errors.fromJson), json));
-  switch (errors) {
-  | None => {user: Data.(get(json)->fromJson), errors: None}
-  | _ => {user: Data.empty, errors}
-  };
-};
-
-let toResult = json => {
   switch (Errors.get(json)) {
-  | None => Belt.Result.Ok(Data.get(json)->Data.fromJson)
-  | Some(e) => Belt.Result.Error(Errors.toArray(e))
+  | None => User(Data.(get(json)->fromJson))
+  | Some(e) => Errors(e)
   };
 };
