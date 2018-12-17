@@ -90,11 +90,8 @@ let make = (~logIn, ~router, _children) => {
                 {ReasonReact.string("Have an account?")}
               </a>
             </p>
-            {if (state.registrationFailed) {
-               <ErrorMessages errors={state.errors} />;
-             } else {
-               ReasonReact.null;
-             }}
+            {state.registrationFailed ?
+               <ErrorMessages errors={state.errors} /> : ReasonReact.null}
             <form>
               <fieldset className="form-group">
                 <input
