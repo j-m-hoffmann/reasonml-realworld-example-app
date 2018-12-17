@@ -74,10 +74,10 @@ let make = (~logOut, ~router, _children) => {
               password: "",
             }),
           )
-        | Errors(_) =>
+        | Errors(errors) =>
           self.send(
             SettingsFetched({
-              bio: "Fetching settings failed",
+              bio: Belt.Array.reduce(errors, "", (a, e) => a ++ " " ++ e),
               email: "",
               image: "",
               name: "",
