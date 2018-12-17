@@ -60,17 +60,19 @@ module Data = {
 
   let get = json =>
     Js.Json.decodeObject(json)
-    ->Js.Option.andThen((. prop) => Js.Dict.get(prop, "user"), _)
-    ->Belt.Option.getWithDefault(Js.Json.parseExn({j|{}|j}));
+    |> Js.Option.andThen((. prop) => Js.Dict.get(prop, "user"));
 };
 
 type t =
   | User(Data.t)
   | Errors(array(string));
 
-let fromJson = json => {
+let fromJson = json =>
   switch (Errors.get(json)) {
-  | None => User(Data.(get(json)->fromJson))
   | Some(e) => Errors(Errors.toArray(e))
+  | None =>
+    switch (Data.get(json)) {
+    | Some(d) => User(Data.fromJson(d))
+    | None => Errors([|"Received malformed userdata"|])
+    }
   };
-};
