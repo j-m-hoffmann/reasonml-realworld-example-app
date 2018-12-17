@@ -88,22 +88,20 @@ let make = (~article, _children) => {
         Belt.List.keep(state.commentList, comment => comment.id != id);
       ReasonReact.UpdateWithSideEffects(
         {...state, commentList: commentsWithout},
-        (
-          _self =>
-            Request.Article.deleteComment(~id, ~slug=state.slug) |> ignore
-        ),
+        _self =>
+          Request.Article.deleteComment(~id, ~slug=state.slug) |> ignore,
       );
     | CommentsFetched(commentList) =>
       ReasonReact.Update({...state, commentList})
     | FollowUser(name) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, isFollowing: true},
-        (_self => Request.User.follow(name) |> ignore),
+        _self => Request.User.follow(name) |> ignore,
       )
     | UnFollowUser(name) =>
       ReasonReact.UpdateWithSideEffects(
         {...state, isFollowing: false},
-        (_self => Request.User.unFollow(name) |> ignore),
+        _self => Request.User.unFollow(name) |> ignore,
       )
     },
   didMount: self =>
@@ -137,12 +135,10 @@ let make = (~article, _children) => {
               onClick={handle(followUser)}>
               <i className="ion-plus-round" />
               {ReasonReact.string(" ")}
-              {
-                ReasonReact.string(
-                  (state.isFollowing ? "unfollow " : "follow ")
-                  ++ article.author.username,
-                )
-              }
+              {ReasonReact.string(
+                 (state.isFollowing ? "unfollow " : "follow ")
+                 ++ article.author.username,
+               )}
               <span className="counter"> {ReasonReact.string("(10)")} </span>
             </button>
             {ReasonReact.string("  ")}
@@ -184,12 +180,10 @@ let make = (~article, _children) => {
               onClick={handle(followUser)}>
               <i className="ion-plus-round" />
               {ReasonReact.string(" ")}
-              {
-                ReasonReact.string(
-                  (state.isFollowing ? "unfollow " : "follow ")
-                  ++ article.author.username,
-                )
-              }
+              {ReasonReact.string(
+                 (state.isFollowing ? "unfollow " : "follow ")
+                 ++ article.author.username,
+               )}
               <span className="counter"> {ReasonReact.string("(0)")} </span>
             </button>
             {ReasonReact.string(" ")}
@@ -221,17 +215,15 @@ let make = (~article, _children) => {
                 </button>
               </div>
             </form>
-            {
-              Belt.List.toArray(state.commentList)
-              ->Belt.Array.mapWithIndex(_, (index, comment) =>
-                  <Comment
-                    comment
-                    index
-                    deleteComment={_ => send(DeleteComment(comment.id))}
-                  />
-                )
-              ->ReasonReact.array
-            }
+            {Belt.List.toArray(state.commentList)
+             ->Belt.Array.mapWithIndex(_, (index, comment) =>
+                 <Comment
+                   comment
+                   index
+                   deleteComment={_ => send(DeleteComment(comment.id))}
+                 />
+               )
+             ->ReasonReact.array}
           </div>
         </div>
       </div>
