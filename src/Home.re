@@ -24,6 +24,7 @@ type state = {
   tags: array(string),
 };
 
+/*TODO into reducer */
 let populateGlobalFeed = (self, page) =>
   /* Get the right page if there are more than 10 articles */
   Request.Article.all(~page, ~f=json =>
@@ -31,7 +32,6 @@ let populateGlobalFeed = (self, page) =>
   )
   |> ignore;
 
-/*TODO into reducer */
 let showMyFeed = (event, self) => {
   event->ReactEvent.Mouse.preventDefault;
   Request.Article.feed(~f=json =>
@@ -41,7 +41,6 @@ let showMyFeed = (event, self) => {
   self.ReasonReact.send(ShowMyFeed);
 };
 
-/*TODO into reducer */
 let showGlobalFeed = (event, self) => {
   event->ReactEvent.Mouse.preventDefault;
   populateGlobalFeed(self, 0);
@@ -59,6 +58,7 @@ let goToProfile = (router, event, {ReasonReact.state: _state}) => {
   event->ReactEvent.Mouse.preventDefault;
   DirectorRe.setRoute(router, "/profile");
 };
+/*TODO into reducer */
 
 let updateFavoritedCount = (articles, currentSlug) =>
   Belt.Array.map(articles, (article: Article.t) =>
@@ -75,6 +75,7 @@ let updateFavoritedCount = (articles, currentSlug) =>
 
 let mapWIU = Belt.Array.mapWithIndexU;
 
+/* TODO move into own component */
 let renderTag = (self, index, tag) =>
   <a
     onClick={event =>
@@ -165,6 +166,7 @@ let renderArticle =
       </a>
     </div>
   </div>;
+/* TODO move into own component */
 
 let component = ReasonReact.reducerComponent("Home");
 

@@ -59,7 +59,9 @@ let goToArticle = (router, articleCallback, article, event, _self) => {
   articleCallback(article);
   DirectorRe.setRoute(router, "/article");
 };
+/*TODO move into reducer*/
 
+/* TODO move into own component */
 let renderArticle =
     (handle, router, articleCallback, isFavorites, index, article: Article.t) =>
   <div key={string_of_int(index)} className="article-preview">
