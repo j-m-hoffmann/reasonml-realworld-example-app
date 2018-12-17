@@ -48,7 +48,7 @@ let make = (~logIn, ~router, _children) => {
             AuthResponse.(
               switch (fromJson(json)) {
               | User(user) => self.send(LoginSuccessful(user))
-              | Errors(e) => self.send(LoginFailed(Errors.toArray(e)))
+              | Errors(e) => self.send(LoginFailed(e))
               }
             )
           )

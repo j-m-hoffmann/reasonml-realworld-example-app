@@ -51,32 +51,22 @@ let () =
         );
         test("should have an invalid email", () =>
           switch (fromJson(signUpErrors)) {
-          | Errors(e) =>
-            let errors = Errors.fromJson(e);
-            switch (errors.email) {
-            | Some(error) => expect(error[0]) |> toBe("is invalid")
-            | None => fail("this has failed")
-            };
-          | User(_) => fail("this has failed")
+          | Errors(e) => expect(e[0]) |> toBe("Email is invalid")
+          | User(_) => fail("Failed to return errors")
           }
         );
         test("should have an error where the password is too short", () =>
           switch (fromJson(signUpErrors)) {
           | Errors(e) =>
-            let errors = Errors.fromJson(e);
-            switch (errors.password) {
-            | Some(password) =>
-              expect(password[0])
-              |> toBe("is too short (minimum is 8 characters)")
-            | None => fail("Failed to check password validation")
-            };
-          | User(_) => fail("Failed to return any errors")
+            expect(e[1])
+            |> toBe("Password is too short (minimum is 8 characters)")
+          | User(_) => fail("Failed to return errors")
           }
         );
         test("should have the correct username", () =>
           switch (fromJson(authSuccess)) {
           | User(u) => expect(u.username) |> toBe("bryant")
-          | Errors(_) => fail("Failed to return any errors")
+          | Errors(_) => fail("Failed to return errors")
           }
         );
       }

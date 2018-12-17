@@ -77,11 +77,11 @@ module Data = {
 
 type t =
   | User(Data.t)
-  | Errors(Js.Json.t);
+  | Errors(array(string));
 
 let fromJson = json => {
   switch (Errors.get(json)) {
   | None => User(Data.(get(json)->fromJson))
-  | Some(e) => Errors(e)
+  | Some(e) => Errors(Errors.toArray(e))
   };
 };
