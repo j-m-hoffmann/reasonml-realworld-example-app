@@ -36,11 +36,8 @@ let make = (~comment: t, ~index, ~deleteComment, _children) => {
           {ReasonReact.string(comment.author.username)}
         </a>
         <span className="date-posted">
-          {
-            ReasonReact.string(
-              Js.Date.fromString(comment.createdAt) |> Js.Date.toDateString,
-            )
-          }
+          Js.Date.(fromString(comment.createdAt)->toDateString)
+          ->ReasonReact.string
         </span>
         <span className="mod-options">
           <i className="ion-trash-a" onClick=deleteComment />

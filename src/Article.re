@@ -174,12 +174,8 @@ let make = (~article, _children) => {
                 {ReasonReact.string(article.author.username)}
               </a>
               <span className="date">
-                {
-                  ReasonReact.string(
-                    Js.Date.fromString(article.createdAt)
-                    |> Js.Date.toDateString,
-                  )
-                }
+                Js.Date.(fromString(article.createdAt)->toDateString)
+                ->ReasonReact.string
               </span>
             </div>
             <button
