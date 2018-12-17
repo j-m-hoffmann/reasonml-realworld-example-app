@@ -35,7 +35,7 @@ module Errors = {
   };
 };
 
-module User = {
+module Data = {
   type t = {
     bio: option(string),
     createdAt: string,
@@ -73,7 +73,7 @@ module User = {
 
 type t = {
   errors: option(Errors.t),
-  user: User.t,
+  user: Data.t,
 };
 
 let checkForErrors = json =>
@@ -89,14 +89,14 @@ let fromJson = json => {
   let errors =
     Json.Decode.(optional(field("errors", Errors.fromJson), json));
   switch (errors) {
-  | None => {user: user(json)->User.fromJson, errors: None}
-  | _ => {user: User.empty, errors}
+  | None => {user: user(json)->Data.fromJson, errors: None}
+  | _ => {user: Data.empty, errors}
   };
 };
 
 let toResult = json => {
   switch (checkForErrors(json)) {
-  | None => Belt.Result.Ok(user(json)->User.fromJson)
+  | None => Belt.Result.Ok(user(json)->Data.fromJson)
   | Some(e) => Belt.Result.Error(Errors.toArray(e))
   };
 };

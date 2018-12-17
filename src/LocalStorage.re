@@ -12,7 +12,7 @@ let token = () => getItem("jwt", localStorage);
 let username = () =>
   getItem("username", localStorage)->Belt.Option.getWithDefault("anonymous");
 
-let save = (user: AuthResponse.User.t) => {
+let save = (user: AuthResponse.Data.t) => {
   switch (user.bio) {
   | Some(bio) => setItem("bio", bio, localStorage)
   | None => ()
