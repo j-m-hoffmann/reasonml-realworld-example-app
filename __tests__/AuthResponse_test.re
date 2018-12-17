@@ -33,13 +33,13 @@ let () =
     "New user request",
     ExpectJs.(
       () => {
-        test("should find and return login errors", () =>
+        test("should return login errors", () =>
           switch (fromJson(loginErrors)) {
           | Errors(_) => pass
           | User(_) => fail("Failed to find login errors")
           }
         );
-        test("should find and return sign up errors", () =>
+        test("should return sign up errors", () =>
           switch (fromJson(signUpErrors)) {
           | Errors(_) => pass
           | User(_) => fail("Failed to find sign up errors")
@@ -51,13 +51,13 @@ let () =
           | Errors(_) => fail("errors present in successful authentication")
           }
         );
-        test("should have an invalid email", () =>
+        test("should have 'invalid email' error", () =>
           switch (fromJson(signUpErrors)) {
           | Errors(e) => expect(e[0]) |> toBe("Email is invalid")
           | User(_) => fail("Failed to return errors")
           }
         );
-        test("should have an error where the password is too short", () =>
+        test("should have 'password is too short' error", () =>
           switch (fromJson(signUpErrors)) {
           | Errors(e) =>
             expect(e[1])
@@ -71,7 +71,7 @@ let () =
           | Errors(_) => fail("Failed to return errors")
           }
         );
-        test("should have an invalid email", () =>
+        test("should have 'no data' error", () =>
           switch (fromJson(empty)) {
           | Errors(e) => expect(e[0]) |> toBe("No Data received")
           | User(_) => fail("Returned user even though input was empty")
