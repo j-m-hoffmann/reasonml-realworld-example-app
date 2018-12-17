@@ -46,17 +46,6 @@ module Data = {
     username: string,
   };
 
-  let empty = {
-    bio: None,
-    createdAt: "",
-    email: "",
-    id: 0,
-    image: None,
-    token: "",
-    updatedAt: "",
-    username: "",
-  };
-
   let fromJson = json =>
     Json.Decode.{
       bio: json |> optional(field("bio", string)),
