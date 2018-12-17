@@ -53,15 +53,23 @@ let () =
         );
         test("should have 'invalid email' error", () =>
           switch (fromJson(signUpErrors)) {
-          | Errors(e) => expect(e[0]) |> toBe("Email is invalid")
+          | Errors(errors) =>
+            expect(
+              Belt.Array.someU(errors, (. e) => e == "Email is invalid"),
+            )
+            |> toBe(true)
           | User(_) => fail("Failed to return errors")
           }
         );
         test("should have 'password is too short' error", () =>
           switch (fromJson(signUpErrors)) {
-          | Errors(e) =>
-            expect(e[1])
-            |> toBe("Password is too short (minimum is 8 characters)")
+          | Errors(errors) =>
+            expect(
+              Belt.Array.someU(errors, (. e) =>
+                e == "Password is too short (minimum is 8 characters)"
+              ),
+            )
+            |> toBe(true)
           | User(_) => fail("Failed to return errors")
           }
         );
@@ -73,7 +81,11 @@ let () =
         );
         test("should have 'no data' error", () =>
           switch (fromJson(empty)) {
-          | Errors(e) => expect(e[0]) |> toBe("No Data received")
+          | Errors(errors) =>
+            expect(
+              Belt.Array.someU(errors, (. e) => e == "No Data received"),
+            )
+            |> toBe(true)
           | User(_) => fail("Returned user even though input was empty")
           }
         );
