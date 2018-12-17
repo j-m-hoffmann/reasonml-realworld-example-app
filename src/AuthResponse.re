@@ -73,6 +73,6 @@ let fromJson = json =>
   | None =>
     switch (Data.get(json)) {
     | Some(d) => User(Data.fromJson(d))
-    | None => Errors([|"Received malformed userdata"|])
+    | None => Errors([|"No Data received"|])
     }
   };

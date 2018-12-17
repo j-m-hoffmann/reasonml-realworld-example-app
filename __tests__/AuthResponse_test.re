@@ -18,6 +18,8 @@ let authSuccess =
   }|j},
   );
 
+let empty = Json.parseOrRaise({j|{}|j});
+
 let loginErrors =
   Json.parseOrRaise({j|{"errors":{"email or password":["is invalid"]}}|j});
 
@@ -67,6 +69,12 @@ let () =
           switch (fromJson(authSuccess)) {
           | User(u) => expect(u.username) |> toBe("bryant")
           | Errors(_) => fail("Failed to return errors")
+          }
+        );
+        test("should have an invalid email", () =>
+          switch (fromJson(empty)) {
+          | Errors(e) => expect(e[0]) |> toBe("No Data received")
+          | User(_) => fail("Returned user even though input was empty")
           }
         );
       }
