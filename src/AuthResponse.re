@@ -12,6 +12,10 @@ module Errors = {
       username: json |> optional(field("username", array(string))),
     };
 
+  let get = json =>
+    Js.Json.decodeObject(json)
+    |> Js.Option.andThen((. prop) => Js.Dict.get(prop, "errors"));
+
   /*let toList = ({email, password, username}) =>*/
   /*switch (email, password, username) {*/
   /*| (None, None, None) => []*/
@@ -81,10 +85,6 @@ type t = {
   user: Data.t,
 };
 
-let checkForErrors = json =>
-  Js.Json.decodeObject(json)
-  |> Js.Option.andThen((. prop) => Js.Dict.get(prop, "errors"));
-
 let fromJson = json => {
   let errors =
     Json.Decode.(optional(field("errors", Errors.fromJson), json));
@@ -95,7 +95,7 @@ let fromJson = json => {
 };
 
 let toResult = json => {
-  switch (checkForErrors(json)) {
+  switch (Errors.get(json)) {
   | None => Belt.Result.Ok(Data.get(json)->Data.fromJson)
   | Some(e) => Belt.Result.Error(Errors.toArray(e))
   };
