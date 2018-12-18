@@ -90,7 +90,7 @@ let renderTag = (self, index, tag) =>
   </a>;
 
 let renderPager = ({send, ReasonReact.handle}, articlesCount) => {
-  let pageRanges = Belt.Array.makeBy(articlesCount / 10, i => i + 1);
+  let pageRanges = Belt.Array.range(1, articlesCount / 10);
   let reduceArticles = (currentPageNumber, event, _self) => {
     event->ReactEvent.Mouse.preventDefault;
     send(ArticlesByPage(currentPageNumber));
