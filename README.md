@@ -5,13 +5,15 @@
 ```sh
 npm install
 npm start
-# in another tab
+# in a second tab
 npm run webpack
+# in a third tab
+npm run server
 ```
 
-After you see the webpack compilation succeed (the `npm run webpack` step), open up `build/index.html` (**no server needed!**). Then modify whichever `.re` file in `src` and refresh the page to see the changes.
+**We need the server to make the app work!** Since icons, stylesheets and fonts are loaded from the web.
 
-**For more elaborate ReasonReact examples**, please see https://github.com/reasonml-community/reason-react-example
+**For other ReasonReact examples**, please see https://github.com/reasonml-community/reason-react-example
 
 ## Run Project with Server
 
@@ -32,4 +34,4 @@ This will replace the development artifact `build/Index.js` for an optimized ver
 
 If you make use of routing (via `ReasonReact.Router` or similar logic) ensure that server-side routing handles your routes or that 404's are directed back to `index.html` (which is how the dev server is set up).
 
-**To enable dead code elimination**, change `bsconfig.json`'s `package-specs` `module` from `"commonjs"` to `"es6"`. Then re-run the above 2 commands. This will allow Webpack to remove unused code.
+**To enable dead code elimination**, change `bsconfig.json`'s `package-specs` `module` from `"commonjs"` to `"es6"`. Then re-run the above 2 commands. This will allow Webpack to remove unused code. **Remember to switch back for further development** since Jest wont work with es6 modules.
