@@ -17,6 +17,9 @@ npm run server
 
 **For other ReasonReact examples**, please see https://github.com/reasonml-community/reason-react-example
 
+## To Do
+- Replace Director with the native Router
+- Loads of Cleanups
 ## Run Project with Server
 
 To run with the webpack development server run `npm run server` and view in the browser at http://localhost:8000. Running in this environment provides hot reloading and support for routing; just edit and save the file and the browser will automatically refresh.
